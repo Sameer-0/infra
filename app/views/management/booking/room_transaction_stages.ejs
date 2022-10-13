@@ -1,0 +1,343 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+
+    <%- include("../partials/roomSubMenu") %>
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>ROOM TRANSACTION STAGE List</h5>
+            </div>
+            <div>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-roomtransaction-stages-modal"><i class="fas fa-plus"></i></button>
+            
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row" id="roomTransactionStageTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+               
+                </thead>
+                <tbody>
+                    <% let count = 1%>
+                    <% roomTransactionStageList.map(list=>{%>
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- list.name %></td>
+                        <td><%- list.description %></td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-roomtransaction-stage"
+                                data-roomtransaction-stages-id="<%- list.rtsid %>"></i>
+                        </td>
+                      
+                    </tr>
+                    <%})%>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="add-roomtransaction-stages-modal" tabindex="-1"
+    aria-labelledby="add-roomtransaction-stages-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-roomtransaction-stages-title">ADD ROOM TRANSACTION STAGES</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="mb-3">
+                    <label for="roomName" class="form-label">Enter Room Transaction Stage</label>
+                    <input type="text" class="form-control" id="rtsName" placeholder="Enter Name">
+                    <input type="hidden" id="rtsId">
+                </div>
+
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Enter Description</label>
+                    <textarea class="form-control" id="description" placeholder="Enter Description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <span class="errorMsg"></span>
+                <button type="submit" class="btn createRoomTransactionStages modal-inputform-btn">Create</button>
+                <button type="submit" class="btn updateRoomTransactionStages modal-inputform-btn d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include('../partials/notification') %>
+<%- include('../partials/alert') %>
+<%- include("../partials/footer") %>
+<script>
+    $(document).ready(function () {
+
+        //Create 
+        $(".createRoomTransactionStages").on('click', function () {
+            $.ajax({
+                url: '/management/rooms/bookings/transaction-stages/create',
+                method: 'POST',
+                type: 'JSON',
+                data: {
+                    rtsName: $('#rtsName').val(),
+                    description: $('#description').val(),
+                },
+                success: data => {
+                    if (data.status == 200) {
+                       
+                 
+                        showExpressSuccess(data);
+                    } else {
+                        $(".errorMsg").html(data.message)
+                    }
+                },
+                error: err => {
+                    showExpressError(err.responseJSON);
+                }
+            })
+        })
+
+        //edit
+        $("#roomTransactionStageTable").on('click', '.edit-roomtransaction-stage', function () {
+            $(".createRoomTransactionStages").addClass('d-none')
+            $(".updateRoomTransactionStages").removeClass('d-none')
+            $("#add-roomtransaction-stages-title").html(`UPDATE ROOM TRANSACTION STAGES`)
+            $.ajax({
+                url: '/management/rooms/bookings/transaction-stages/findone',
+                method: 'POST',
+                type: 'JSON',
+                data: {
+                    Id: $(this).attr("data-roomtransaction-stages-id")
+                },
+                success: data => {
+                    let room = data.data
+                    $('#rtsId').val(room.rtsid),
+                        $('#rtsName').val(room.rtsName),
+                        $('#description').val(room.description),
+                        $("#add-roomtransaction-stages-modal").modal('show')
+                },
+                error: err => {
+                    showExpressError(err.responseJSON);
+                }
+            })
+        })
+
+
+        //Update 
+        $(".updateRoomTransactionStages").on('click', function () {
+            $.ajax({
+                url: '/management/rooms/bookings/transaction-stages/update',
+                method: 'POST',
+                type: 'JSON',
+                data: {
+                    rtsId: $("#rtsId").val(),
+                    rtsName: $('#rtsName').val(),
+                    description: $('#description').val(),
+                },
+                success: data => {
+                    if (data.status == 200) {
+                       
+                        showExpressSuccess(data);
+                    } else {
+                        $(".errorMsg").html(data.message)
+                    }
+
+                },
+                error: err => {
+                    showExpressError(err.responseJSON);
+                }
+            })
+        })
+
+
+        //Select All campus
+        $("#roomTransactionStageTable").on('click', '.selectAll-Room-Transaction', function () {
+            if (this.checked) {
+                // Iterate each checkbox
+                $('.delete-rootTransaction-stage:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('.delete-rootTransaction-stage:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+        })
+
+
+
+
+
+        //Delete Single and mutiple Delete
+        $('.select-delete-rootTransaction').on('click', function () {
+            let deleteids = []
+            $('.delete-rootTransaction-stage:checked').each(function () {
+                let obj = {
+                    id: $(this).attr("data-roomtransaction-stages-id"),
+                }
+                deleteids.push(obj)
+            })
+
+            if (deleteids.length > 0) {
+                console.log('deleteids::::::::::::::', deleteids)
+                let ApiObj = {
+                    url: '/management/rooms/bookings/transaction-stages/delete',
+                    type: 'POST',
+                    data: {
+                        Ids: JSON.stringify(deleteids)
+                    },
+                    dataType: 'JSON'
+                }
+                ajaxApi(ApiObj).then(result => {
+
+                    // notify();
+                    showExpressSuccess(result);
+                }).catch(error => {
+                    showExpressError(error.responseJSON)
+                })
+
+            } else {
+                alert('Select Fields')
+            }
+        })
+
+
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: '/management/rooms/bookings/transaction-stages/search',
+                data: {
+                    keyword: keyword
+                },
+                success: function (data) {
+                    let roomTypeStageList = data.data;
+
+                    let AjaxTable = `<table class="table custom_row" id="roomTransactionStageTable">
+                    <thead>
+                        <th>Sr No.</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                        <th>All <input type="checkbox" class="selectAll-Room-Transaction"></th>
+                    </thead>
+                    <tbody>`;
+
+                    if (roomTypeStageList.length > 0) {
+                        let count = 1;
+                        for (list of roomTypeStageList) {
+                            AjaxTable +=
+                                `<tr>
+                            <td>${count++}</td>
+                            <td>${list.name}</td>
+                            <td>${list.description}</td>
+                            <td>
+                                <i class="fas fa-edit text-dark cursor-pointer edit-roomtransaction-stage"
+                                    data-roomtransaction-stages-id="${list.rtsid}"></i>
+                            </td>
+                            <td>
+                            <input type="checkbox" data-roomtransaction-stages-id="${list.rtsid}"
+                                class="delete-rootTransaction-stage">
+                        </td>
+                        </tr>`
+                        }
+                    } else {
+                        AjaxTable +=
+                            ` <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>`;
+                    }
+                    AjaxTable += `<tbody></table>`
+                    $("#roomTransactionStageTable").html(AjaxTable);
+                }
+            })
+        }, 500));
+
+            function showExpressSuccess(errors) {
+
+                console.log('success',errors);
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : errors.message,
+                    message:"",
+                    type: 'alert-success',
+                    buttons: {
+                        positive:{
+                            text: "Okay",
+                            action: function(){
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                            }
+                        }
+                    }
+                }
+                simpleAlert.alert(obj);
+            }
+
+            function showExpressError(errors) {
+                
+                console.log('success<><><',errors);
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : "Error",
+                    message: errors.errors,
+                    express:'true',
+                    type: 'alert-danger',
+                    buttons: {
+                        positive:{
+                            text: "Okay",
+                            action: function(){
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                            }
+                        }
+                    }
+                }
+                simpleAlert.alert(obj);
+            }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

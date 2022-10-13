@@ -1,0 +1,813 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    <%- include("../partials/faculty-menu") %>
+    <div class="errorHtml"></div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Faculty Works</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger" href="/admin/faculties/works/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-facultywork-modal">
+                    <i class="fas fa-plus"></i></button>
+                <!-- <button class="btn ms-auto select-delete-facultywork add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-facultywork add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+       
+
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+           <table class="table custom_row table-bordered" id="facultyWorkTable">
+                <thead>
+                    <th>Sr.No</th>
+                    <th>Faculty</th>
+                    <th>Faculty Id</th>
+                    <th>Program</th>
+                    <th>Session</th>
+                    <th>Module</th>
+                    <th>Total Lecture per week</th>
+                    <th>Total Practical per week</th>
+                    <th>Total Tutorial per week</th>
+                    <th>Total Workshop per week</th>
+                    <th>Batch preference</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% let count  = 1%>
+                    <% for(let faculty of facultyWorkList) {%>
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- faculty.faculty_name %></td>
+                        <td><%- faculty.faculty_id %></td>
+                        <td><%- faculty.program_name %></td>
+                        <td><%- faculty.acad_session %></td>
+                        <td><%- faculty.module_name %></td>
+                        <td><%- faculty.lecture_per_week %></td>
+                        <td><%- faculty.practical_per_week %></td>
+                        <td><%- faculty.tutorial_per_week %></td>
+                        <td><%- faculty.workshop_per_week %></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" class="changeStatus" name="batch_preference" data-id="<%- faculty.id %>"
+                                    data-is-batch-preference="<%- faculty.is_batch_preference_set_status %>"
+                                    <%- faculty.is_batch_preference_set_status == 'Yes' ? 'Checked' :  ''  %>>
+                                <span class="switch-slider round"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <a class="edit-facultyWorks" data-id="<%- faculty.id %>" data-program-lid="<%-faculty.program_lid%>" data-session-lid="<%-faculty.session_lid %>" data-faculty-lid="<%- faculty.faculty_lid %>" data-program-session-lid="<%- faculty.program_session_lid %>" data-module-lid="<%- faculty.module_lid %>" data-lecture-per-week="<%- faculty.lecture_per_week%>" data-practical-per-week="<%-faculty.practical_per_week%>" data-tutorial-per-week="<%-faculty.tutorial_per_week%>" data-workshop-per-week="<%-faculty.workshop_per_week%>" data-is-batch-preference-set="<%-faculty.is_batch_preference_set %>"><span class="fa fa-edit"></span></a>
+                            <a class="delete-faculty-works" data-id="<%- faculty.id %>"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>
+                    <%}%>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--ADD Modal -->
+<div class="modal fade" id="add-facultywork-modal" tabindex="-1" aria-labelledby="add-facultywork-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-facultywork-modal-title">ADD FACULTY WORKS</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive ">
+                    <table class="table table-bordered" id="add-more-facultywork-table">
+                        <thead>
+                            <th width="15%">Faculty</th>
+                            <th width="15%">Program</th>
+                            <th width="15%">Session</th>
+                            <th width="15%">Module</th>
+                            <th width="10%">Total Lecture per week</th>
+                            <th width="10%">Total Practical per week</th>
+                            <th width="10%">Total Tutorial per week</th>
+                            <th width="10%">Total Workshop per week</th>
+                            <th >Action</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select class="select2 modalSelect2" name="faculty_lid" id="faculty_lid">
+                                        <option value="">--Select Faculty--</option>
+                                        <% for(faculty of facultyList) {%>
+                                        <option value="<%- faculty.id %>">
+                                            <%- faculty.faculty_name %>-<%- faculty.faculty_id %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="program_lid" id="program_lid">
+                                        <option value="">--Select Program--</option> 
+                                        <% for(program of programList) {%>
+                                        <option value="<%- program.id %>" data-program-id="<%- program.program_id%>"><%- program.program_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="session_lid" id="session_lid">       
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="module_lid" id="module_lid">
+                                        <!-- <option value="">--Select Module--</option>
+                                        <% for(course of courseWorkload) {%>
+                                        <option value="<%- course.id %>">
+                                            <%- course.module_name %>(<%- course.module_id %>)</option>
+                                        <%}%> -->
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="lecture_per_week" id="lecture_per_week" class="form-control">
+                                </td>
+                                <td>
+                                    <input type="number" name="practical_per_week" id="practical_per_week" class="form-control">
+                                </td>
+                                <td>
+                                    <input type="number" name="tutorial_per_week" id="tutorial_per_week" class="form-control">
+                                </td>
+                                <td><input type="number" name="workshop_per_week" id="workshop_per_week" class="form-control"></td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-facultyworkfield"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- <div class="errorHtml"></div> -->
+                <button type="button" class="btn btn-success  btn-sm" id="add-more-facultyworkfields"><i
+                        class="fas fa-plus"></i>
+                    Add More Fields</button>
+                <button type="submit" class="btn  createFacultyWorkLoad modal-inputform-btn">Create
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--EDIT Modal -->
+<div class="modal fade" id="edit-facultywork-modal" tabindex="-1" aria-labelledby="edit-facultywork-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content modal-inputform rounded-0">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="edit-facultywork-modal-title">UPDATE FACULTY WORKS</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Faculty Name</label>
+                        <input type="text" name="faculty_name" id="faculty_name" class="form-control" disabled>
+                        <input type="hidden" id="hidden_id">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Program Name</label>
+                        <input type="text" name="program_name" id="program_name" class="form-control" disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Academic Session</label>
+                        <input type="text" name="acad_session" id="acad_session" class="form-control" disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Module Name</label>
+                        <input type="text" name="module_name" id="module_name" class="form-control" disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Total Lecture per week</label>
+                        <input type="number" name="lecture_per_week" id="lecture_per_week" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Total Practical per week</label>
+                    <input type="number" name="practical_per_week" id="practical_per_week" class="form-control">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Total Tutorial per week</label>
+                        <input type="number" name="tutorial_per_week" id="tutorial_per_week" class="form-control">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Total Workshop per week</label>
+                        <input type="number" name="workshop_per_week" id="workshop_per_week" class="form-control">
+                    </div>
+                  </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn  updateFacultyWorkLoad modal-inputform-btn">Update </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<%- include("../partials/footer") %>
+<script
+src="https://cdn.rawgit.com/botmonster/jquery-bootpag/master/lib/jquery.bootpag.min.js">
+</script>
+
+<script>
+$(document).ready(function () {
+
+    $('.select2').select2({
+        dropdownParent: $('#add-facultywork-modal')
+    });
+
+    $('#facultyWorkTable').on('change', '.changeStatus', function () {
+        let currentrow = $(this)
+                if ($(this).is(':checked')) {
+                    console.log('Yes')
+                    chnageStatus($(this).attr('data-id'), 1, currentrow)
+                } else {
+                    console.log('No')
+                    chnageStatus($(this).attr('data-id'), 0, currentrow)
+                }
+            })
+
+            function chnageStatus(id, status, currentrow) {
+                console.log('currentrow:::::::::>>',currentrow)
+                       let ApiObj = {
+                             url: '/admin/faculties/works/change',
+                             type: 'POST',
+                            data: {
+                                    id: id,
+                                    status: status
+                                 },
+                                 dataType: 'JSON'
+                                }
+                                ajaxApi(ApiObj).then(result => {
+                                    //loadDays
+                                  if(result.status=="200"){
+                                    currentrow.find('input:radio[name=batch_preference]').prop("checked", true);
+                                }else{
+                                    currentrow.find('input:radio[name=batch_preference]').prop("checked", false);
+                                }
+                     
+                            }).catch(error => {
+                                currentrow.find('input:radio[name=batch_preference]').prop("checked", false);
+                })
+            }
+
+            function loadDays(){
+                   let ApiObj = {
+                                    url: '/admin/faculties/works/GetAll',
+                                    type: 'POST',
+                                    data: { },
+                                    dataType: 'JSON'
+                                }
+
+                                ajaxApi(ApiObj).then(result => {
+                                    showAjaxTable(result.result)
+                                }).catch(error => {
+
+                                })
+            }
+
+    //Add more rows for FacultyWorks
+    $('#add-more-facultyworkfields').on('click', function () {
+        console.log("Adding faculty work fields::::")
+        let lastTr = $(
+            '#add-more-facultywork-table tbody tr:last-child'
+        )
+        lastTr.find('.modalSelect2').select2('destroy');
+
+        let faculty_lid = lastTr.find(
+            `select[name='faculty_lid']`).val();
+        let program_session_lid = lastTr.find(
+            `select[name='program_session_lid']`).val();
+        let module_lid = lastTr.find(
+            `select[name='module_lid']`).val();
+        let lecture_per_week = lastTr.find(
+            `select[name='lecture_per_week']`).val();
+        let practical_per_week = lastTr.find(
+            `select[name='practical_per_week']`).val();
+        let tutorial_per_week = lastTr.find(
+            `select[name='tutorial_per_week']`).val();
+        let workshop_per_week = lastTr.find(
+            `select[name='workshop_per_week']`).val();
+        let is_batch_preference_set = lastTr.find(
+                `select[name='is_batch_preference_set']`)
+            .val();
+        let clonedTr = lastTr.clone();
+        console.log(lastTr.find(`select[name='module_lid']`)
+            .val())
+
+        clonedTr.find(`select[name='faculty_lid']`).val(
+            faculty_lid).trigger('change')
+        clonedTr.find(`select[name='program_session_lid']`)
+            .val(program_session_lid).trigger('change')
+        clonedTr.find(`select[name='module_lid']`).val(
+            module_lid).trigger('change')
+        clonedTr.find(`select[name='lecture_per_week']`)
+            .val('')
+        clonedTr.find(`select[name='practical_per_week']`)
+            .val('')
+        clonedTr.find(`select[name='tutorial_per_week']`)
+            .val('')
+        clonedTr.find(`select[name='workshop_per_week']`)
+            .val('')
+        clonedTr.find(
+                `select[name='is_batch_preference_set']`)
+            .val(is_batch_preference_set).trigger('change')
+
+            lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-facultywork-modal')
+                });
+
+            clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-facultywork-modal')
+                });
+
+        $('#add-more-facultywork-table tbody').append(
+            clonedTr)
+    })
+
+
+    $('#add-more-facultywork-table').on('click',
+        '.remove-facultyworkfield',
+        function () {
+            let trLength = $(
+                    '#add-more-facultywork-table tbody tr')
+                .length;
+            if (trLength > 1) {
+                $(this).closest('tr').remove()
+            } else {
+                alert('Cannot delete this room.')
+            }
+        })
+
+        //Create facultyworkload
+        $(".createFacultyWorkLoad").on('click', function(){
+            console.log('create function calling..')
+            let facultyElems = $('#add-more-facultywork-table tbody tr');
+            let facultyCount = facultyElems.length;
+            let facultyJson = [];
+            facultyElems.each(function (index, elem) {
+                let faculty_lid = $(elem).find(`select[name='faculty_lid']`).val()
+                let program_lid = $(elem).find(`select[name='program_lid']`).val();
+                let session_lid = $(elem).find(`select[name='session_lid']`).val();
+                let module_lid = $(elem).find(`select[name='module_lid']`).val();
+                let lecture_per_week = $(elem).find(`input[name='lecture_per_week']`).val();
+                let practical_per_week = $(elem).find(`input[name='practical_per_week']`).val();
+                let tutorial_per_week = $(elem).find(`input[name='tutorial_per_week']`).val();
+                let workshop_per_week = $(elem).find(`input[name='workshop_per_week']`).val();
+                let is_batch_preference_set = $(elem).find(`select[name='is_batch_preference_set']`).val();
+
+                if (index < facultyCount - 1) {
+                    let obj = {
+                        faculty_lid: faculty_lid,
+                        program_lid: program_lid,
+                        session_lid:session_lid,
+                        module_lid: module_lid,
+                        lecture_per_week: lecture_per_week,
+                        practical_per_week: practical_per_week,
+                        tutorial_per_week: tutorial_per_week,
+                        workshop_per_week: workshop_per_week
+                       // is_batch_preference_set: is_batch_preference_set
+                    }
+                    facultyJson.push(obj)
+                } else {
+                    let obj = {
+                        faculty_lid: faculty_lid,
+                        program_lid: program_lid,
+                        session_lid:session_lid,
+                        module_lid: module_lid,
+                        lecture_per_week: lecture_per_week,
+                        practical_per_week: practical_per_week,
+                        tutorial_per_week: tutorial_per_week,
+                        workshop_per_week: workshop_per_week
+                        //is_batch_preference_set: is_batch_preference_set
+                    }
+                    facultyJson.push(obj)
+                }
+            })
+
+            console.log('Json::::::::::::',facultyJson)
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/works/create',
+                data: {
+                    inputJSON: JSON.stringify(facultyJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log(result)
+                showSuccess(result)
+
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+            url: "/admin/faculties/works/search",
+            data: {
+                keyword: keyword,
+                pageNo: 1
+            },
+            success: function (data) {
+                showAjaxTable(data.data)
+            }
+        })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/faculties/works/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data)
+                    }
+                })
+            })
+
+        //Update Faculty Workload
+        $(".updateFacultyWorkLoad").on('click', function(){
+            console.log('create function calling..')
+                let facultyJson = [];
+                let id = $("#edit-facultywork-modal #hidden_id").val()
+                let lecture_per_week =  $("#edit-facultywork-modal #lecture_per_week").val()
+                let practical_per_week =  $("#edit-facultywork-modal #practical_per_week").val()
+                let tutorial_per_week = $("#edit-facultywork-modal #tutorial_per_week").val()
+                let workshop_per_week = $("#edit-facultywork-modal #workshop_per_week").val()
+
+                let obj = {
+                        id:id,
+                        lecture_per_week: lecture_per_week,
+                        practical_per_week: practical_per_week,
+                        tutorial_per_week: tutorial_per_week,
+                        workshop_per_week: workshop_per_week,
+                    }
+
+                    facultyJson.push(obj)
+
+            console.log('Json::::::::::::',facultyJson)
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/works/update',
+                data: {
+                    inputJSON: JSON.stringify(facultyJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log(result)
+                showSuccess(result)
+
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        //Session by Program API 
+        $("#program_lid").on('change',function(){
+        let program_lid =  $(this).val();
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/works/session-by-program',
+                data: {
+                    program_lid: program_lid,
+                  
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('api returnssss:', result.result)
+                let sessionList = `<option value="">Select Session Name</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        sessionList +=`<option value="${element.acad_session_lid}">${element.acad_session}</option>`;
+                    });
+                } else {
+                    sessionList += `<option value="">No Session Found!</option>`;
+                }
+                $("#add-facultywork-modal  #session_lid").html(sessionList)
+                
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        //Session by Program API 
+        $("#session_lid").on('change',function(){
+
+            let session_lid =  $(this).val();
+            let program_id = $('#program_lid option:selected').attr('data-program-id');
+            let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/faculties/works/module-by-program-session',
+                    data: {
+                        session_lid: session_lid,
+                        program_id: program_id,
+                    
+                    },
+                    dataType: 'JSON'
+                }
+                console.log('::>>', session_lid,  program_id)
+                ajaxApi(ApiObj).then(result => {
+                    console.log('Module list::>>', result)
+                    let moduleName = `<option value="">Select Module</option>`;
+                    if (result.result.length > 0) {
+                        result.result.forEach(element => {
+                            moduleName +=`<option value="${element.id}">${element.module_name}</option>`;
+                        });
+                    } else {
+                        moduleName += `<option value="">No Module Found!</option>`;
+                    }
+                    $("#add-facultywork-modal  #module_lid").html(moduleName)
+                }).catch(error => {
+                    showError(error.responseJSON)
+                })
+        })
+
+            //edit-facultyWorks
+            $("#facultyWorkTable").on('click','.edit-facultyWorks',function(){
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/works/findone',
+                data: {
+                    Id: $(this).attr("data-id"),
+                  
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let obj =  result.data;
+                console.log('Response:::::::::::::::>', obj)
+                 $("#edit-facultywork-modal #hidden_id").val(obj.id)
+                $("#edit-facultywork-modal #faculty_name").val(obj.faculty_name).trigger('change')
+                $("#edit-facultywork-modal #acad_session").val(obj.acad_session).trigger('change')
+                $("#edit-facultywork-modal #module_name").val(obj.module_name).trigger('change')
+                $("#edit-facultywork-modal #program_name").val(obj.program_name).trigger('change')
+                $("#edit-facultywork-modal #lecture_per_week").val(obj.lecture_per_week).trigger('change')
+                $("#edit-facultywork-modal #practical_per_week").val(obj.practical_per_week).trigger('change')
+                $("#edit-facultywork-modal #tutorial_per_week").val(obj.tutorial_per_week).trigger('change')
+                $("#edit-facultywork-modal #workshop_per_week").val(obj.workshop_per_week).trigger('change')
+            $("#edit-facultywork-modal").modal('show')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+ 
+        //PAGINATION
+    let pageCount = `<%- pageCount %>`
+    let pageNos = Math.ceil(Number(pageCount) / 10)
+    console.log("Page Numbers", pageNos)
+    $('#pagination').bootpag({
+        total: pageNos,
+        page: 1,
+        maxVisible: 10,
+        leaps: true,
+        firstLastUse: true,
+        first: '←',
+        last: '→',
+        wrapClass: 'pagination',
+        activeClass: 'active', 
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first'
+    }).on("page", function (event, num) {
+        console.log('pagination here!!')
+        $.ajax({
+            type: "POST",
+            url: "/admin/faculties/works/pagination",
+            data: {
+                pageNo: num
+            },
+            success: function (data) {
+                console.log(data.data)
+                showAjaxTable(data.data) 
+            }
+        })
+    });
+
+
+        //Delete Faculty API
+        $("#facultyWorkTable").on('click','.delete-faculty-works',function(){
+            let id = $(this).attr("data-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/works/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/faculties/works/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    showAjaxTable(data.data) 
+                }
+            })
+        })
+
+
+    function showAjaxTable(facultiesList) {
+            let AjaxTable = `<table class="table custom_row table-bordered" id="facultyWorkTable">
+                <thead>
+                    <th>Sr.No</th>
+                    <th>Faculty</th>
+                    <th>Faculty Id</th>
+                    <th>Program</th>
+                    <th>Session</th>
+                    <th>Module</th>
+                    <th>Total Lecture per week</th>
+                    <th>Total Practical per week</th>
+                    <th>Total Tutorial per week</th>
+                    <th>Total Workshop per week</th>
+                    <th>Batch preference</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+            if (facultiesList.length > 0) {
+                let count  = 1;
+                for (faculty of facultiesList) {
+                    AjaxTable +=
+                    `<tr>
+                        <td>${count++}</td>
+                        <td>${faculty.faculty_name}</td>
+                        <td>${faculty.faculty_id}</td>
+                        <td>${faculty.program_name}</td>
+                        <td>${faculty.acad_session}</td>
+                        <td>${faculty.module_name}</td>
+                        <td>${faculty.lecture_per_week}</td>
+                        <td>${faculty.practical_per_week}</td>
+                        <td>${faculty.tutorial_per_week}</td>
+                        <td>${faculty.workshop_per_week}</td>
+                        <td><label class="switch">
+                                <input type="checkbox" name="batch_preference" class="changeStatus" data-id="${faculty.id}"
+                                    data-is-batch-preference="${faculty.is_batch_preference_set_status}"
+                                    ${faculty.is_batch_preference_set_status == 'Yes' ? 'Checked' :  ''  }>
+                                <span class="switch-slider round"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <a class="edit-facultyWorks" data-id="${faculty.id}" data-program-lid="${faculty.program_lid}" data-session-lid="${faculty.session_lid}" data-faculty-lid="${ faculty.faculty_lid }" data-program-session-lid="${ faculty.program_session_lid }" data-module-lid="${ faculty.module_lid }" data-lecture-per-week="${ faculty.lecture_per_week}" data-practical-per-week="${faculty.practical_per_week}" data-tutorial-per-week="${faculty.tutorial_per_week}" data-workshop-per-week="${faculty.workshop_per_week}" data-is-batch-preference-set="${faculty.is_batch_preference_set }"><span class="fa fa-edit"></span></a>
+                            <a class="delete-faculty-works" data-id="${faculty.id}"><i class="fa fa-trash text-danger"></i></a>
+                            </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                         <td colspan="11">No Data Found</td>
+                      </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#facultyWorkTable").html(AjaxTable);
+
+        }
+
+
+
+        function showError(errors) {
+             console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+})
+
+</script>
+<%- include("../partials/footerEnd") %>

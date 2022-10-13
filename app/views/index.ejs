@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/font-awesome-all.min.css">
+  <title>Hello, world!</title>
+
+  <style>
+    /* REUABLE CLASSES START*/
+    .p-60-30 {
+      padding: 60px 30px;
+    }
+
+    .px-30 {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
+    /* REUABLE CLASSES END*/
+
+    body {
+      font-family: 'Roboto Slab', serif;
+      font-size: 18px;
+      background: linear-gradient(90deg, #790004, #000b45);
+    }
+
+    #main-page {
+      min-height: 100vh;
+      border-radius: 0px;
+      overflow: hidden;
+      background: radial-gradient(#ffdbdd, #edf0ff);
+      position: relative;
+    }
+
+    #main-nav {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    #main-nav .nav-link {
+      color: rgb(0, 0, 0);
+    }
+
+    #main-nav li {
+      margin-left: 50px;
+    }
+
+    #main-logo {
+      max-width: 250px;
+    }
+
+
+    #banner-section {
+      background-image: url('../img/banner-bg.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    #banner-section .wrapper {
+      background: rgb(255 255 255 / 85%);
+      padding: 25px 30px;
+    }
+
+    /* .features {
+      background: #00284e;
+    } */
+
+    .features .circle {
+      width: 80px;
+      height: 80px;
+      background: #f3f3f3;
+      border-radius: 50%;
+      display: flex;
+      padding: 16px;
+      margin: auto;
+      position: relative;
+      border: 1px solid #767778;
+    }
+
+    .features .circle a {
+      z-index: 5;
+    }
+
+    .features .circle img {
+      width: 48px;
+    }
+
+    .features a {
+      text-decoration: none;
+    }
+
+    .cust-circle {
+      width: 500px;
+      height: 500px;
+      background: #fff;
+      display: block;
+      border-radius: 50%;
+      position: absolute;
+      top: -262px;
+      left: -107px;
+      z-index: 1;
+    }
+
+
+    #hbs-head {
+      background: aliceblue;
+    }
+
+    .home-logo-wraper {
+      max-width: 200px;
+      padding: 10px;
+      margin: auto;
+      border-radius: 25px;
+    }
+
+    .line-bottom {
+      border: 2px solid #f95632;
+      width: 100px;
+      position: relative;
+      animation-name: lineToggleColorRev;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite
+    }
+
+    .line-bottom::after {
+      content: '';
+      position: absolute;
+      width: 50px;
+      border: 2px solid #69d6f4;
+      top: -2px;
+      right: -2px;
+      animation-name: lineToggleColor;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .header {
+      background: linear-gradient(45deg, #fbf7dc, rgb(230 240 255));
+    }
+
+    .header .nav {
+      background: #ecf2f5;
+      box-shadow: 0px 15px 8px -19px #000;
+    }
+
+    .header .nav a {
+      color: #000;
+      text-decoration: none;
+      padding: 0 15px;
+    }
+
+    /* ANIMATION */
+
+
+    @keyframes lineToggleColor {
+      0% {
+        border: 2px solid #69d6f4;
+      }
+
+      100% {
+        border: 2px solid #f95632;
+      }
+    }
+
+    @keyframes lineToggleColorRev {
+      0% {
+        border: 2px solid #f95632;
+      }
+
+      100% {
+        border: 2px solid #69d6f4;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="main-page" class="bg-white">
+    <!-- main page start -->
+    <div class="wrapper">
+      <header class="header">
+        <div class="row">
+          <div class="col-6">
+            <div class="home-logo-wraper">
+              <img src="/image/logo-nmims.png" class="img-fluid">
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="home-logo-wraper">
+              <img src="/image/logo-svkm.png" class="img-fluid">
+            </div>
+          </div>
+          <div class="col-12 p-2 d-flex justify-content-center nav">
+            <a href="tel:022-42199993"><i class="fas fa-phone"></i> 022-42199993</a>
+            <a href="mailto:portal_app_team@svkm.ac.in"><i class="fas fa-envelope"></i> portal_app_team@svkm.ac.in</a>
+          </div>
+        </div>
+
+      </header>
+      <div class="container text-center py-5">
+        <h1 class="h2 mt-5">Welcome to Infrastructure & Timetable Portal.</h1>
+        <p>Timetable automation and infrastructure management made easy.</p>
+        <hr class="line-bottom" style="display:block; margin:auto"/>
+
+        <div class="row features">
+          <div class="col-md-3 col-sm-4 col-6 mt-5">
+            <div class="circle">
+              <img src="/image/timetable.jpg" alt="Timetable Automation">
+            </div>
+            <p class="font-weight-bold pt-2">Timetable Automation</p>
+          </div>
+
+          <div class="col-md-3 col-sm-4 col-6 mt-5">
+            <div class="circle">
+              <img src="/image/Reschedule.png" alt="Reschedule Timetable">
+            </div>
+            <p class="font-weight-bold pt-2">Reschedule Timetable</p>
+          </div>
+          <div class="col-md-3 col-sm-4 col-6 mt-5">
+            <div class="circle">
+              <img src="/image/infra-management.png" alt="Infrastructure Management">
+            </div>
+            <p class="font-weight-bold pt-2">Infrastructure Management</p>
+          </div>
+          <div class="col-md-3 col-sm-4 col-6 mt-5">
+            <div class="circle">
+              <img src="/image/Statistics.jpg" alt="MIS Report">
+            </div>
+            <p class="font-weight-bold pt-2">MIS Report</p>
+          </div>
+        </div>
+
+        <div class="col-6 mx-auto">
+          <p class="mt-5 h4 text-danger">Select your organization to continue...</p>
+          <select class="form-control text-center" id="org-select">
+            <option>--Select Organization--</option>
+            <% for(let org of orgList) { %>
+            <option value="<%- org.slug_name %>"><%- org.org_name %> (<%- org.org_abbr %>)</option>
+            <% } %>
+          </select>
+
+          <button class="btn btn-md btn-dark mt-3 px-5" id="go-btn">GO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/popper.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+
+  <script>
+
+    $(document).ready(function(){$('#go-btn').on('click', function () {
+      console.log('clicked');
+      $.ajax({
+        type: 'POST',
+        url: '/set-slug',
+        data: {
+          slug: $('#org-select').val()
+        }
+      })
+      window.location.href = `http://${$('#org-select').val()}.localhost:3000/user/login`
+    })
+  }
+    )
+  </script>
+
+</body>
+
+</html>

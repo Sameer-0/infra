@@ -1,0 +1,314 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="breadcrumbs-container">
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+    <%- include("../partials/academicSubMenu") %>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>Academic Sessions</h5>
+            <!-- <button class="btn add-btn ms-auto" data-bs-toggle="modal"
+            data-bs-target="#add-academicSession-modal"><i class="fas fa-plus"></i></button> -->
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row" id="acadSessionTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Acad Session</th>
+                    <th>Sap Academic Session</th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let session of acadSession) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- session.acad_session %>
+                        </td>
+                        <td>
+                            <%- session.sap_acad_session_id %>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+<!-- ADD NEW ACAD SESSION MODAL -->
+<div class="modal fade" id="add-academicSession-modal" tabindex="-1" role="dialog"
+    aria-labelledby="add-academicSession-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header bg-info modal-inputform-header">
+                <h5 class="modal-title text-white" id="add-academicSession-modal-title">Add Acad Session</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="form-row mt-4">
+                    <input name="acad_session" id="acad_session" type="text" class="form-control"
+                        placeholder="Enter Academic Session" required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <input name="acadSessionId" id="acadSessionId" type="hidden" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn modal-inputform-btn createAcadSession ">Create</button>
+                <button type="button" class="btn modal-inputform-btn updateAcadSession  d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    //management/campus/add
+    $('.createAcadSession').on('click', function () {
+
+        let ApiObj = {
+            type: 'POST',
+            url: '/management/academic/session/create',
+            data: {
+                acadSession: $("#acad_session").val()
+            },
+            dataType: 'JSON'
+        }
+
+
+
+        ajaxApi(ApiObj).then(result => {
+            console.log('Result:::::::::::', result)
+        }).catch(error => {
+
+            let errors = error.responseJSON.message
+            console.log('Error:::::::::::', errors)
+            let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+            errors.map(er => {
+                errorHtml +=
+                    `<li>${er}</li>`
+            })
+            errorHtml +=
+                `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+            $("#errorHtml").html(errorHtml)
+        })
+    })
+
+
+
+    $('.updateAcadSession').on('click', function () {
+
+        let ApiObj = {
+            url: '/management/academic/session/update',
+            type: 'POST',
+            data: {
+                acadSessionId: $("#acadSessionId").val(),
+                acadSession: $("#acad_session").val()
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            console.log('Result:::::::::::', result)
+        }).catch(error => {
+
+            let errors = error.responseJSON.message
+            console.log('Error:::::::::::', errors)
+            let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+            errors.map(er => {
+                errorHtml +=
+                    `<li>${er}</li>`
+            })
+            errorHtml +=
+                `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+            $("#errorHtml").html(errorHtml)
+        })
+    })
+
+    $('#acadSessionTable').on('click', '.delete-acadSession', function () {
+
+        let ApiObj = {
+            url: '/management/academic/session',
+            type: 'DELETE',
+            data: {
+                Id: $(this).attr('data-acadSession-id')
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            location.reload()
+            console.log('Result:::::::::::', result)
+        }).catch(error => {
+
+            let errors = error.responseJSON.message
+            console.log('Error:::::::::::', errors)
+            let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+            errors.map(er => {
+                errorHtml +=
+                    `<li>${er}</li>`
+            })
+            errorHtml +=
+                `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+            $("#errorHtml").html(errorHtml)
+        })
+    })
+
+
+
+    //search feature delay function is writter in script.js file which is located in public/js/script.js
+            // SEARCH PROGRAM TYPE
+            $('#searchkeyword').on('input', delay(function (e) {
+                let keyword = $("#searchkeyword").val()
+                $.ajax({
+                    type: "POST",
+                    url: "/management/academic/session/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: 1
+                    },
+                    success: function (result) {
+                        AjaxTable(result.data)
+                    }
+                })
+            }, 500));
+
+
+        //Search With Pagination
+        $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                console.log('PAGE NO.:::::::::::', $(this).attr('data-lp'))
+                console.log('keyword.:::::::::::', keyword)
+                $.ajax({
+                    type: "POST",
+                    url: "/management/academic/session/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        AjaxTable(data.data)
+                    }
+                })
+            })
+
+
+
+
+
+
+
+    //Pagination Here
+    let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/management/academic/session/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    AjaxTable(data.data) 
+                }
+            })
+        });
+
+
+function AjaxTable(acadSessionList){
+    let AjaxTable = `<table class="table custom_row" id="acadSessionTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Acad Session</th>
+                    <th>Sap Academic Session</th>
+                </thead>
+                <tbody>`;
+
+            if (acadSessionList.length > 0) {
+                for (session of acadSessionList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>
+                            ${session.acadSessionId}
+                        </td>
+                        <td>
+                            ${session.acad_session}
+                        </td>
+                        <td>
+                            ${session.sap_acad_session_id}
+                        </td>
+                    </tr>`;
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                                <td colspan="3">No Data Found</td>
+                            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#acadSessionTable").html(AjaxTable);
+}
+
+</script>
+<%- include("../partials/footerEnd") %>

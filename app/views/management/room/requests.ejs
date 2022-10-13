@@ -1,0 +1,345 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+   
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>ROOM Request</h5>
+            </div>
+            <div>
+                <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-room-modal">
+                    <i class="fas fa-plus"></i></button>
+                <button class="btn ms-auto delete-selected-rooms-types add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-rooms-types add-btn" title="Bulk Delete"><img
+                        src="/icons/delete.png" alt="" width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row" id="RoomRequests">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Transaction Type</th>
+                    <th>Stage</th>
+                    <th>Orgnization</th>
+                    <th>Campus</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <%let count = 1%>
+                    <% for(let request of requestedList){%>
+                    <tr>
+                        <td><%- count++%></td>
+                        <td><%-request.transaction_type %></td>
+                        <td><%-request.stage %></td>
+                        <td><%-request.org_abbr %></td>
+                        <td><%-request.campus_abbr %></td>
+                        <td><a class="view-room-request" title="View Details" data-id="<%-request.id %>" data-slug-name="<%- request.slug_name%>"><img src="/icon_imgs/transparency.png"></a>
+                    </tr>
+                    <%}%>   
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+        </div>
+        <div>
+            <p id="pagination" class="pagination-search"></p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+<div class="modal fade" id="room-request-info" tabindex="-1" aria-labelledby="room-request-info" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="room-request-info-title">Room Request Info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div id="errorHtml"></div>
+        <div class="modal-body">
+            
+            <div id="ShowRoomInfoTable"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success approvalAndRejection"  data-status="1"><img src="/icon_imgs/approve.png"> Approve</button>
+            <button type="button" class="btn btn-success approvalAndRejection rejectbtn" data-status="0"><img src="/icon_imgs/reject24.png"> Reject</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    $(document).ready(function () {
+
+        $('#RoomRequests').on('click','.view-room-request',function(){
+            let id = $(this).attr("data-id");
+            let tr = $(this).parent().parent();
+            let requestSlugName = $(this).attr("data-slug-name");
+            console.log('id:::::::::',id);
+            let ApiObj = {
+                url: '/management/rooms/requests/roomInfo',
+                type: 'POST',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                
+
+                let htmlTable = `<table class="table table-borderd">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Room No</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        
+                    </tr>    
+                    </thead>
+                    <tbody>`
+                        let count = 1
+                       result.data.forEach(function(item){
+                        htmlTable+=` <tr>
+                        <td>${count++}</td>
+                        <td>${item.room_number}</td>
+                        <td>${item.start_time}</td>
+                        <td>${item.end_time}</td>
+                        <td>${item.start_date}</td>
+                        <td>${item.end_date}</td>
+                        </tr>`
+                       })
+                       htmlTable+= `</tbody></table>`;
+               // console.log(htmlTable)
+                $("#ShowRoomInfoTable").html(htmlTable)
+                $(".approvalAndRejection").attr({"data-room-requestid": result.transactionid, "data-slug-name" : requestSlugName});
+                $("#room-request-info").modal('show')
+                $('.approvalAndRejection').removeClass('d-none');
+                if($(this).parent().parent().find('td:nth-child(3)').text() == 'rejected'){
+                    $('.rejectbtn').addClass('d-none');
+                } 
+                else if($(this).parent().parent().find('td:nth-child(3)').text() == 'accepted'){
+                    $('.approvalAndRejection').addClass('d-none');
+                }
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        // Api for Approval and Rejection of Room Requests
+        $(".approvalAndRejection").on('click', function() {
+
+            console.log(">>>>>>>>>>> CLICKED")
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/rooms/requests/approval',
+                data: {
+                    input_room_request_lid: $(this).attr("data-room-requestid"),
+                    approval_flag: $(this).attr("data-status"),
+                    slug_name: $(this).attr("data-slug-name")
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+              console.log('result::::::::::::::',result)
+              showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                dataType:"JSON",
+                url: "/management/rooms/requests/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    showAjaxTable(data.data)
+                },
+               
+            })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/management/rooms/requests/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data)
+                    }
+                })
+            })
+
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/management/rooms/requests/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    showAjaxTable(data.data)
+                }
+            })
+        });
+
+        function showAjaxTable(roomTypeList) {
+            let AjaxTable = `<table class="table custom_row" id="RoomRequests">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Transaction Type</th>
+                    <th>Stage</th>
+                    <th>Orgnization</th>
+                    <th>Campus</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+            if (roomTypeList.length > 0) {
+                let count = 1;
+                for (request of roomTypeList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>${ count++}</td>
+                        <td>${request.transaction_type}</td>
+                        <td>${request.stage}</td>
+                        <td>${request.org_abbr}</td>
+                        <td>${request.campus_abbr}</td>
+                        <td><a class="view-room-request" title="View Details" data-id="${request.id}"><img src="/icon_imgs/transparency.png"></a>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr><td colspan="5">No Data Found</td></tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#RoomRequests").html(AjaxTable);
+        }
+
+
+
+        function showError(errors) {
+                console.log('error::::::::::',errors)
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : errors.description,
+                    message: errors.data,
+                    type: 'alert-danger',
+                    buttons: {
+                        positive:{
+                            text: "Okay",
+                            action: function(){
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                            }
+                        }
+                    }
+                }
+                simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log('error::::::::::',errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+            
+        }
+
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

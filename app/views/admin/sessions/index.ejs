@@ -1,0 +1,56 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    <div class="row my-3 gx-3 gy-3 row1-data ">
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/sessions/types">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/room-type.PNG" alt="">
+                        <p class="fw-normal pt-1">SESSION TYPES</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/sessions/dates">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/room-type.PNG" alt="">
+                        <p class="fw-normal pt-1">SESSION DATE</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<%- include("../partials/footer") %>
+
+
+<script>
+    $(document).ready(function () {
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

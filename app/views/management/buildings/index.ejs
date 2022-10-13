@@ -1,0 +1,620 @@
+<%- include("../partials/head") %>
+
+
+
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    <div class="errorHtml"></div>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Building List</h5>
+            </div>
+            <div>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-building-modal"><i class="fas fa-plus"></i></button>
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row" id="buildingTable">
+                <thead>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Floors</th>
+                    <th>Owner</th>
+                    <th>Handled By</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Campus</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% for (let building of buildingList) { %>
+                    <tr>
+                        <td>
+                            <%- building.building_name %>
+                        </td>
+                        <td>
+                            <%- building.building_number %>
+                        </td>
+                        <td>
+                            <%- building.total_floors %>
+                        </td>
+                        <td>
+                            <%- building.owner %>
+                        </td>
+                        <td>
+                            <%- building.handled_by %>
+                        </td> 
+                        <td>
+                            <%- building.start_time %>
+                        </td>
+                        <td>
+                            <%- building.end_time %>
+                        </td>
+                        <td>
+                            <%- building.campus_abbr %>
+                        </td>
+                        <td>
+                            <a class="edit-building" data-building-id="<%- building.building_id %>"><i class="fas fa-edit text-dark cursor-pointer"
+                                ></i></a>
+                                <a class="delete-building" data-id="<%- building.building_id %>"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>
+
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- ADD NEW BUILDING MODAL -->
+<!-- Modal -->
+<div class="modal fade" id="add-building-modal" tabindex="-1" aria-labelledby="add-building-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-lg">
+        <div class="modal-content modal-inputform">
+            
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-building-modal-title">Add New Building</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+
+
+            <div class="modal-body">
+                <div class="errorHtml"></div>
+                <input type="hidden" name="buildingId" id="buildingId">
+                <div class="">
+                    <table class="table " id="add-more-building-table">
+                        <thead>
+                            <th>Building Name</th>
+                            <th>Building Number</th>
+                            <th>Total Floor Count</th>
+                            <th>Owner</th>
+                            <th>Start time</th>
+                            <th>End time</th>
+                            <th>Handled by</th>
+                            <th>Campus</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input name="building_name" id="building_name" type="text" class="form-control"
+                                        placeholder="Building Name" required>
+                                </td>
+                                <td>
+                                    <input name="building_number" id="building_number" type="number"
+                                        class="form-control" placeholder="Building Number" required>
+                                </td>
+                                <td>
+                                    <input name="total_floors" id="total_floors" type="number" class="form-control"
+                                        placeholder="Total Floor Count" required>
+                                </td>
+                                <td>
+                                    <select name="owner_id" id="owner_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let owner of orgList) { %>
+                                            <option value="<%- owner.id %>">
+                                                <%- owner.org_abbr %> 
+                                            </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="start_time_id" id="start_time_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let time of timeList) { %>
+                                            <option value="<%- time.id %>">
+                                                <%- time.start_time %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="end_time_id" id="end_time_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let time of timeList) { %> 
+                                            <option value="<%- time.id %>">
+                                                <%- time.end_time %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="handled_by" id="handled_by" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let handler of orgList) { %>
+                                            <option value="<%- handler.id %>">
+                                                <%- handler.org_abbr %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                        <select name="campus_lid" id="campus_lid" class="select2 modalSelect2">
+                                            <option value="">--select--</option>
+                                            <% for(let campus of campusList) { %>
+                                                <option value="<%- campus.id %>">
+                                                    <%- campus.campus_abbr %>
+                                                </option>
+                                            <% } %>
+                                        </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-building"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success  btn-sm" id="add-more-building"><i class="fas fa-plus"></i>Add More Building</button>
+                <button type="submit" class="btn createBuilding modal-inputform-btn">Create Building</button>
+                <button type="submit" class="btn updateBuilding modal-inputform-btn d-none">Update Building</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/notification') %>
+<%- include('../partials/alert') %>
+<%- include("../partials/footer") %>
+
+
+<script src="/js/leftsidebartoggle.js"></script>
+<script>
+
+   $('.select2').select2({
+        dropdownParent: $('#add-building-modal')
+    });
+
+    //ADD MORE BUILDING ROW
+    $('#add-more-building').on('click', function () {
+                console.log("Organization Added::::")
+                let lastTr = $('#add-more-building-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+                let buildingName = lastTr.find(`input[name='building_name']`).val();
+                let buildingNumber = lastTr.find(`input[name='building_number']`).val();
+                let floors = lastTr.find(`input[name='floors']`).val();
+                let ownerId = lastTr.find(`select[name='owner_id']`).val();
+                let startTimeId = lastTr.find(`select[name='start_time_id']`).val();
+                let endTimeId = lastTr.find(`select[name='end_time_id']`).val();
+                let handledById = lastTr.find(`select[name='handled_by']`).val();
+                let campusId = lastTr.find(`select[name='campus_lid']`).val();
+
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='building_name']`).val('')
+                clonedTr.find(`input[name='building_number']`).val('')
+                clonedTr.find(`input[name='floors']`).val('')
+                clonedTr.find(`select[name='owner_id']`).val('')
+                clonedTr.find(`select[name='start_time_id']`).val('')
+                clonedTr.find(`select[name='end_time_id']`).val('')
+                clonedTr.find(`select[name='handled_by']`).val('')
+                clonedTr.find(`select[name='campus_lid']`).val('')
+
+                $('#add-more-building-table tbody').append(clonedTr)
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-building-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-building-modal')
+                });
+            })
+
+            $('#add-more-building-table').on('click', '.remove-building', function () {
+                let trLength = $('#add-more-building-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+
+
+
+    $(".createBuilding").on('click', function () {
+        let buildingElems = $('#add-more-building-table tbody tr');
+        let buildingCount = buildingElems.length;
+        let buildingJson = [];
+        buildingElems.each(function (index, elem) {
+            let building_name = $(elem).find(`input[name='building_name']`).val()
+            let building_number = $(elem).find(`input[name='building_number']`).val();
+            let total_floors = $(elem).find(`input[name='total_floors']`).val();
+            let owner_id = $(elem).find(`select[name='owner_id']`).val();
+            let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+            let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+            let handled_by = $(elem).find(`select[name='handled_by']`).val();
+            let campus_lid = $(elem).find(`select[name='campus_lid']`).val();
+
+
+            if (index < buildingCount - 1) {
+                let obj = {
+                    building_name: building_name,
+                    building_number: building_number,
+                    total_floors: total_floors,
+                    owner_id: owner_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id,
+                    handled_by: handled_by,
+                    campus_lid: campus_lid
+                }
+                buildingJson.push(obj)
+            } else {
+                let obj = {
+                    building_name: building_name,
+                    building_number: building_number,
+                    total_floors: total_floors,
+                    owner_id: owner_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id,
+                    handled_by: handled_by,
+                    campus_lid: campus_lid
+                }
+                buildingJson.push(obj)
+            }
+        })
+        let ApiObj = {
+            type: 'POST',
+            url: '/management/buildings/create',
+            data: {
+                inputJSON: JSON.stringify(buildingJson)
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => { 
+            // notify();
+            showSuccess(result)
+        }).catch(error => {
+            showError(error.responseJSON)
+        }) 
+
+    })
+
+
+
+    $('#buildingTable').on('click', '.edit-building', function () {
+        $("#add-building-modal-title").html('Update Building')
+        $(".createBuilding").addClass('d-none')
+        $(".updateBuilding").removeClass('d-none')
+        $("#add-more-building").addClass('d-none')
+        let ApiObj = {
+            type: 'POST',
+            url: '/management/buildings/findone',
+            data: {
+                Id: $(this).attr('data-building-id')
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            let building = result.buildingData;
+            console.log('Success: ', building)
+            $("#buildingId").val(building.id),
+                $("#building_name").val(building.building_name),
+                $("#building_number").val(building.building_number),
+                $("#total_floors").val(building.total_floors),
+                $("#owner_id").val(building.owner_id).trigger('change'),
+                $("#handled_by").val(building.handled_by).trigger('change'),
+                $("#start_time_id").val(building.start_time_id).trigger('change'),
+                $("#end_time_id").val(building.end_time_id).trigger('change'),
+                $("#campus_lid").val(building.campus_lid).trigger('change'),
+                $("#add-building-modal").modal('show')
+        }).catch(error => {
+            showError(error.responseJSON)
+        })
+    })
+
+
+    $(".updateBuilding").on('click', function () {
+
+        let buildingElems = $('#add-more-building-table tbody tr');
+        let buildingCount = buildingElems.length;
+
+        let buildingJson = [];
+
+        buildingElems.each(function (index, elem) {
+            let buildingId = $("#buildingId").val()
+            let building_name = $(elem).find(`input[name='building_name']`).val()
+            let building_number = $(elem).find(`input[name='building_number']`).val();
+            let total_floors = $(elem).find(`input[name='total_floors']`).val();
+            let owner_id = $(elem).find(`select[name='owner_id']`).val();
+            let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+            let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+            let handled_by = $(elem).find(`select[name='handled_by']`).val();
+            let campus_lid = $(elem).find(`select[name='campus_lid']`).val();
+
+
+            if (index < buildingCount - 1) {
+                let obj = {
+                    id: buildingId,
+                    building_name: building_name,
+                    building_number: building_number,
+                    total_floors: total_floors,
+                    owner_id: owner_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id,
+                    handled_by: handled_by,
+                    campus_lid: campus_lid
+                }
+                buildingJson.push(obj)
+            } else {
+                let obj = {
+                    id: buildingId,
+                    building_name: building_name,
+                    building_number: building_number,
+                    total_floors: total_floors,
+                    owner_id: owner_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id,
+                    handled_by: handled_by,
+                    campus_lid: campus_lid
+                }
+                buildingJson.push(obj)
+            }
+        })
+
+        if (buildingJson.length > 0) {
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/buildings/update',
+                data: {
+                    inputJSON: JSON.stringify(buildingJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+            //   notify();
+            showSuccess(result);
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        } else {
+            alert('Select Building First')
+        }
+    })
+
+
+
+
+    //Pagination Here
+    let pageCount = `<%- pageCount %>`
+    console.log("Page Count=====>>>", pageCount)
+    let pageNos = Math.ceil(Number(pageCount) / 10)
+
+    console.log("Page Numbers", pageNos)
+    $('#pagination').bootpag({
+        total: pageNos,
+        page: 1,
+        maxVisible: 10,
+        leaps: true,
+        firstLastUse: true,
+        first: '←',
+        last: '→',
+        wrapClass: 'pagination',
+        activeClass: 'active',
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first'
+    }).on("page", function (event, num) {
+        $.ajax({
+            type: "POST",
+            url: "/management/buildings/pagination",
+            data: {
+                pageNo: num
+            },
+            success: function (data) {
+                showAjaxTable(data.data) // Building List
+            }
+        })
+    });
+
+
+
+    //search feature delay function is writter in script.js file which is located in public/js/script.js
+    $('#searchkeyword').on('input', delay(function (e) {
+        let keyword = $("#searchkeyword").val()
+        $.ajax({
+            type: "POST",
+            url: "/management/buildings/search",
+            data: {
+                keyword: keyword,
+                pageNo: 1
+            },
+            success: function (data) {
+                showAjaxTable(data.data) // Building List
+            }
+        })
+    }, 500));
+
+
+            //Search With Pagination
+             $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/management/buildings/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data)
+                    }
+                })
+            })
+
+
+            //Delete Faculty API
+            $("#buildingTable").on('click','.delete-building',function(){
+            let id = $(this).attr("data-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/buildings/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+        }
+        simpleAlert.alert(obj);
+        }
+
+
+    function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+    function showAjaxTable(buildingList) {
+        let AjaxTable = `<table class="table table-bordered" id="buildingTable">
+                    <thead>
+                        <th>Name</th>
+                        <th>Number</th>
+                        <th>Floors</th>
+                        <th>Owner</th>
+                        <th>Handled By</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Campus</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>`;
+
+        if (buildingList.length > 0) {
+            for (building of buildingList) {
+                AjaxTable +=
+                    `<tr>
+                            <td>${building.building_name}</td>
+                            <td>${building.building_number}</td>
+                            <td>${building.total_floors}</td>
+                            <td>${building.owner}</td>
+                            <td>${building.handled_by}</td>
+                            <td>${building.start_time}</td>
+                            <td>${building.end_time}</td>
+                            <td>${building.campus_abbr}</td>
+                            <td>
+                                <i class="fas fa-edit text-dark cursor-pointer edit-building"
+                                    data-building-id="${building.building_id}" ></i>
+                                    <a class="delete-building" data-id="${building.building_id}"><i class="fa fa-trash text-danger"></i></a>
+                            </td>
+                        </tr>`
+            }
+        } else {
+            AjaxTable +=
+                ` <tr>
+                                <td colspan="9">No Data Found</td>
+                            </tr>`;
+        }
+        AjaxTable += `<tbody></table>`
+        $("#buildingTable").html(AjaxTable);
+    }
+</script>
+<%- include("../partials/footerEnd") %>

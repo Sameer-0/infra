@@ -1,0 +1,378 @@
+<%- include("../partials/head") %>
+<style>
+         hr{
+            margin:  0 !important;
+        }
+
+        .timetable-container {
+            width: var(--timetableWidth);
+            background: #e6e6e6;
+            /* border: 2px solid;    */
+        }
+
+        .day-name {
+            min-width: var(--roomNoWidth);
+            max-width: var(--roomNoWidth);
+            background: #006faa;
+            color: #fff;
+            border-bottom: 1px solid;
+            text-align: center;
+            padding: 10px 0px;
+        }
+
+        .room-slots {
+            width: var(--roomSlotWidth);
+            min-height: 10px;
+            position: relative;
+            background-size: var(--breakIntervalWidth);
+            background-image:
+                linear-gradient(to right, grey 1px, transparent 1px)
+        }
+
+        .timetable-slots{
+            width: var(--roomSlotWidth);
+            min-height: 10px;
+            position: relative;
+            left: 50px;
+        }
+
+        .timetable-slots span{
+            width: 156px;
+            font-size:10px;
+        }
+
+        .room {
+            border: 1px solid black;
+            line-height: 0px;
+        }
+
+        .event {
+            position: absolute;
+             /* width: var(--eventWidth); */
+            background: #ffffff;
+            word-break: break-word;
+            height: 100%;
+            /* overflow: hidden; */
+            padding-right: calc(var(--breakIntervalWidth) + 2px);
+            padding-left:  2px;
+            padding-top: 5px;
+            font-size: 14px;
+        }
+
+    
+       
+
+        /* .event:nth-child(even) .start-time{
+            background-color: #dc3545 !important;
+      
+        }
+
+        .event:nth-child(even) .end-time{
+            background: #dc3545 !important;
+        } */
+       
+
+        .start-time{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            border-radius: 0!important;
+            font-size: 0.75rem;
+        }
+
+        .end-time{
+            position: absolute;
+            right: var(--breakIntervalWidth);
+            bottom: 0;
+            border-radius: 0!important;
+            font-size: 0.75rem;
+        }
+
+        .fa-arrows-left-right{
+            /* position: absolute; */
+            right: calc(var(--breakIntervalWidth) + 78px - 7px);
+            bottom: 0;
+        }
+
+        .break {
+            position: absolute;
+            height: 100%;
+            width: var(--breakIntervalWidth);
+            background-size: 3px;
+            background: #1ff704ab;
+        }
+
+        .fixed-break{
+            position: absolute;
+            height: 100%;
+            /* background-color: #006faa; */
+            width: var(--fixedBreakWidth);
+            background-size: 3px;
+            background: repeating-linear-gradient(251deg, #212121, #444141 12px);
+            color: #fff;
+            font-size: 13px;
+            padding: 1px 18px;
+            text-align: center;
+            line-height: 1.1;
+            z-index: 100;
+
+        }
+
+        .occupied-event{
+            position: absolute;
+            background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
+            height: 100%;
+            text-align: center;
+            padding: 125px 0px;
+            font-weight: bold;
+        }
+
+        .light-success{
+            background: #3dff23ab;
+        }
+        .light-danger{
+            background: #ff0800ab;
+        }
+</style>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+    
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Room Allocation Status</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger download-current-report  disabled"  >Download Currunt </a>
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="row">
+                <div class="input-groups col-md-4 col-sm-12">
+                    <label for="RoomFilter">Select Room:</label>
+                    <select name="RoomFilter" id="RoomFilter" class="form-select select2">
+                        <option selected disabled value>--Select Room--</option>
+                        <option value="0" data-room-mumber="0">Download All</option>
+                        <% for(let room_d of roomListStr){%>
+                        <option value="<%- room_d.id%>" data-room-mumber="<%-room_d.room_number%>"><%-room_d.room_number%></option>
+                        <%}%>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mb-3">
+                    <div class="form-check form-check-inline mt-3">
+                        <input class="form-check-input" type="checkbox" id="showDetails">
+                        <label class="form-check-label" for="showDetails">Show Details</label>
+                        <!-- <div class="form-check-label" for="showTimeline">Time Line : <span id="showTimeline">00:00 - 00:00</span></div> -->
+                    </div>
+               
+                <div class="my-2">
+                    <table>
+                        <tr>
+                            <td>Lecture Alloted: </td>
+                            <td> <div style="height: 20px;width: 20px;background: #ff4b12;" class="ms-2"></div></td>
+                        </tr>
+                    </table>
+                    
+                </div>
+            </div>
+            <div class="timetable-slots" ></div>
+             <div class="timetable-container" style="overflow-x: auto;"></div>
+        </div>
+      
+    </div>
+</div>
+
+<%- include("../partials/footer") %>
+<script src="/js/dashboardscript.js"></script>
+<script src="/js/leftsidebartoggle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+<script>
+      
+$(document).ready(function(){
+
+    $(".select2").select2()
+
+                         
+    let dayJson = JSON.parse(`<%-dayList%>`)
+    console.log('dayJson::::::>',dayJson)
+    let timeJson = JSON.parse(`<%- timeSlotList%>`);
+    console.log('time slot list::', timeJson)
+    let timeTablestartSlot = timeJson[0].id;
+    console.log('timeTablestartSlot::::::::::>',timeTablestartSlot)
+
+
+    let targetProp = {};
+
+    let timetableProp = {
+        totalSlots: 116,
+        pxPerSlot: 13,
+        roomNoWidth: 50,
+        
+    }
+
+    let dragObj = {
+        initialClientX: null,
+        initialClientY: null,
+        isMouseDown: false,
+        targetElem: null,
+        isDraggable: false,
+        isDroppable: true,
+        isDragging: false
+    }
+
+
+
+    //SHOW DETAILS IF CHECKED 
+    $("#showDetails").on('click',function(){
+        if ($(this).is(':checked')) {
+            $(".slotStatusWithDetails .show-content").removeClass('d-none')
+            $(".slotStatusWithDetails").css('line-height','1.4')
+            $(".day-name").css('padding','100px 0px')
+            $(".slotStatusWithDetails").css('padding-top','15px')
+            console.log('CHECKED::::::::>>')
+        }else{
+            $(".slotStatusWithDetails .show-content").addClass('d-none')
+            console.log('UNCHECKED::::::::>>')
+            $(".slotStatusWithDetails").css('line-height','0')
+            $(".day-name").css('padding','10px 0px')
+        }
+    })
+
+    let cssRoot = document.querySelector(':root');
+    let styleRoot = getComputedStyle(cssRoot);
+
+    cssRoot.style.setProperty('--timetableWidth', `${timetableProp.totalSlots * timetableProp.pxPerSlot + 50 }px`);
+    cssRoot.style.setProperty('--roomNoWidth', `${timetableProp.roomNoWidth}px`);
+    cssRoot.style.setProperty('--breakIntervalWidth', `${timetableProp.pxPerSlot}px`);
+    cssRoot.style.setProperty('--eventWidth', `${(timetableProp.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
+    cssRoot.style.setProperty('--roomSlotWidth', `${timetableProp.totalSlots * timetableProp.pxPerSlot}px`);
+        
+    let fixedBreakSlotStart = 115
+
+    
+
+
+    $("#RoomFilter").on('change', function () {
+        let room_lid = $(this).val(); 
+        let room_number = $("#RoomFilter option:selected").attr("data-room-mumber")
+        console.log('room_number:::::::::',room_number)
+        $("#showDetails").prop('checked',false)
+            console.log('API hit')
+
+            
+              if(room_lid > 0){
+              $(".download-current-report").attr('data-faculty-id',room_number)
+              $(".download-current-report").removeClass('disabled')
+              $(".download-current-report").html('Download Current')
+              $(".download-current-report").attr('href',`/admin/mis/simulation-chart/room-wise-allocation/download/${room_number}`)
+
+                let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/mis/simulation-chart/room-wise-allocation',
+                    data: {
+                        room_lid: room_lid,
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+                    timeTableDisplay(result.result)
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                })
+              }else{
+                console.log('IN ELSE CONDITION::::::::')
+                $(".download-current-report").attr('data-faculty-id',room_number)
+                $(".download-current-report").attr('href',`/admin/mis/simulation-chart/room-wise-allocation/download/${room_number}`)
+                $(".download-current-report").removeClass('disabled')
+                $(".download-current-report").html('Download ALL')
+              }
+
+
+    })
+
+
+    function timeTableDisplay(bookedSlot){
+    console.log('INSIDE TIMETABLE',bookedSlot)
+        let fixedBreadWidth ;
+        let roomSlot;
+        let eventStartSlot;
+        let eventLeftPosition;
+        let dayHtml  = ``;
+            for( let day of dayJson ){
+                dayHtml +=`<div class="d-flex room" day-lid="${day.id}">
+                <div class="day-name" day-lid="${day.id}" >
+                    ${day.sort_name}
+                </div>
+                
+                <div class="room-slots">
+
+                </div>
+                </div>`
+            }
+            
+            let timeTableBox = document.querySelector('.timetable-container');
+            timeTableBox.innerHTML = dayHtml;
+        
+            for( let event of bookedSlot) {
+            //   console.log('event::::::::::::::>>',event)
+            if(!event.is_break){
+            eventStartSlot = event.start_slot;
+            roomSlot = document.querySelector(`.room[day-lid ="${event.day_lid}"] .room-slots`)
+            eventLeftPosition =   (eventStartSlot - timeTablestartSlot) * timetableProp.pxPerSlot
+            let breakElement = (eventLeftPosition + (timetableProp.pxPerSlot * 13) >= (timetableProp.totalSlots * timetableProp.pxPerSlot)) || event.end_slot == fixedBreakSlotStart ?
+            `<div class="break d-none" style="left: ${timetableProp.pxPerSlot * 12}px; top: 0; bottom:0; width:${timetableProp.pxPerSlot}px"></div>` :
+            `<div class="break" style="left: ${timetableProp.pxPerSlot * 12}px; top: 0; bottom:0; width:${timetableProp.pxPerSlot}px"></div>`
+                
+
+            let  roomSlotItem = document.createElement('div');
+            roomSlotItem.setAttribute("class",`event room-slot-item text-white ${event.day_lid ? 'light-danger':'bg-warning'}`)
+            roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_slot - event.start_slot + 2) * timetableProp.pxPerSlot}px;`)
+            
+            roomSlotItem.innerHTML =
+                    `<div class="slotStatusWithDetails"><span class="show-content d-none">${event.program_name} - ${event.acad_session} <br><hr> ${event.module_name} <br><hr> ${event.division} - ${event.batch} (${event.event_type}) - ${event.room_number}<br><hr> ${event.faculty_name} </span>
+                <span class="badge  start-time">${timeJson[eventStartSlot - timeTablestartSlot].start_time}</span>
+            <span class="badge  end-time">${timeJson[eventStartSlot - timeTablestartSlot + 11].end_time}</span></div> ${breakElement}`;
+            //console.log('roomSlotItem::::::::',roomSlotItem)
+            roomSlot.append(roomSlotItem);
+            }
+            else {
+                console.log('HERE FALSE')
+                roomSlot = document.querySelector(`.room[day-lid = "${event.day_lid}"] .room-slots`)
+                eventStartSlot = event.start_slot;
+                eventLeftPosition =   (eventStartSlot - timeTablestartSlot) * timetableProp.pxPerSlot;
+
+                let fixedBreak = document.createElement('div');
+                fixedBreak.setAttribute("class","fixed-break room-slot-item")
+                fixedBreak.setAttribute("style",`left: ${eventLeftPosition}px; top: 0;`)
+                fixedBreak.setAttribute("data-break",`${event.is_break}`)
+                fixedBreak.innerText = 'BREAK';
+                fixedBreadWidth = (event.end_slot - event.start_slot) * timetableProp.pxPerSlot + timetableProp.pxPerSlot;
+                /// console.log('breakinterval count:::::', fixedBreadWidth)
+                roomSlot.append(fixedBreak);
+            }
+        }
+        cssRoot.style.setProperty('--fixedBreakWidth', `${fixedBreadWidth}px`);
+    }
+
+})                        
+                        
+            
+</script>
+    <%- include("../partials/footerEnd") %>

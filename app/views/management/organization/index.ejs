@@ -1,0 +1,609 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+
+    <div class="errorHtml"></div>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Organizations</h5>
+            </div>
+            <div>
+                <button class="btn ms-auto add-btn" data-bs-toggle="modal" data-bs-target="#add-org-modal"><i
+                        class="fas fa-plus"></i></button>
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row organizationTable" id="organizationTable">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Abbr</th>
+                        <th>Name</th>
+                        <th>Complete Name</th>
+                        <th>Type</th>
+                        <th>Campus</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let count = 1; %>
+                    <% for (let org of orgList) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- org.org_abbr %>
+                        </td>
+                        <td>
+                            <%- org.org_name %>
+                        </td>
+                        <td>
+                            <%- org.org_complete_name %>
+                        </td>
+                        <td>
+                            <%- org.org_type %>
+                        </td>
+                        <td>
+                            <%- org.campus_abbr %>
+                        </td>
+                        <td>
+                            <a class="edit-org" data-org-id="<%- org.id %>"><i
+                                    class="fas fa-edit text-dark cursor-pointer"></i></a>
+                            <a class="delete-organization" data-id="<%- org.id %>"><i
+                                    class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- totalentries %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+
+
+<!-- ADD NEW ORG MODAL -->
+<div class="modal fade" id="add-org-modal" aria-labelledby="add-building-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-org-modal-title">Add New
+                    Organization</h5>
+                <button type="button" class="btn fs-4 text-dark" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="errorHtml"></div>
+                <input type="hidden" id="roomId" name="roomId">
+                <div class="">
+                    <table class="table table-bordered organizationTable" id="add-more-org-table">
+                        <thead>
+                            <th>Organization Id</th>
+                            <th>Organization Abbr</th>
+                            <th>Organization Name</th>
+                            <th>Organization Complete Name</th>
+                            <th>Organization Type</th>
+                            <th>Campus</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input name="orgLid" id="orgLid" type="hidden">
+                                    <input name="orgId" id="orgId" type="number" class="form-control"
+                                        placeholder="Organization Id" required>
+                                </td>
+
+                                <td>
+                                    <input name="orgAbbr" id="orgAbbr" type="text" class="form-control"
+                                        placeholder="Organization Abbr" required>
+                                </td>
+
+                                <td>
+                                    <input name="orgName" id="orgName" type="text" class="form-control"
+                                        placeholder="Organization Name" required>
+                                </td>
+
+                                <td>
+                                    <input name="orgCompleteName" id="orgCompleteName" type="text" class="form-control"
+                                        placeholder="Organization Complete Name" required>
+                                </td>
+
+                                <td>
+                                    <select name="orgType" id="orgType" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let orgType of orgtypeList) { %>
+                                        <option value="<%- orgType.id %>">
+                                            <%- orgType.name %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="campus" id="campus" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let campus of campusList) { %>
+                                        <option value="<%- campus.id %>">
+                                            <%- campus.campus_abbr %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-organization"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" id="add-more-orgnization"><i
+                        class="fas fa-plus"></i> Add More Organization</button>
+                <button type="submit" class="btn createOrg modal-inputform-btn">Create Organization</button>
+                <button type="submit" class="btn updateOrg modal-inputform-btn d-none">Update Organization</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<%- include('../partials/notification') %>
+<%- include('../partials/alert') %>
+
+<%- include("../partials/footer") %>
+
+
+<script>
+    $('document').ready(function () {
+
+        $('.select2').select2({
+            dropdownParent: $('#add-org-modal')
+        });
+
+        //ADD MORE ORGANIZATION
+        $('#add-more-orgnization').on('click', function () {
+
+            console.log("Organization Added::::")
+            let lastTr = $('#add-more-org-table tbody tr:last-child')
+            console.log('last trrr ', lastTr)
+            lastTr.find('.modalSelect2').select2('destroy');
+            let orgId = lastTr.find(`input[name='orgId']`).val();
+            let orgAbbr = lastTr.find(`input[name='orgAbbr']`).val();
+            let orgName = lastTr.find(`input[name='orgName']`).val();
+            let orgCompleteName = lastTr.find(`input[name='orgCompleteName']`).val();
+            let orgType = lastTr.find(`select[name="orgType"]`).val();
+            let campus = lastTr.find(`select[name="campus"]`).val();
+            console.log('yelo', orgType)
+
+            let clonedTr = lastTr.clone();
+            clonedTr.find(`input[name='orgId']`).val('')
+            clonedTr.find(`input[name='orgAbbr']`).val('')
+            clonedTr.find(`input[name='orgName']`).val('')
+            clonedTr.find(`input[name='orgCompleteName']`).val('')
+            clonedTr.find(`select[name='orgType']`).val('');
+            clonedTr.find(`select[name='campus']`).val('');
+
+            $('#add-more-org-table tbody').append(clonedTr)
+
+            lastTr.find('.modalSelect2').select2({
+                dropdownParent: $('#add-org-modal')
+            });
+
+            clonedTr.find('.modalSelect2').select2({
+                dropdownParent: $('#add-org-modal')
+            });
+        })
+
+        $('#add-more-org-table').on('click', '.remove-organization', function () {
+            let trLength = $('#add-more-org-table tbody tr').length;
+            if (trLength > 1) {
+                $(this).closest('tr').remove()
+            } else {
+                alert('Cannot delete this room.')
+            }
+        })
+
+
+        //Create 
+        $(".createOrg").on('click', function () {
+            let orgElems = $('#add-more-org-table tbody tr');
+            let orgCount = orgElems.length;
+            let orgJson = [];
+
+            orgElems.each(function (index, elem) {
+
+                let orgId = $(elem).find(`input[name='orgId']`).val()
+                let orgAbbr = $(elem).find(`input[name='orgAbbr']`).val()
+                let orgName = $(elem).find(`input[name='orgName']`).val()
+                let orgCompleteName = $(elem).find(`input[name='orgCompleteName']`).val()
+                let orgType = $(elem).find(`select[name='orgType']`).val();
+                let campus_lid = $(elem).find(`select[name="campus"]`).val()
+
+                if (index < orgCount - 1) {
+                    let obj = {
+                        org_id: orgId,
+                        org_id_str: orgId,
+                        org_abbr: orgAbbr,
+                        org_name: orgName,
+                        org_complete_name: orgCompleteName,
+                        org_type_id: orgType,
+                        campus_lid: campus_lid
+                    }
+                    orgJson.push(obj)
+                } else {
+                    let obj = {
+                        org_id: orgId,
+                        org_id_str: orgId,
+                        org_abbr: orgAbbr,
+                        org_name: orgName,
+                        org_complete_name: orgCompleteName,
+                        org_type_id: orgType,
+                        campus_lid: campus_lid
+                    }
+                    orgJson.push(obj)
+                }
+            })
+
+
+            console.log('orgJson::::::::::::::::::::>>>', orgJson)
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/organizations/create',
+                data: {
+                    inputJSON: JSON.stringify(orgJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('Result:::::::::::', result)
+
+
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+
+        })
+
+        $('#organizationTable').on('click', '.edit-org', function () {
+            $(".createOrg").addClass('d-none')
+            $(".updateOrg").removeClass('d-none')
+            $("#add-more-orgnization").addClass('d-none')
+            $("#add-org-modal-title").html("Update Organization")
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/organizations/findone',
+                data: {
+                    Id: $(this).attr('data-org-id')
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let org = result.orgData;
+
+                console.log('result.orgData', result.orgData)
+                $('#orgLid').val(org.id)
+                $('#orgId').val(org.org_id)
+                $('#orgAbbr').val(org.org_abbr)
+                $('#orgName').val(org.org_name)
+                $('#orgCompleteName').val(org.org_complete_name)
+                $('#orgType').val(org.org_type_id).trigger('change')
+                $("#campus").val(org.campus_lid).trigger('change')
+                $("#add-org-modal").modal('show')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        $(".updateOrg").on('click', function () {
+
+            let orgElems = $('#add-more-org-table tbody tr');
+            let orgCount = orgElems.length;
+            let orgJson = [];
+            orgElems.each(function (index, elem) {
+                let id = $(elem).find(`input[name='orgLid']`).val()
+                let orgId = $(elem).find(`input[name='orgId']`).val()
+                let orgAbbr = $(elem).find(`input[name='orgAbbr']`).val()
+                let orgName = $(elem).find(`input[name='orgName']`).val()
+                let orgCompleteName = $(elem).find(`input[name='orgCompleteName']`).val()
+                let orgType = $(elem).find(`select[name='orgType']`).val()
+
+                let campus_lid = $(elem).find(`select[name='campus']`).val()
+                let active = $(elem).find(`input[name='active']`).val()
+
+
+                if (index < orgCount - 1) {
+                    let obj = {
+                        id: id,
+                        org_id: orgId,
+                        org_id_str: orgId,
+                        org_abbr: orgAbbr,
+                        org_name: orgName,
+                        org_complete_name: orgCompleteName,
+                        org_type_id: orgType,
+                        campus_lid: campus_lid,
+                    }
+                    orgJson.push(obj)
+                } else {
+                    let obj = {
+                        id: id,
+                        org_id: orgId,
+                        org_id_str: orgId,
+                        org_abbr: orgAbbr,
+                        org_name: orgName,
+                        org_complete_name: orgCompleteName,
+                        org_type_id: orgType,
+                        campus_lid: campus_lid,
+                    }
+                    orgJson.push(obj)
+                }
+            })
+
+            console.log('orgJson::::::::::', orgJson)
+
+            if (orgJson.length > 0) {
+                $.ajax({
+                    url: '/management/organizations/update',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        inputJSON: JSON.stringify(orgJson)
+                    },
+                    success: data => {
+                        showSuccess(data)
+                    },
+                    error: err => {
+                        showError(err.responseJSON)
+                    }
+                })
+            } else {
+                alert('Select org First');
+            }
+        })
+
+
+
+        // validation demo:
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+
+            $.ajax({
+                type: "POST",
+                url: "/management/organization/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    AjaxTable(data.data)
+                }
+            })
+        });
+
+        //delete-organization
+        //Delete Faculty API
+        $("#organizationTable").on('click', '.delete-organization', function () {
+            let id = $(this).attr("data-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/organizations/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        // SEARCH ORGANIZATION TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: "/management/organizations/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    console.log('Result::::::::::',data)
+                    AjaxTable(data.data)
+                }
+            })
+        }, 500));
+
+        //Search With Pagination
+        $(".pagination-search").on('click', '.pagination li', function () {
+            let keyword = $("#searchkeyword").val()
+            let pageNo = $(this).attr('data-lp')
+            $.ajax({
+                type: "POST",
+                url: "/management/organizations/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: pageNo
+                },
+                success: function (data) {
+                    AjaxTable(data.data)
+                }
+            })
+        })
+
+
+
+        function AjaxTable(orgList) {
+            let AjaxTable = `<table class="table custom_row organizationTable" id="organizationTable">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Abbr</th>
+                        <th>Name</th>
+                        <th>Complete Name</th>
+                        <th>Type</th>
+                        <th>Campus</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    `;
+
+            if (orgList.length > 0) {
+                let count = 1;
+                for (org of orgList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>
+                         ${count++}
+                        </td>
+                        <td>
+                            ${org.org_abbr}
+                        </td>
+                        <td>
+                            ${org.org_name}
+                        </td>
+                        <td>
+                            ${org.org_complete_name}
+                        </td>
+                        <td>
+                            ${org.org_type}
+                        </td>
+                        <td>
+                           ${org.campus_abbr}
+                        </td>
+                        <td>
+                            <a class="edit-org" data-org-id="${org.id}"><i class="fas fa-edit text-dark cursor-pointer" ></i></a>
+                            <a class="delete-organization" data-id="${org.id}"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                        <td colspan="7" class="text-center">No Data Found</td>
+                     </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#organizationTable").html(AjaxTable);
+        }
+
+
+
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

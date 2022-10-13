@@ -1,0 +1,218 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-header table-card-header text-uppercase d-flex">
+            <h5>ROOM TRANSACTION LIST</h5>
+            <!-- <button type="button" class="btn btn-success ms-auto" data-bs-toggle="modal"
+                data-bs-target="#add-room-modal">
+                <i class="fas fa-plus"></i> Add New</button> -->
+        </div>
+        <div class="card-body">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="trans-table">
+                    <thead>
+                        <th>Transaction UUID</th>
+                        <th>Applicant</th>
+                        <th>Applicant Sap ID</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <% for (let transaction of transactionList) { %>
+                        <tr>
+                            <td><%- transaction.transaction_uuid %></td>
+                            <td><%- transaction.applicant_name %></td>
+                            <td><%- transaction.applicant_sap_id %></td>
+                            <td>
+                                <a class="btn btn-success  btn-sm view-details"
+                                    data-trans-id="<%- transaction.transaction_uuid %>">View Details</a>
+
+                                <a class="fas fa-check-square fa-2x approve-trans"
+                                    data-trans-id="<%- transaction.transaction_uuid %>"></a>
+                                <i class="fas fa-trash-alt fa-2x text-danger reject-trans"
+                                    data-trans-id="<%- transaction.transaction_uuid %>"></i>
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="transaction-modal" tabindex="-1" aria-labelledby="transaction-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transaction-modal-title">VIEW ROOM TRANSACTION LIST</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="roomtransactionTable"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close window</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/footer") %>
+<script>
+    $(document).ready(() => {
+
+        //view-details
+        $("#trans-table").on('click', '.view-details', function () {
+
+            let ApiObj = {
+                url: '/management/rooms/bookings/transactions/findone',
+                type: 'POST',
+                data: {
+                    transid: $(this).attr("data-trans-id")
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let ajaxTable = `<table class="table table-bordered   table-hover"" id="trans-details-table">
+                            <thead>
+                                <th>Room </th>
+                                <th>Transaction Type</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Stage</th>
+                                <th>Organization</th>
+                                <th>Campus</th>
+                            </thead>
+                        `;
+                result.data.forEach(function (trans) {
+                    ajaxTable += `<tr>
+                        <td>${trans.room}</td>
+                        <td>${trans.trans_type}</td>
+                        <td>${trans.start_date}</td>
+                        <td>${trans.end_date}</td>
+                        <td>${trans.start_time}</td>
+                        <td>${trans.end_time}</td>
+                        <td>${trans.stage}</td>
+                        <td>${trans.organization}</td>
+                        <td>${trans.campus}</td>
+                     </tr>`
+                })
+
+                ajaxTable += `</table>`
+                $("#roomtransactionTable").html(ajaxTable)
+                $("#transaction-modal").modal('show')
+            }).catch(error => {
+                console.log('Error: ', err)
+            })
+
+        })
+
+
+        //approve-trans
+        $("#trans-table").on('click', '.approve-trans', function () {
+            let ApiObj = {
+                url: '/management/rooms/bookings/transactions/approve-trans',
+                type: 'POST',
+                data: {
+                    transid: $(this).attr("data-trans-id")
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log(result.data.message)
+                alert(result.data.message)
+            }).catch(error => {
+                console.log('Error: ', err)
+            })
+        })
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+           
+            let ApiObj = {
+                url: "/management/rooms/bookings/transactions/search",
+                type: 'POST',
+                data: {
+                    keyword: $("#searchkeyword").val()
+                },
+                dataType: 'JSON'
+            }
+            
+            ajaxApi(ApiObj).then(result => {
+                let transactionList = result.data;
+
+                    let AjaxTable = `<table class="table table-bordered" id="trans-table">
+                    <thead>
+                        <th>Transaction UUID</th>
+                        <th>Applicant</th>
+                        <th>Applicant Sap ID</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>`;
+
+                    if (transactionList.length > 0) {
+                        let count = 1;
+                        for (transaction of transactionList) {
+                            AjaxTable +=
+                                `                         <tr>
+                            <td>${transaction.transaction_uuid}</td>
+                            <td>${transaction.applicant_name}</td>
+                            <td>${transaction.applicant_sap_id}</td>
+                            <td>
+                                <a class="btn btn-success  btn-sm view-details"
+                                    data-trans-id="${transaction.transaction_uuid}">View Details</a>
+
+                                <a class="fas fa-check-square fa-2x approve-trans"
+                                    data-trans-id="${transaction.transaction_uuid}"></a>
+
+                                <i class="fas fa-trash-alt fa-2x text-danger reject-trans"
+                                    data-trans-id="${transaction.transaction_uuid}"></i>
+                            </td>
+                        </tr>`
+                        }
+                    } else {
+                        AjaxTable +=
+                            ` <tr>
+                                <td colspan="4">No Data Found</td>
+                            </tr>`;
+                    }
+                    AjaxTable += `<tbody></table>`
+                    $("#trans-table").html(AjaxTable);
+            }).catch(error => {
+                console.log('Error: ', err)
+            })
+
+        }, 500));
+
+
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

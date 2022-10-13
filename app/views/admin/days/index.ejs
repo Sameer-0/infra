@@ -1,0 +1,145 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+      <!--DASHBOARD CONTENT START-->
+      <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+ 
+    <!--DASHBOARD CONTENT START-->
+
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>DAYS</h5>
+            </div>
+            <div>
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered custom_row" id="dayTable">
+                <thead>
+                    <th>Day of week</th>
+                    <th>Day Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <%for(day of dayList){%>
+                    <tr>
+                        <td><%- day.id %></td>
+                        <td><%- day.day_name %></td>
+                        <td><%- day.status %></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" class="changeStatus" data-id="<%- day.id %>"
+                                    data-status="<%- day.status %>"
+                                    <%- day.status == 'Yes' ? 'Checked' :  ''  %>>
+                                <span class="switch-slider round"></span>
+                            </label>
+                        </td> 
+                    </tr>
+                    <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+
+
+
+
+<%- include("../partials/footer") %>
+                    <script>
+                        $(document).ready(function () {
+
+                            //Create 
+                            $('#dayTable').on('change', '.changeStatus', function () {
+                               
+                                if ($(this).is(':checked')) {
+                                    //console.log('Yes')
+                                    chnageStatus($(this).attr('data-id'), 1)
+                                } else {
+                                    //console.log('No')
+                                    chnageStatus($(this).attr('data-id'), 0)
+                                }
+                            })
+
+                            function chnageStatus(id, status) {
+                                let ApiObj = {
+                                    url: '/admin/days/change',
+                                    type: 'POST',
+                                    data: {
+                                        id: id,
+                                        status: status
+                                    },
+                                    dataType: 'JSON'
+                                }
+
+                                ajaxApi(ApiObj).then(result => {
+                                loadDays()
+                                }).catch(error => {
+
+                                })
+                            }
+
+                            function loadDays(){
+                                let ApiObj = {
+                                    url: '/admin/days/GetAll',
+                                    type: 'POST',
+                                    data: { },
+                                    dataType: 'JSON'
+                                }
+
+                                ajaxApi(ApiObj).then(result => {
+                                  AjaxTable(result.result)
+                                }).catch(error => {
+
+                                })
+                            }
+
+                            function AjaxTable(days){
+let htmlTable = `<table class="table table-bordered custom_row" id="dayTable">
+                <thead>
+                    <th>Day of week</th>
+                    <th>Day Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`
+                    days.forEach(day => {
+                        htmlTable +=`<tr>
+                        <td>${day.id}</td>
+                        <td>${day.day_name}</td>
+                        <td>${day.status}</td>
+                        <td> <label class="switch">
+                                <input type="checkbox" class="changeStatus" data-id="${day.id}"
+                                    data-status="${day.status}"
+                                    ${day.status == 'Yes' ? 'Checked' :  ''}>
+                                <span class="switch-slider round"></span>
+                            </label></td>
+
+                    </tr>`
+                    });
+                  
+                    htmlTable += `</tbody></table>`;
+                    $("#dayTable").html(htmlTable)
+                            }
+
+                        })
+                    </script>
+                    <%- include("../partials/footerEnd") %>

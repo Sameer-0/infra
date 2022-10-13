@@ -1,0 +1,43 @@
+<%- include('alert') %>
+<div class="col-12 p-0 dashboardContentWrapper">
+            <div class="w-100">
+
+                <!--HEADER START-->
+                <nav class="navbar navbar-expand-lg sticky-top">
+                    <a class="navbar-brand flex-grow-1" href="#">
+                        <h1>LOGO</h1>
+                    </a>
+                    <div class="nav-item dropdown mobileUser">
+                        <a class="nav-link dropdown-toggle" href="#" id="userIcoDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user-circle fa-2x"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right userDropdown" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">My Profile</a>
+                            <a class="dropdown-item" href="pages/logout.php"></a>
+                        </div>
+                    </div>
+                    <button class="navbar-toggler" type="button">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userIcoDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span>User Admin</span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right userDropdown" aria-labelledby="navbarDropdown">
+                                  <a class="dropdown-item" href="#">Test Admin User</a>
+                                    <a class="dropdown-item" href="#">My Account</a>
+                                    <a class="dropdown-item" href="/logout">Logout</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <!--Notificaion icon-->
+                <!-- <div class="notif-icon cursor-pointer">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <p class="small">3 new</p>
+                </div> -->
+                <!--HEADER END-->

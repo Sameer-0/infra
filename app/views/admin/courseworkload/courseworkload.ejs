@@ -1,0 +1,1144 @@
+<%- include("../partials/head") %>
+<link rel="stylesheet" href="/css/simpleAlert.css">
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="row my-3 gx-3 gy-3 row1-data">
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/courseworkload">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/fetchcourse.png" alt="">
+                        <p class="fw-normal pt-1">FETCH COURSE WORKLOAD</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/courseworkload/workload">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/biology.png" alt="">
+                        <p class="fw-normal pt-1">COURSE WORKLOAD</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/courseDayRoomPreference">
+            <div class="card row1-data-card text-center">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <img src="/icon_imgs/prefernece.png" alt="">
+                        <p class="fw-normal pt-1">COURSE PREFERENCE</p>
+                    </div>
+            </div>
+        </a>
+        </div> -->
+    </div>
+
+    <div class="card table-card mt-3">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>COURSE WORKLOAD</h5>
+            </div>
+            <!-- <div class="table-searchbar-container">
+                <button type="button"><i class="fas fa-search"></i> </button><input
+                type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+            </div> -->
+            <div class="ms-2">
+                <a href="/admin/courseworkload/workload/module-abbr" class="btn btn-danger">Update Module Abbr</a>
+                <a class="btn btn-danger" href="/admin/courseworkload/workload/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#open-course-modal">
+                    <i class="fas fa-plus"></i></button>
+                
+                <!-- <button class="btn ms-auto select-delete-holidays add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-holiday add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+
+        <div class="row my-2 ms-2 me-2">
+            <div class="col-md-2">
+                <label>Show Entry</label>
+                <select class="form-select" id="changeEntry">
+                    <%for(let page of locals.page_filter){%>
+                       <option value="<%-page%>"><%-page%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="col-md-3 mt-4">
+                <select class="form-select form-control select2" id="programNameFilter">
+                    <option selected>Select Program</option>
+                    <%for(let prog of programList){%>
+                    <option value="<%-prog.program_id%>"><%-prog.program_name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="col-md-4  mt-4">
+                <select class="form-select form-control select2" id="sessionNameFilter">
+                </select>
+            </div>
+
+            <div class="col-md-3  mt-4">
+                <input type="search" id="searchkeyword" placeholder="Enter keywords" class="form-control">
+            </div>
+
+        </div>
+
+        <div class="card-body table-responsive">
+           <!-- <caption><span class="text-danger">Note:</span> In order to keep all intake the same, simply insert records in the first field and click on the checkbox. If the checkbox is unchecked, the records will be emptied.</caption> -->
+            <table class="table custom_row table-bordered" id="courseWorkloadTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Module Name</th>
+                    <th>Module Code</th>
+                    <th>Program Id</th>
+                    <th>Program Code</th>
+                    <th>Acad Session</th>
+                    <th>Module Type <input type="checkbox" id="moduleTypeCheck"></th>
+                    <th>Intake <input type="checkbox" id="intakeCheck"></th>
+                    <th>Student per division <input type="checkbox" id="studentPerDivisionCheck"></th>
+                    <th>Lecture count per batch per week <input type="checkbox" id="lectureCountPerBatchPerWeekCheck"></th>
+                    <th>Practical count per batch per week <input type="checkbox" id="practicalCountPerBatchPerWeekCheck"></th>
+                    <th>Tutorial count_per batch per week <input type="checkbox" id="TutorialCountPerBatchPerWeekCheck"></th>
+                    <th>Workshop count per batch per week <input type="checkbox" id="WorkshopCountPerBatchPerWeekCheck"></th>
+                    <th>Session Events per Semester <input type="checkbox" id="SessionEventsPerSemesterCheck"></th>
+                    <th>Continuous <input type="checkbox" id="ContinuousCheck"></th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <%
+                        let count = 1
+                        for(let course of courseWorkloadList) { %>
+                    <tr>
+                        <td><%- count++ %> <input type="hidden" class="form-control rounded-0" name="workloadlid"
+                                value="<%-course.id %>"></td>
+                        <td data-module-name="<%-course.module_name%>"><%-course.module_name%></td>
+                        <td data-module-id="<%-course.module_id%>"><%-course.module_id%></td>
+                        <td data-program-id="<%-course.program_id%>"><%-course.program_id%></td>
+                        <td data-program-code="<%-course.program_code%>"><%-course.program_code%></td>
+                        <td data-acad-session-lid="<%-course.acad_session_lid%>" data-acad-session="<%-course.acad_session%>"><%-course.acad_session%></td>
+                        <td>
+                            <select class="form-select rounded-0" name="module_type_lid">
+                                <!-- <option value="">Select Module Type</option> -->
+                                <% for (let module of moduleList) { %>
+                                <% if (course.module_type_lid == module.id) { %>
+                                <option value="<%- module.id %>" selected><%- module.name %></option>
+                                <%} else { %>
+                                <option value="<%- module.id %>"><%- module.name %></option>
+                                <% } %>
+                                <%}%>
+                            </select>
+                            </td>
+                            <td><input type="number" class="form-control rounded-0" name="intake" value="<%-course.intake%>">
+                        </td>
+                        <td><input type="number" class="form-control rounded-0" name="student_per_division"
+                                value="<%-course.student_per_division%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="lecture_count_per_batch"
+                                value="<%-course.lecture_count_per_batch%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="practical_count_per_batch"
+                                value="<%-course.practical_count_per_batch%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="tutorial_count_per_batch"
+                                value="<%-course.tutorial_count_per_batch%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="workshop_count_per_batch"
+                                value="<%-course.workshop_count_per_batch%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="session_events_per_semester"
+                                value="<%-course.session_events_per_semester%>"></td>
+                        <td><input type="number" class="form-control rounded-0" name="continuous"
+                                value="<%-course.continuous%>"></td>
+                        <td><a class="delete-course-workload" data-id="<%-course.id%>"><span class="fa fa-trash"></span></a></td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %></p>
+                </div>
+                <div>
+                    <!-- <button class="btn btn-success SaveAll"><span class="fa fa-pen"></span> Update </button> -->
+                    <!-- <button class="btn btn-success SaveAll"><span class="fa fa-check"></span> Final Submit </button> -->
+                </div>
+            </div>
+        </div>
+        <div class="ms-auto me-2">
+            <button class="btn btn-danger preview-btn"><span class="fa fa-eye"></span> Preview </button>
+            <button class="btn btn-success SaveAll my-2"><span class="fa fa-pen"></span> Update </button>
+        </div>
+    </div>
+</div>
+
+
+<!--Import Modal -->
+<div class="modal fade" id="open-course-modal" tabindex="-1" aria-labelledby="open-course-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h3 class="modal-title" id="open-room-modal-title">Select Course</h3>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+            <div class="modal-body py-0">
+                <div class="row sticky-top">
+
+
+                    <div class="col-md-3 col-xxl-3 border-end h-100">
+                        <label for="exampleFormControlInput1" class="form-label mt-3">Select Program</label>
+                            <select class="form-select form-control" id="programName">
+                                <option selected>Select Program</option>
+                                <%for(let program of programList){%>
+                                <option value="<%-program.program_id%>"><%-program.program_name%></option>
+                                <%}%>
+                              </select>
+
+                            <label for="exampleFormControlInput1" class="form-label mt-2">Select Acadmic Session</label>
+                            <select class="form-select form-control" id="sessionName">
+                                  <option selected>Select Session</option>
+                            </select>
+                       
+                            <label for="exampleFormControlInput1" class="form-label mt-2" style="margin-top: 10px;">Course List</label>
+                            <ul class="list-group custom-select-list selectList selectListCourse"></ul>
+                    </div>
+                    <div class="col-md-9 col-xxl-9">
+                        <table class="table table-bordered" id="add-more-course-table">
+                            <thead>
+                                <tr>
+                                    <th>Course Name</th>
+                                    <th>Program Name</th>
+                                    <th>Session</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="error-html"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn modal-inputform-btn" id="importCourse">Import Course</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="open-priview-modal" tabindex="-1" aria-labelledby="open-priview-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="open-priview-modal-Label">Preview Course workload</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body priview-table">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-primary">Download Excel</button> -->
+          <button type="button" class="btn btn-secondary"  onclick="tableToExcel('previewTable', 'Course Workload')" ><span class="fa fa-download"></span> Download Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<%- include("../partials/footer") %>
+<script>
+    $(document).ready(function () {
+        let username = `<%- locals.userId %>`;
+        $('.select2').select2();
+
+        //Filter APIS FOR INITIALCOURSE WORKLOAD
+        $("#programNameFilter").on('change',function(){
+            let programId = $(this).val()
+            console.log('programId:::::::::::>',programId)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/courseworkload/workload/workload-by-programid',
+                data: {
+                    programId: programId
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('result',result)
+                let  sessionName = `<option value="" disabled>Select Session</option>`;
+                if (result.sessionList.length > 0) {
+                   
+                    result.sessionList.forEach(element => {
+                        sessionName +=`<option value="${element.acad_session_lid}" >${element.acad_session}</option>`;
+                    });
+                    AjaxtTable(result.workload)
+                } else {
+                    sessionName += `<option value="">No Session Found!</option>`;
+                }
+                $("#sessionNameFilter").html(sessionName).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        $("#sessionNameFilter").on('change',function(){
+            let programId = $("#programNameFilter").val()
+            let sessionId = $(this).val()
+            console.log('programID',programId,'SessionId',sessionId)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/courseworkload/workload/workload-by-programid-sessionid',
+                data: {
+                    programId: programId,
+                    sessionId: sessionId
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                    AjaxtTable(result.data)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //previewModal
+        $(".preview-btn").on('click', function(){
+            let courseElems = $('#courseWorkloadTable tbody tr');
+            let courseCount = courseElems.length;
+            let courseJSON = [];
+            courseElems.each(function (index, elem) {
+                let workloadlid = $(elem).find(`input[name='workloadlid']`).val()
+                let intake = $(elem).find(`input[name='intake']`).val()
+                let student_per_division = $(elem).find(`input[name='student_per_division']`).val();
+                let lecture_count_per_batch = $(elem).find(
+                    `input[name='lecture_count_per_batch']`).val();
+                let practical_count_per_batch = $(elem).find(
+                    `input[name='practical_count_per_batch']`).val();
+                let tutorial_count_per_batch = $(elem).find(
+                    `input[name='tutorial_count_per_batch']`).val();
+                let workshop_count_per_batch = $(elem).find(
+                    `input[name='workshop_count_per_batch']`).val();
+                let session_events_per_semester = $(elem).find(
+                    `input[name='session_events_per_semester']`).val();
+                let module_type_lid = $(elem).find(`select[name='module_type_lid'] option:selected`).text();
+                let continuous = $(elem).find(`input[name='continuous']`).val();
+                let module_name = $(elem).find(`td[data-module-name]`).attr(`data-module-name`);
+                let program_id = $(elem).find(`td[data-program-id]`).attr(`data-program-id`);
+                let module_id = $(elem).find(`td[data-module-id]`).attr(`data-module-id`);
+                let acad_session = $(elem).find(`td[data-acad-session]`).attr(
+                    `data-acad-session`);
+                let program_code = $(elem).find(`td[data-program-code]`).attr(
+                    `data-program-code`);
+                    let obj = {
+                        id: workloadlid,
+                        intake: intake,
+                        student_per_division: student_per_division,
+                        lecture_count_per_batch: lecture_count_per_batch,
+                        practical_count_per_batch: practical_count_per_batch,
+                        tutorial_count_per_batch: tutorial_count_per_batch,
+                        workshop_count_per_batch: workshop_count_per_batch,
+                        session_events_per_semester: session_events_per_semester,
+                        continuous: continuous,
+                        module_type_lid: module_type_lid,
+                        user_id: username,
+                        module_name: module_name,
+                        program_id: program_id,
+                        module_id: module_id,
+                        acad_session: acad_session,
+                        program_code: program_code
+                    }
+                    courseJSON.push(obj)
+            })
+            let previewTable = `<table class="table custom_row table-bordered" id="previewTable" summary="Code page support in different versions of MS Windows." rules="groups" >
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Module Name</th>
+                    <th>Module Code</th>
+                    <th>Program Id</th>
+                    <th>Program Code</th>
+                    <th>Acad Session</th>
+                    <th>Module Type</th>
+                    <th>Intake</th>
+                    <th>Student per division</th>
+                    <th>Lecture count per batch per week</th>
+                    <th>Practical count per batch per week</th>
+                    <th>Tutorial count_per batch per week</th>
+                    <th>Workshop count per batch per week</th>
+                    <th>Session Events per Semester</th>
+                    <th>Module Event Abbr</th>
+                    <th>Continuous</th>
+                </thead>`;
+                let count = 1;
+                courseJSON.forEach(function(course){
+                    previewTable +=`<tr>
+                            <td>${count++}</td>
+                            <td>${course.module_name}</td>
+                            <td>${course.module_id}</td>
+                            <td>${course.program_id}</td>
+                            <td>${course.program_code}</td>
+                            <td>${course.acad_session}</td>
+                            <td>${course.module_type_lid}</td>
+                            <td>${course.intake}</td>
+                            <td>${course.student_per_division}</td>
+                            <td>${course.lecture_count_per_batch}</td>
+                            <td>${course.practical_count_per_batch}</td>
+                            <td>${course.tutorial_count_per_batch}</td>
+                            <td>${course.workshop_count_per_batch}</td>
+                            <td>${course.session_events_per_semester}</td>
+                            <td>${course.module_event_abbr}</td>
+                            <td>${course.continuous}</td>
+                            </tr>` 
+                })
+        $(".priview-table").html(previewTable)
+         $("#open-priview-modal").modal('show')
+        })
+
+
+        $(document).on('click','#courseWorkloadTable th:nth-child(8)', function(){        
+            
+            // $('#courseWorkloadTable td:nth-child(8)').text('yele')
+        
+        })
+
+        $(document).on('click', '#courseWorkloadTable th:nth-child(7)', function(){
+        //    console.log($('#courseWorkloadTable td:nth-child(8)'),'::::<<<<<<>>>>>>>>>')
+        })
+
+        //FILTER APIS
+        $("#programName").on('change',function(){
+            let programId = $(this).val()
+            console.log('programId:::::::::::',programId)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/courseworkload/workload/session-by-programid',
+                data: {
+                    programId: programId
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('result:::::::::::::',result)
+                let sessionName = ``;
+                if (result.data.length > 0) {
+                    sessionName += `<option value="">Select Session</option>`;
+                    result.data.forEach(element => {
+                        sessionName +=`<option value="${element.sap_acad_session}">${element.sess_desc}</option>`;
+                    });
+                    // $('.add-faculty-date-time').removeAttr('disabled')
+                } else {
+                    sessionName += `<option value="">No Session Found!</option>`;
+                }
+                $("#open-course-modal  #sessionName").html(sessionName).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        //FETCH COURSE LISTS
+        $("#sessionName").on('change',function(){
+            let sessionId = $(this).val()
+            let programId = $("#programName").val()
+           
+            if(sessionId){
+                //Call API
+                console.log('ProgramName', programId,'SessionName',sessionId)
+                let ApiObj = {
+                type: 'POST',
+                url: '/admin/courseworkload/workload/fetching-courses',
+                data: {
+                    programId: programId,
+                    sessionId: sessionId
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('result:::::::::::::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',result.data)
+
+                let courseList = ``;
+
+                if(result.data.length > 0){
+                    result.data.forEach(function(coursewsdl){
+                        courseList +=  `<li class="list-group-item my-1 border-top" data-clickable="true"
+                                data-module-objid="${coursewsdl.module_objid}" data-course-wsdl-id="${coursewsdl.id}" data-module-name="${coursewsdl.module_desc}" data-program-name="${coursewsdl.program_name}" data-session-desc="${coursewsdl.sess_desc}">
+                        ${ coursewsdl.module_desc}  ${ coursewsdl.program_name}  ${coursewsdl.sess_desc}</li>`
+                    })
+
+                    $("#open-course-modal .selectListCourse").html(courseList)
+                }
+
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+
+            }
+        })
+
+
+        //SaveAll
+        $(".SaveAll").on('click', function () {
+            console.log('SaveAll::::::::::>>>')
+            let courseElems = $('#courseWorkloadTable tbody tr');
+            let courseCount = courseElems.length;
+            let courseJSON = [];
+            courseElems.each(function (index, elem) {
+                let workloadlid = $(elem).find(`input[name='workloadlid']`).val()
+                let intake = $(elem).find(`input[name='intake']`).val()
+                let student_per_division = $(elem).find(`input[name='student_per_division']`)
+                    .val();
+                let lecture_count_per_batch = $(elem).find(
+                    `input[name='lecture_count_per_batch']`).val();
+                let practical_count_per_batch = $(elem).find(
+                    `input[name='practical_count_per_batch']`).val();
+                let tutorial_count_per_batch = $(elem).find(
+                    `input[name='tutorial_count_per_batch']`).val();
+                let workshop_count_per_batch = $(elem).find(
+                    `input[name='workshop_count_per_batch']`).val();
+                let session_events_per_semester = $(elem).find(
+                    `input[name='session_events_per_semester']`).val();
+                let module_type_lid = $(elem).find(`select[name='module_type_lid']`).val();
+                let continuous = $(elem).find(`input[name='continuous']`).val();
+                let module_name = $(elem).find(`td[data-module-name]`).attr(`data-module-name`);
+                let program_id = $(elem).find(`td[data-program-id]`).attr(`data-program-id`);
+                let module_id = $(elem).find(`td[data-module-id]`).attr(`data-module-id`);
+                let acad_session_lid = $(elem).find(`td[data-acad-session-lid]`).attr(
+                    `data-acad-session-lid`);
+                    let module_event_abbr = $(elem).find(
+                    `input[name='module_event_abbr']`).val();
+
+                console.log('module_name:::::::::::::::>>>>>', module_name, program_id,
+                    module_id, acad_session_lid)
+
+                if (index < courseCount - 1) {
+                    let obj = {
+                        id: workloadlid,
+                        intake: intake,
+                        student_per_division: student_per_division,
+                        lecture_count_per_batch: lecture_count_per_batch,
+                        practical_count_per_batch: practical_count_per_batch,
+                        tutorial_count_per_batch: tutorial_count_per_batch,
+                        workshop_count_per_batch: workshop_count_per_batch,
+                        session_events_per_semester: session_events_per_semester,
+                        continuous: continuous,
+                        module_type_lid: module_type_lid,
+                        user_id: username,
+                        module_name: module_name,
+                        program_id: program_id,
+                        module_id: module_id,
+                        acad_session_lid: acad_session_lid,
+                        module_event_abbr: module_event_abbr
+                    }
+                    courseJSON.push(obj)
+                } else {
+                    let obj = {
+                        id: workloadlid,
+                        intake: intake,
+                        student_per_division: student_per_division,
+                        lecture_count_per_batch: lecture_count_per_batch,
+                        practical_count_per_batch: practical_count_per_batch,
+                        tutorial_count_per_batch: tutorial_count_per_batch,
+                        workshop_count_per_batch: workshop_count_per_batch,
+                        session_events_per_semester: session_events_per_semester,
+                        continuous: continuous,
+                        module_type_lid: module_type_lid,
+                        user_id: username,
+                        module_name: module_name,
+                        program_id: program_id,
+                        module_id: module_id,
+                        acad_session_lid: acad_session_lid,
+                        module_event_abbr: module_event_abbr
+                    }
+                    courseJSON.push(obj)
+                }
+            })
+
+            console.log('Json::::::::::::', courseJSON)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/courseworkload/workload/update',
+                data: {
+                    inputJSON: JSON.stringify(courseJSON)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log(result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+
+
+        // SEARCH PROGRAM TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: "/admin/courseworkload/workload/search",
+                data: {
+                    keyword: keyword
+                },
+                success: function (data) {
+                    console.log('response::::::::::::>>', data)
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+     
+        $(".selectListCourse").on('click', '.list-group-item', function () {
+            // remove current element when added to right sidebar
+            if ($(this).attr('data-clickable') == 'true') {
+                console.log('appending:::::>>', $(this).attr("data-module-name"))
+                $("#open-course-modal #add-more-course-table  tbody").append(
+                    `<tr data-clickable="true">
+                    <td data-module-objid="${$(this).attr('data-module-objid')}" data-module-name="${$(this).attr('data-module-name')}" data-course-wsdl-id="${$(this).attr("data-course-wsdl-id")}">${$(this).attr("data-module-name")}</td>
+                    <td data-program-name="${$(this).attr('data-program-name')}" data-program-name="${$(this).attr("data-program-name")}">${$(this).attr("data-program-name")}</td>
+                    <td data-session-desc="${$(this).attr('data-session-desc')}" data-session-desc="${$(this).attr("data-session-desc")}">${$(this).attr("data-session-desc")}</td>
+                    <td>
+                        <i class="fas fa-trash-alt text-danger cursor-pointer clicktoremove"></i>
+                    </td>
+                </tr>`)
+            }
+            $(this).attr('data-clickable', 'false');
+            $($(this)).fadeOut(300, function () {
+                $($(this)).remove()
+            })
+        })
+
+
+        //Remove Element
+        $("#add-more-course-table").on('click', '.clicktoremove', function () {
+            console.log('Log Here',$(this).parent().parent().find('td[data-module-name]').attr('data-module-name'))
+            if ($(this).parent().parent().attr('data-clickable') == 'true') {
+                $(".selectListCourse").append(`<li class="list-group-item my-1 border-top" data-module-objid="${$(this).parent().parent().find('td[data-module-objid]').attr('data-module-objid')}" data-course-wsdl-id="${$(this).parent().parent().find('td[data-course-wsdl-id]').attr('data-course-wsdl-id')}" data-program-name="${$(this).parent().parent().find('td[data-program-name]').attr('data-program-name')}" data-session-desc="${$(this).parent().parent().find('td[data-session-desc]').attr('data-session-desc')}" data-module-name="${$(this).parent().parent().find('td[data-module-name]').attr('data-module-name')}" data-clickable="true"> ${$(this).parent().parent().find("td[data-module-objid]").text()} 
+                    </li>`)
+            }
+
+            $(this).parent().attr('data-clickable', 'false')
+            $($(this)).fadeOut(300, function () {
+                $($(this).parent().parent()).remove()
+            })
+        })
+
+
+                //Import
+                $('#importCourse').on('click', function() {
+
+                    let courseElems = $('#add-more-course-table tbody tr');
+                    let courseCount = courseElems.length;
+                    let courseJson = [];
+                    courseElems.each(function (index, elem) {
+
+                        let wsdlId = $(elem).find('td[data-course-wsdl-id]').attr('data-course-wsdl-id');
+
+                        if (index < courseCount - 1) {
+                            let obj = {
+                                course_wsdl_lid: wsdlId
+                            }
+                            courseJson.push(obj)
+                        } else {
+                            let obj = {
+                                course_wsdl_lid: wsdlId
+                            }
+                            courseJson.push(obj)
+                        }
+                    })
+                    console.log('JSON::::::::::::::::',courseJson);
+                    let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/courseworkload/workload/create',
+                    data: {
+                        inputJSON: JSON.stringify(courseJson),
+                    
+                    },
+                    dataType: 'JSON' 
+                    }
+
+                    ajaxApi(ApiObj).then(result => {
+                    console.log('response::::::::::',result)
+                    showSuccess(result)              
+                    }).catch(error => {
+                    console.log('ERROR::::::::::',error.responseJSON)
+                    showError(error.responseJSON)
+                    })
+            })
+
+
+            $("#courseWorkloadTable").on('click','.delete-course-workload',function(){
+                //showAlert({status:0, description:"", data:[]})
+                //showAlert({status:0, description:"", data:[]})
+                console.log('result')
+                let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/courseworkload/workload/delete',
+                    data: {
+                        id: $(this).attr('data-id')
+                    },
+                    dataType: 'JSON' 
+                    }
+                    ajaxApi(ApiObj).then(result => {
+                        console.log('result', result.status)
+                        if(result.status == 1){
+                            showSuccess(result) 
+                        }
+                        else{
+                            console.log('error')
+                            showError(result)
+                        }
+                                     
+                    }).catch(error => {
+                     showError(error.responseJSON)
+                    })
+            })
+
+
+
+                            //moduleTypeCheck
+                            $("#courseWorkloadTable").on('change','#moduleTypeCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td select[name='module_type_lid']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td select[name='module_type_lid']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td select[name='module_type_lid']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`select[name='module_type_lid']`).val()
+                                            console.log('module_type_lid:::::::::::',intake)
+                                            $(`#courseWorkloadTable tbody tr td select[name='module_type_lid']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td select[name='module_type_lid']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td select[name='module_type_lid']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`select[name='module_type_lid']`).val()
+                                     $(`#courseWorkloadTable tbody tr td select[name='module_type_lid']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //  Intake  Check
+                                $("#courseWorkloadTable").on('change','#intakeCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='intake']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='intake']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='intake']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='intake']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //Student per division
+                                $("#courseWorkloadTable").on('change','#studentPerDivisionCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='student_per_division']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='student_per_division']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='student_per_division']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='student_per_division']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='student_per_division']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='student_per_division']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='student_per_division']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='student_per_division']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //lectureCountPerBatchPerWeekCheck
+                                $("#courseWorkloadTable").on('change','#lectureCountPerBatchPerWeekCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='lecture_count_per_batch']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='lecture_count_per_batch']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='lecture_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='lecture_count_per_batch']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='lecture_count_per_batch']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='lecture_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='lecture_count_per_batch']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='lecture_count_per_batch']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //practicalCountPerBatchPerWeekCheck
+                                $("#courseWorkloadTable").on('change','#practicalCountPerBatchPerWeekCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='practical_count_per_batch']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='practical_count_per_batch']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='practical_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='practical_count_per_batch']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='practical_count_per_batch']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='practical_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='practical_count_per_batch']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='practical_count_per_batch']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //TutorialCountPerBatchPerWeekCheck
+                                $("#courseWorkloadTable").on('change','#TutorialCountPerBatchPerWeekCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='tutorial_count_per_batch']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='tutorial_count_per_batch']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='tutorial_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='tutorial_count_per_batch']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='tutorial_count_per_batch']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='tutorial_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='tutorial_count_per_batch']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='tutorial_count_per_batch']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //WorkshopCountPerBatchPerWeekCheck
+
+                                $("#courseWorkloadTable").on('change','#WorkshopCountPerBatchPerWeekCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='workshop_count_per_batch']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='workshop_count_per_batch']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='workshop_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='workshop_count_per_batch']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='workshop_count_per_batch']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='workshop_count_per_batch']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='workshop_count_per_batch']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='workshop_count_per_batch']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                                //SessionEventsPerSemesterCheck
+                                $("#courseWorkloadTable").on('change','#SessionEventsPerSemesterCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='session_events_per_semester']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='session_events_per_semester']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='session_events_per_semester']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='session_events_per_semester']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='session_events_per_semester']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='session_events_per_semester']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='session_events_per_semester']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='session_events_per_semester']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+                            //ContinuousCheck
+                            $("#courseWorkloadTable").on('change','#ContinuousCheck',function(){ 
+                                    if($(this).is(":checked")){
+                                        let tableRow = $('#courseWorkloadTable tbody tr');
+                                        tableRow.each(function (index, elem){
+                                            if(index == 0 && $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='continuous']`).val() == ''){
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='continuous']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='continuous']`).attr('placeholder','This Field is Mandetory')
+                                            }
+                                            let intake = $(elem).find(`input[name='continuous']`).val()
+                                            $(`#courseWorkloadTable tbody tr td input[name='continuous']`).val(intake).trigger('change')
+                                        })
+                                        console.log('True')
+                                    }else
+                                    {
+                                    let tableRow = $('#courseWorkloadTable tbody tr');
+                                     tableRow.each(function (index, elem){
+                                     if(index == 0){
+                                               // $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='intake']`).css('border','1px solid red')
+                                                $(`#courseWorkloadTable tbody tr:nth-child(${index+1}) td input[name='continuous']`).attr('placeholder','This Field is Mandetory')
+                                        }
+                                     let intake = $(elem).find(`input[name='continuous']`).val()
+                                     $(`#courseWorkloadTable tbody tr td input[name='continuous']`).val('').trigger('change')
+                                 })
+                                        console.log('False')
+                                    }
+                                })
+
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/courseworkload/workload/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    AjaxtTable(data.data) 
+                }
+            })
+        })
+
+        function AjaxtTable(workloadList) {
+            let AjaxTable = `<table class="table custom_row table-bordered" id="courseWorkloadTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Module Name</th>
+                    <th>Module Code</th>
+                    <th>Program Id</th>
+                    <th>Program Code</th>
+                    <th>Acad Session</th>
+                    <th>Module Type <input type="checkbox" id="moduleTypeCheck"></th>
+                    <th>Intake <input type="checkbox" id="intakeCheck"></th>
+                    <th>Student per division <input type="checkbox" id="studentPerDivisionCheck"></th>
+                    <th>Lecture count per batch per week <input type="checkbox" id="lectureCountPerBatchPerWeekCheck"></th>
+                    <th>Practical count per batch per week <input type="checkbox" id="practicalCountPerBatchPerWeekCheck"></th>
+                    <th>Tutorial count_per batch per week <input type="checkbox" id="TutorialCountPerBatchPerWeekCheck"></th>
+                    <th>Workshop count per batch per week <input type="checkbox" id="WorkshopCountPerBatchPerWeekCheck"></th>
+                    <th>Session Events per Semester <input type="checkbox" id="SessionEventsPerSemesterCheck"></th>
+                    <th>Continuous <input type="checkbox" id="ContinuousCheck"></th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+            if (workloadList.length > 0) {
+                let count = 1;
+                for (let course of workloadList) {
+                    AjaxTable +=
+                        `<tr>
+                            <td>${ count++} <input type="hidden" class="form-control rounded-0" name="workloadlid" value="${course.id }"></td>
+                            <td data-module-name="${course.module_name}">${course.module_name}</td>
+                            <td data-module-id="${course.module_id}">${course.module_id}</td>
+                            <td data-program-id="${course.program_id}">${course.program_id}</td>
+                            <td data-program-code="${course.program_code}">${course.program_code}</td>
+                            <td data-acad-session-lid="${course.acad_session_lid}" data-acad-session="${course.acad_session}">${course.acad_session}</td>
+                            <td>
+                            <select class="form-select rounded-0" name="module_type_lid" >`
+                    for (let module of JSON.parse(`<%-moduleListAjax%>`)) {
+                        if (course.module_type_lid == module.id) {
+                            AjaxTable += `<option value="${module.id}" selected>${module.name}</option>`
+                        } else {
+                            AjaxTable += `<option value="${module.id}"> ${module.name}</option>`
+                        }
+                    }
+                    `</select>`
+                    AjaxTable += `</td>
+                            <td><input type="number" class="form-control rounded-0" name="intake" value="${course.intake}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="student_per_division" value="${course.student_per_division}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="lecture_count_per_batch" value="${course.lecture_count_per_batch}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="practical_count_per_batch" value="${course.practical_count_per_batch}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="tutorial_count_per_batch" value="${course.tutorial_count_per_batch}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="workshop_count_per_batch" value="${course.workshop_count_per_batch}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="session_events_per_semester" value="${course.session_events_per_semester}"></td>
+                            <td><input type="number" class="form-control rounded-0" name="continuous" value="${course.continuous}"></td>
+                            <td><a class="delete-course-workload" data-id="${course.id}"><span class="fa fa-trash"></span></a></td>
+                            </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr><td colspan="14">No Data Found</td></tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#courseWorkloadTable").html(AjaxTable);
+        }
+
+
+        function showError(errors) {
+            console.log('errors', errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showAlert(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+</script>
+<!-- Download Excel Workbook client side -->
+<script type="text/javascript">
+    var tableToExcel = (function() {
+      var uri = 'data:application/vnd.ms-excel;base64,'
+        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>'
+        , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+        , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+      return function(table, name) {
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+        window.location.href = uri + base64(format(template, ctx))
+      }
+    })()
+    </script>
+<%- include("../partials/footerEnd") %>

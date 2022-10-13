@@ -1,0 +1,613 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notification icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+
+    <div class="errorHtml"></div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Program Session Time Preference</h5>
+            </div>
+            <div>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-program-session-time-preference-modal"><i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <!-- <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div> -->
+                <div class="ms-auto">
+                    <div class="table-searchbar-container">
+                        <button type="button"><i class="fas fa-search"></i> </button>
+                        <input type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table custom_row table-bordered" id="programSessionTimePreference">
+                <thead>
+                    <th>Program</th>
+                    <th>Session</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% for (let programSessionTime of programSessionTimingList) {%>
+                        <tr>
+                            <td><%- programSessionTime.program_name %></td>
+                            <td><%- programSessionTime.acad_session %></td>
+                            <td><%- programSessionTime.start_time %></td>
+                            <td><%- programSessionTime.end_time %></td>
+                            <td>
+                                <a class="edit-preference" data-id="<%- programSessionTime.id %>" ><i class="fa fa-edit"></i></a>
+                                <a class="delete-time-preference" data-id="<%- programSessionTime.id %>"><i class="fa fa-trash text-danger"></i></a>
+                            </td>
+                        </tr>
+                    <%}%>
+                </tbody>
+            </table>
+         
+        </div>
+    </div>
+</div>
+
+
+<!--ADD Modal -->
+<div class="modal fade" id="add-program-session-time-preference-modal" tabindex="-1" aria-labelledby="add-program-session-time-preference-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-program-session-time-preference-modal-title">ADD PROGRAM SESSION TIME PREFERENCES</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-body">
+
+             <div class="row">
+                 <div class="col-md-3 select-items">
+
+                <div class="mb-3">
+                    <label class="form-label">Select Program</label>
+                    <select class="form-select" name="programName" id="programName">
+                        <option value="">--SELECT PROGRAM--</option>
+                            <% for (program of programList) { %>
+                                <option value="<%- program.id%>"><%- program.program_name %></option>
+                            <%}%>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Session</label>
+                       <select class="form-select" name="sessionName" id="sessionName"></select>
+                </div>
+
+                <div class="mb-3">
+                 <label class="form-label">Select Start Time</label>
+                    <select class="form-select" name="start_time_id" id="start_time_id">
+                        <option value="">--SELECT START TIME--</option>
+                            <% for (time of timeList) { %>
+                                <option value="<%- time.id%>"><%- time.start_time %></option>
+                            <%}%>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select End Time</label>
+                    <select class="form-select" name="end_time_id" id="end_time_id">
+                        <option value="">--SELECT END TIME--</option>
+                        <% for (time of timeList) { %>
+                            <option value="<%- time.id%>"><%- time.end_time %></option>
+                        <%}%>
+                    </select>
+                </div>
+
+  
+                <div class="mb-3 d-grid gap-2">
+                    <button class="btn btn-info text-light add-program-session-time-preference">ADD PREFERENCES</button>
+                </div>
+
+
+                 </div>
+                 <div class="col-md-9 selected-items">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-bordered" id="add-more-program-session-preference">
+                            <thead>
+                                <th>Sr No.</th>
+                                <th>Program Name</th>
+                                <th>Session Name</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table> 
+                    </div>
+                 </div>
+             </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn create-time-preference modal-inputform-btn">Create</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+        <!-- edit modal -->
+        <div class="modal fade" id="edit-program-session-timings-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="hidden" id="program-session-timings-lid" name="program-session-timings-lid">
+                        <label class="form-label">Select Program</label>
+                        <select class="form-select" name="programName" id="programName">
+                            <option value="">--SELECT PROGRAM--</option>
+                                <% for (program of programList) { %>
+                                    <option value="<%- program.id%>"><%- program.program_name %></option>
+                                <%}%>
+                        </select>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Select Session</label>
+                           <select class="form-select" name="sessionName" id="sessionName"></select>
+                    </div>
+    
+                    <div class="mb-3">
+                     <label class="form-label">Select Start Time</label>
+                        <select class="form-select" name="start_time_id" id="start_time_id">
+                            <option value="">--SELECT START TIME--</option>
+                                <% for (time of timeList) { %>
+                                    <option value="<%- time.id%>"><%- time.start_time %></option>
+                                <%}%>
+                        </select>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Select End Time</label>
+                        <select class="form-select" name="end_time_id" id="end_time_id">
+                            <option value="">--SELECT END TIME--</option>
+                            <% for (time of timeList) { %>
+                                <option value="<%- time.id%>"><%- time.end_time %></option>
+                            <%}%>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary updateTimePref">UPDATE</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    
+
+    <%- include("../partials/footer") %>
+    <!--  -->
+    <script>
+        $(document).ready(function () {
+
+            //Get Unlocked Session by program API
+            $("#programName").on('change', function () {
+
+                let programLid = $(this).val();
+            
+                console.log('program-id:::', programLid)
+                let ApiObj = {
+                    url: '/admin/programs/sessions/unlocked-program-sessions',
+                    type: 'POST',
+                    data: {
+                        programLid: programLid,
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+                    
+                    console.log('session list',result)
+                    let sessionList = `<option>--select session--</option>`;
+                    for(let session of result){
+                        sessionList += `<option value="${session.id}" data-program-session-lid="${session.program_session_lid}">${session.acad_session}</option>`
+                    }
+
+                    $('#sessionName').html(sessionList);
+                }).catch(error => {
+                    showError(error.responseJSON)
+                })
+            })
+    
+            //Add Time preference
+            let count = 1;
+            $(".add-program-session-time-preference").on('click', function() {
+                
+                let programName = $("#programName option:selected").text();
+                let SessionName = $("#sessionName option:selected").text();
+                let startTime =  $("#start_time_id option:selected").text();
+                let endTime = $("#end_time_id option:selected").text();
+                let tableRow;
+                tableRow +=  `<tr>
+                    <td data-program-session-lid="${$('#sessionName option:selected').attr('data-program-session-lid')}">${count++}</td>
+                    <td data-program-lid="${$('#programName').val()}">${programName}</td>
+                    <td data-session-lid="${$('#sessionName').val()}">${SessionName}</td>
+                    <td data-start-time-id="${$('#start_time_id').val()}">${startTime}</td>
+                    <td data-end-time-id="${$('#end_time_id').val()}">${endTime}</td>
+                    <td>
+                        <i class="fas fa-trash-alt text-danger cursor-pointer remove-time-preference"></i></td>
+                    </tr>`
+                    
+                    $('#add-more-program-session-preference tbody').append(tableRow)
+            })
+
+
+            //Creating Json for the table
+            $(".create-time-preference").on('click', function() {
+
+                let programSessionTimeElems = $('#add-more-program-session-preference tbody tr');
+                let programSessionPrefCount = programSessionTimeElems.length;
+                let programSessionTimeJSON = [];
+                
+                programSessionTimeElems.each(function (index, elem) {
+                let programSessionLid = $(elem).find(`td[data-program-session-lid]`).attr(`data-program-session-lid`)
+                let programLid = $(elem).find(`td[data-program-lid]`).attr(`data-program-lid`)
+                let sessionLid = $(elem).find(`td[data-session-lid]`).attr(`data-session-lid`)
+                let startTimeId = $(elem).find(`td[data-start-time-id]`).attr(`data-start-time-id`)
+                let endTimeId = $(elem).find(`td[data-end-time-id]`).attr(`data-end-time-id`)
+
+
+                if (index < programSessionPrefCount - 1) {
+                    let obj = {
+                        programSessionLid: programSessionLid,
+                        programLid: programLid,
+                        sessionLid: sessionLid,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId
+                    }
+                    programSessionTimeJSON.push(obj)
+                } else {
+                    let obj = {
+                        programSessionLid: programSessionLid,
+                        programLid: programLid,
+                        sessionLid: sessionLid,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId
+                    }
+                    programSessionTimeJSON.push(obj)
+                }
+            })
+
+                console.log('JSON:::::::::::',programSessionTimeJSON)
+
+                let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/program-session-time-preference/create',
+                    data: {
+                        inputJSON: JSON.stringify(programSessionTimeJSON)
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+                    console.log('successs;;;;;', result)
+                    showSuccess(result)
+                   
+                }).catch(error => {
+                    console.log('errror;;;;;', error)
+                    showError(error.responseJSON)
+                })
+
+            })
+
+            
+            //Remove Element
+            $("#add-more-program-session-preference").on('click', '.remove-time-preference', function () {
+                $($(this)).fadeOut(300, function () {
+                $($(this).parent().parent()).remove()
+                })
+            })
+
+            //EDIT
+            $("#programSessionTimePreference").on('click','.edit-preference',function(){
+                let id = $(this).attr("data-id")
+                console.log('ID:::::::::::::::',id)
+                let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/program-session-time-preference/findone',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'JSON'
+                }
+                ajaxApi(ApiObj).then(result => {
+                let obj = result.result
+                console.log('Response Result:::::::::::::::::::>',obj)
+                // programSessionTimingsForEdit(obj.program_lid, obj.acad_session_lid, obj.start_time_id, obj.end_time_id)
+                $("#program-session-timings-lid").val(obj.id)
+              
+                SessionEdit(obj.program_lid, obj.acad_session_lid)
+                $("#edit-program-session-timings-modal  #programName").val(obj.program_lid).trigger('change')
+                $("#edit-program-session-timings-modal  #start_time_id").val(obj.start_time_id).trigger('change')
+                $("#edit-program-session-timings-modal  #end_time_id").val(obj.end_time_id).trigger('change')
+
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                })
+            })
+
+            function SessionEdit(programLid, acadSessionLid){
+                    let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/programs/sessions/unlocked-program-sessions',
+                    data: {
+                        programLid: programLid
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+
+                    console.log('session edit list:::::>>>>>>', result)
+                    let sessionList = ``;
+                        
+                        if (result.length > 0) {
+                            result.forEach(element => {
+                                sessionList +=
+                                    `<option value="${element.id}" data-program-session-lid="${element.program_session_lid}">${element.acad_session}</option>`;
+                              
+                            });
+                            
+                        } else {
+                            
+                            sessionList += `<option value="">No Session Found!</option>`;
+                      
+                        }
+
+                        console.log('session edit list:::', sessionList);
+                        $("#edit-program-session-timings-modal  #sessionName").html(sessionList);
+                        
+                        $("#edit-program-session-timings-modal #sessionName").val(acadSessionLid).trigger('change')
+                        $("#edit-program-session-timings-modal").modal('show')
+                        $("#edit-program-session-timings-modal  #sessionName").attr('disabled', 'disabled');
+                        $("#edit-program-session-timings-modal  #programName").attr('disabled', 'disabled');
+
+                
+                }).catch(error => {
+                    showError(error.responseJSON)
+                })
+                }
+
+            //Update Preferences
+            $(".updateTimePref").on('click', function(){
+                console.log('Read....')
+            
+                let programSessionTimingJSON = [];
+                let id = $("#program-session-timings-lid").val()
+                let programSessionLid = $("#edit-program-session-timings-modal #sessionName option:selected").attr("data-program-session-lid")
+                let programLid = $("#edit-program-session-timings-modal #programName").val()
+                let sessionLid = $("#edit-program-session-timings-modal #sessionName").val()
+                let startTimeId = $("#edit-program-session-timings-modal #start_time_id").val()
+                let endTimeId = $("#edit-program-session-timings-modal #end_time_id").val()
+                let obj = {
+                                id: id,
+                                programSessionLid : programSessionLid,
+                                programLid : programLid,
+                                sessionLid : sessionLid,
+                                startTimeId: startTimeId,
+                                endTimeId: endTimeId,
+                            }
+                            programSessionTimingJSON.push(obj)
+                    console.log(programSessionTimingJSON)
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/admin/program-session-time-preference/update',
+                        data: {
+                            inputJSON: JSON.stringify(programSessionTimingJSON)
+                        },
+                        dataType: 'JSON'
+                    }
+                    ajaxApi(ApiObj).then(result => {
+                        console.log(result)
+                        showSuccess(result)
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+            })
+
+            //Delete API
+            $("#programSessionTimePreference").on('click','.delete-time-preference', function(){
+               
+                let id = $(this).attr("data-id");
+                let ApiObj = {
+                    type: 'POST',
+                    url: '/admin/program-session-time-preference/delete',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'JSON'
+                }
+                console.log('delete::::')
+                ajaxApi(ApiObj).then(result => {
+                   console.log('successs', result)
+                    // showSuccess(result);
+                    showExpressSuccess(result);
+                }).catch(error => {
+                    showError(error);
+                })
+            })
+
+
+        // SEARCH
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            
+            $.ajax({
+                type: "POST",
+                url: "/admin/program-session-time-preference/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    console.log('data.data::::::::',data.data)
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/program-session-time-preference/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    AjaxtTable(data.data) 
+                }
+            })
+        })
+
+
+        function AjaxtTable(programTypeList) {
+                let AjaxTable = `<table class="table custom_row table-bordered" id="programSessionTimePreference">
+                    <thead>
+                    <th>Program</th>
+                    <th>Session</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </thead>`;
+                if (programTypeList.length > 0) {
+                    let count = 1;
+                    for (program of programTypeList) {
+                        AjaxTable +=
+                            `<tr>
+                            <td>${program.program_name}</td>
+                            <td>${program.acad_session}</td>
+                            <td>${program.start_time}</td>
+                            <td>${program.end_time}</td>
+                            <td>
+                                <a class="edit-preference" data-id="${program.id}" ><i class="fa fa-edit"></i></a>
+                                <a class="delete-time-preference" data-id="${program.id}"><i class="fa fa-trash text-danger"></i></a>
+                            </td>
+                        </tr>`
+                    }
+                } else {
+                    AjaxTable +=
+                        `<tr><td colspan="5">No Data Found</td></tr>`;
+                }
+        AjaxTable += `<tbody></table>`
+        $("#programSessionTimePreference").html(AjaxTable);
+    }
+
+            function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : "success",
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+        function showExpressSuccess(errors) {
+            console.log('success',errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : "Successfully Deleted",
+                message:"",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+            }
+        })
+    </script>
+    <%- include("../partials/footerEnd") %>

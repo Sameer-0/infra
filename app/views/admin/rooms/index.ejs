@@ -1,0 +1,595 @@
+<%- include("../partials/head") %>
+<style>
+
+</style>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notification icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+ 
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="row my-3 gx-3 gy-3 row1-data">
+        <div class="col-xl-2 col-lg-4 col-md-6 ">
+            <a href="/admin/rooms/booking">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/online-booking.png" alt="">
+                            <p class="fw-normal pt-1">ROOM BOOKING</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- <div class="col-xl-2 col-lg-4 col-md-6 ">
+            <a href="/admin/rooms/requests">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/pull.png" alt="">
+                            <p class="fw-normal pt-1">Room Requests</p>
+                    </div>
+                </div>
+            </a>
+        </div> -->
+    </div>
+    
+    <div class="card table-card">
+        <div class="modal-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="modal-title text-white" id="add-room-modal-title">BOOKED ROOMS</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#roomCancelModal"><i
+                    class="fas fa-home"></i> Room change Request</a>
+                <a class="btn btn-danger" href="/admin/rooms/download"><i
+                    class="fas fa-download"></i> Download </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <input type="hidden" id="roomId" name="roomId">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div> -->
+                <table class="table " id="room-booked-table">
+                    <thead>
+                        <th>#</th>
+                        <th>Room Number</th>
+                        <th>Floor</th>
+                        <th>Capacity</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Building Name</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <%let rcount = 1;%>
+                        <% for(let list of bookedRoomList) {%>
+                            <tr>
+                                <td><%- rcount++ %></td>
+                                <td><%- list.room_number %></td>
+                                <td><%- list.floor_number %></td>
+                                <td><%- list.capacity %></td>
+                                <td><%- list.start_time %></td>
+                                <td><%- list.end_time %></td>
+                                <td><%- list.start_date %></td>
+                                <td><%- list.end_date %></td>
+                                <td><%- list.building_name %></td>
+                                <td><a class="room-cancel-request" data-id="<%-list.id %>" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Room"><i class="fa-solid fa-xmark text-danger"></i></a></td>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p>Total entries: <%- totalentries %> </p>
+                    </div>
+                    <div>
+                        <p id="pagination" class="pagination-search"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="roomCancelModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content rounded-0">
+      <div class="modal-header">
+        <h5 class="modal-title placeholder-glow" id="exampleModalLabel">ROOM CHANGE REQUEST</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group booked-room-lists">
+                        <% for(let room of bookedRoomList) {%>
+                            <a  class="list-group-item list-group-item-action border rounded-0 my-1" aria-current="true" data-room-lid="<%-room.room_lid%>" data-room-trans-lid="<%-room.id%>" data-building-name="<%- room.building_name %>" data-room-number="<%- room.room_number %>" data-start-time="<%- room.start_time %>" data-end-time="<%- room.end_time %>" data-start-date="<%- room.start_date %>" data-end-date="<%- room.end_date %>">
+                                <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" ><%- room.building_name %></h6>
+                                <small>Room No: <%- room.room_number %></small>
+                                </div>
+                                <p class="mb-1">
+                                <small>Start Time: <%- room.start_time %></small>
+                                <small>End Time: <%- room.end_time %></small>
+                                 </p>
+                                <small>Start Date: <%- room.start_date %></small>
+                                <small>End Date: <%- room.end_date %></small> 
+                            </a>                               
+                        <%}%>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <table class="table rounded-0 edit-booking-table" >
+  <thead>
+    <tr>
+      <th>Room No.</th>
+      <th>Building Name</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Remark</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary rounded-0" id="roomChangeRequest">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="booking-cancel-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-0">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Booking Cancellation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+               <p><span class="text-danger">Note:</span> If you want to cancel your room permanently then use this option after 
+                cancellation again if you wish to apply for the same room you need to apply for a room.</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Reason for cancellation</label>
+                <input class="form-control" id="room-id" type="hidden">
+                <textarea class="form-control rounded-0" id="cancel-reason" placeholder="Enter reason" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary confirm-btn rounded-0">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <%- include("../partials/footer") %>
+    <script src="https://cdn.rawgit.com/botmonster/jquery-bootpag/master/lib/jquery.bootpag.min.js"> </script>
+    <script>
+        $(document).ready(function () {
+            let acadDate = JSON.parse(`<%- academicCalender %>`);
+
+        let startDate;
+        let endDate;
+
+        for (let obj of acadDate) {
+            startDate += `<option value="${obj.id}">${obj.date}</option>`;
+        }
+
+        for (let obj of acadDate) {
+            endDate += `<option value="${obj.id}">${obj.date}</option>`;
+        }
+
+
+            $(".booked-room-lists").on('click','.list-group-item-action',function(){
+
+                roomSlotByRoomId($(this).attr('data-room-lid')).then(result=>{
+                    let buildingName = $(this).attr('data-building-name')
+                let roomNumber = $(this).attr('data-room-number')
+                let startTime  = $(this).attr('data-start-time')
+                let endTime  = $(this).attr('data-end-time')
+                let startDateText =  $(this).attr('data-start-date')
+                let endtDateText =  $(this).attr('data-end-date')
+                let roomlid = $(this).attr('data-room-lid')
+                let room_tran_lid = $(this).attr('data-room-trans-lid')
+
+                let optionStartTime = ``;
+                let optionEndTime =  ``;
+                for (let obj of result.data.roomslot) {
+                        optionStartTime += `<option value="${obj.id}">${obj.start_time}</option>`;
+                    }
+
+                for (let obj of result.data.roomslot) {
+                    optionEndTime += `<option value="${obj.id}">${obj.end_time}</option>`;
+                }
+
+                $("#roomCancelModal .edit-booking-table tbody").append(`
+                <tr>
+                    <td data-room-lid="${roomlid}" data-room-tran-detail-lid="${room_tran_lid}">${roomNumber}</td>
+                    <td>${buildingName}</td>
+                    <td>${startTime}</td>
+                    <td>${endTime}</td>
+                    <td>${startDateText}</td>
+                    <td>${endtDateText}</td>
+                    <td>
+                        <select class="select2 modalSelect2" name="startTime">
+                        ${optionStartTime}
+                         </select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="endTime">
+                        ${optionEndTime}
+                         </select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="startDate">${startDate}</select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="endDate">${endDate}</select>    
+                    </td>
+                    <td><input type="text" class="form-control rounded-0" name="remark"></td>
+                    <td><a class="remove-rooms"><span class="fa-solid fa-xmark text-danger"></span></a></td>
+                </tr>`)
+
+                $('#roomCancelModal .edit-booking-table tbody tr:last-child .select2').select2({
+                dropdownParent: $('#roomCancelModal')
+                });
+                $(this).remove()
+                })
+            })
+
+            $("#roomCancelModal .edit-booking-table").on('click','.remove-rooms',function(){
+                $(this).parent().parent().remove()
+            })
+
+            $('[data-bs-toggle="tooltip"]').tooltip()
+            $("#room-booked-table").on('click','.room-cancel-request',function(){
+                let id =  $(this).attr('data-id')
+                $("#room-id").val(id)
+                console.log('id::::::::::::',id)
+                $("#booking-cancel-modal").modal('show')
+            })
+
+            $(".confirm-btn").on('click',function(){
+               let room_tran_details_lid =  $("#room-id").val()
+               let reason =  $("#cancel-reason").val()
+               let inputJSSON = []
+
+               if(reason.length > 2){
+
+                let obj= {
+                    room_tran_details_lid: room_tran_details_lid,
+                    reason: reason
+                }
+
+                inputJSSON.push(obj)
+
+                console.log('CALL APIHere')
+                let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/cancel-request',
+                data: {
+                    inputJSON: JSON.stringify(inputJSSON)
+                },
+                dataType: 'JSON'
+            }
+                ajaxApi(ApiObj).then(result => {
+                    showSuccess(result)
+                }).catch(error => {
+                    showError(error.responseJSON)
+                })
+               }else{
+                $("#booking-cancel-modal #cancel-reason").css('border','2px solid #ff0000')
+               }
+            })
+
+
+            $("#roomChangeRequest").on('click',function(){
+                let roomElems = $('#roomCancelModal .edit-booking-table tbody tr');
+                let roomCount = roomElems.length;
+                let roomJson = [];
+                roomElems.each(function(index, elem){
+
+                    let start_time_id =  $(elem).find(`select[name='startTime']`).val();
+                    let end_time_id =  $(elem).find(`select[name='endTime']`).val();
+                    let start_date_id =  $(elem).find(`select[name='startDate']`).val();
+                    let end_date_id =  $(elem).find(`select[name='endDate']`).val();
+                    let room_lid = $(elem).find(`td[data-room-lid]`).attr('data-room-lid');
+                    let room_trans_detail_lid = $(elem).find(`td[data-room-tran-detail-lid]`).attr('data-room-tran-detail-lid');
+                    let remark =  $(elem).find(`input[name='remark']`).val();
+                    let obj = {
+                        room_lid: room_lid,
+                        room_trans_detail_lid: room_trans_detail_lid,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        start_date_id: start_date_id,
+                        end_date_id: end_date_id,
+                        remark: remark
+                    }
+                    roomJson.push(obj)
+                })
+
+                console.log('JOSN::::::::::::::',roomJson)
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/update-request',
+                data: {
+                    inputJSON: JSON.stringify(roomJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+            })
+
+
+       
+
+    // SEARCH PROGRAM TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({ 
+            type: "POST",
+            url: "/admin/rooms/search",
+            data: {
+            keyword: keyword,
+            pageNo: 1
+            },
+            success: function (data) {
+                console.log('earch data', data.data)
+            AjaxtTable(data.data)
+            }
+            })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                console.log('PAGE NO.:::::::::::', $(this).attr('data-lp'))
+                console.log('keyword.:::::::::::', keyword)
+                if(keyword){
+                    $.ajax({ 
+                    type: "POST",
+                    url: "/admin/rooms/search",
+                    data: {
+                    keyword: keyword,
+                    pageNo: 1
+                    },
+                    success: function (data) {
+                         AjaxtTable(data.data)
+                    }
+                })
+                }
+            })
+
+
+    //Pagination Here
+    let pageCount = `<%- pageCount %>`
+    console.log("Page Count=====>>>", pageCount)
+    let pageNos = Math.ceil(Number(pageCount) / 10)
+    console.log("Page Numbers", pageNos)
+    $('#pagination').bootpag({
+    total: pageNos,
+    page: 1,
+    maxVisible: 10,
+    leaps: true,
+    firstLastUse: true,
+    first: '←',
+    last: '→',
+    wrapClass: 'pagination',
+    activeClass: 'active',
+    disabledClass: 'disabled',
+    nextClass: 'next',
+    prevClass: 'prev',
+    lastClass: 'last',
+    firstClass: 'first'
+    }).on("page", function (event, num) {
+    $.ajax({
+    type: "POST",
+    url: "/admin/rooms/pagination",
+    data: {
+    pageNo: num
+    },
+    success: function (data) {
+    AjaxtTable(data.data)
+    }
+    })
+    });
+
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/rooms/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    AjaxtTable(data.data) 
+                }
+            })
+        })
+
+
+        //Get Room Slot Time For Specific Room
+        function roomSlotByRoomId(roomLid){
+            console.log('Room Lid Fun:::::::::::>>', roomLid)
+            return new Promise((resolve, reject) =>{
+                $.ajax({
+                type: "POST",
+                url: "/admin/rooms/booking/room-slot-by-room-id",
+                data: {
+                    roomLid: roomLid
+                },
+                success: function (data) {
+                 //   console.log('data::::::::::',data.roomslot)
+                    // return data.roomslot;
+                    resolve({
+                        status:"success",
+                        data:data
+                    })
+                },
+                error: function(data){
+                    resolve({
+                        status:"failed",
+                        err: error
+                    })
+                }
+            })
+            })
+        }
+    
+
+    function AjaxtTable(bookedRoomList){
+        let AjaxTable = `<table class="table custom_row table-bordered" id="roomTransactionTable">
+                <thead>
+                        <th>#</th>
+                        <th>Room Number</th>
+                        <th>Floor</th>
+                        <th>Capacity</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Building Name</th>
+                        <th>Action</th>
+                </thead>
+                <tbody>`;
+                if (bookedRoomList.length > 0) {
+                    let count = 1;
+                    for (room of bookedRoomList) {
+                        AjaxTable +=
+                            ` <tr>
+                                <td>${count++}</td>
+                                <td>${room.room_number}</td>
+                                <td>${room.floor_number}</td>
+                                <td>${room.capacity}</td>
+                                <td>${room.start_time}</td>
+                                <td>${room.end_time}</td>
+                                <td>${room.start_date}</td>
+                                <td>${room.end_date}</td>
+                                <td>${room.building_name}</td>
+                                <td><a class="room-cancel-request" data-id="${room.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Room"><i class="fa-solid fa-xmark text-danger"></i></a></td>
+                            </tr>`
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="9">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#room-booked-table").html(AjaxTable);
+    }
+
+
+    function showError(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+        
+    })
+
+    </script>
+    <%- include("../partials/footerEnd") %>

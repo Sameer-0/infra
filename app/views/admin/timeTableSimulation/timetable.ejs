@@ -1,0 +1,2110 @@
+
+
+
+<%- include("../partials/head") %>
+<style>
+         hr{
+            margin:  0 !important;
+        }
+
+        .timetable-container {
+            width: var(--timetableWidth);
+            background: #e6e6e6;
+            /* border: 2px solid;    */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+        }
+
+        .room-no {
+            min-width: var(--roomNoWidth);
+            max-width: var(--roomNoWidth);
+            background: #006faa;
+            color: #fff;
+            /* border-right: 1px solid; */
+            border-bottom: 1px solid;
+            text-align: center;
+            padding: 99px 0px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+        }
+
+        .room-slots {
+            width: var(--roomSlotWidth);
+            min-height: 150px;
+            position: relative;
+            background-size: var(--breakIntervalWidth);
+            background-image:
+                linear-gradient(to right, grey 1px, transparent 1px)
+        }
+
+
+
+        .room {
+            border: 1px solid black;
+            min-height: 200px;
+            max-height: 200px;
+        }
+
+        .event {
+            position: absolute;
+             /* width: var(--eventWidth); */
+            background: #ffffff;
+            word-break: break-word;
+            height: 100%;
+            text-align: center;
+            /* overflow: hidden; */
+            padding-right: calc(var(--breakIntervalWidth) + 2px);
+            padding-left:  2px;
+            padding-top: 5px;
+            font-size: 14px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+        }
+
+        .pending-event{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            position: relative;
+            margin: 2px auto;
+            border-radius: 0.25rem;
+            
+        }
+
+        .selected-pending-event{
+            border: 2px solid #d53439;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        }
+
+        .selected-pending-event .pending-list-bullet{
+            color: #d53439;
+        }
+        
+
+        .pen-element{
+            position: absolute;
+            width:169px; 
+            height:200px;
+            border-left:1px solid rgb(255, 86, 86); 
+            border-right:1px solid rgb(255, 86, 86);
+            box-shadow: rgba(0, 0, 0, 0.30) 0px 5px 15px;
+        }
+    
+       
+        /* .event:nth-child(even) .start-time{
+            background-color: #dc3545 !important;
+      
+        }
+
+        .event:nth-child(even) .end-time{
+            background: #dc3545 !important;
+        } */
+       
+
+        .start-time{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            border-radius: 0!important;
+            font-size: 0.75rem;
+        }
+
+        .end-time{
+            position: absolute;
+            right: var(--breakIntervalWidth);
+            bottom: 0;
+            border-radius: 0!important;
+            font-size: 0.75rem;
+        }
+
+        .fa-arrows-left-right{
+            position: absolute;
+            right: calc(var(--breakIntervalWidth) + 78px - 7px);
+            bottom: 0;
+        }
+
+        .break {
+            position: absolute;
+            height: 100%;
+            width: var(--breakIntervalWidth);
+            background-size: 3px;
+            background: repeating-linear-gradient(45deg, #e9ecef, #adb5bd 15px);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;  
+            
+        }
+
+        .fixed-break{
+            position: absolute;
+            height: 100%;
+            /* background-color: #006faa; */
+            width: var(--fixedBreakWidth);
+            background-size: 3px;
+            background: repeating-linear-gradient(251deg, #212121, #444141 12px);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 99px 8px;
+            text-align: center;
+            line-height: 1;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .occupied-event{
+            position: absolute;
+            background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
+            height: 100%;
+            text-align: center;
+            padding: 99px 0px;
+            font-weight: bold;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+</style>
+<%- include("../partials/leftSidebarTimeTable") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+
+    <%- include("../partials/timetableSimulationMenu") %>
+    <div class="card table-card mb-1 timetable-filter-container">
+        <div class="card-body" id="timetable-filter">
+            <div class="row">
+                <div class="input-groups col-md-4 col-sm-12">
+                    <label for="program-name" class="d-flex justify-content-between">Select Program:</label>
+
+                    <select name="program-name" id="program-name" class="form-select">
+                        <option selected disabled value>--Select Program--</option>
+                        <% if(programList.length>0){ %>
+                        <option value="">All Programs</option>
+                        <% } %>
+                        <% for(let program of programList){%>
+                        <option value="<%- program.id%>"><%-program.program_name%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div class="input-groups col-md-4 col-sm-12">
+                    <label for="program-name">Select Session:</label>
+                    <select name="session-name" id="session-name" class="form-select">
+                        <option selected disabled value>--Select Session--</option>
+                    </select>
+                </div>
+
+                <div class="input-groups col-md-4 col-sm-12">
+                    <label for="program-name">Select Day:</label>
+                    <select name="day" id="day" class="form-select" disabled>
+                        <option selected disabled value>--Select Day--</option>
+                        <% for(let day of dayList){%>
+                        <option value="<%- day.id%>"><%- day.day_name %></option>
+                        <%}%>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-3 row">
+                <div class="col-md-4 col-sm-12">
+                    <select name="room-name" id="room-name" class="form-select" disabled>
+                        
+                        <option selected disabled value>--Select Room--</option>
+                    
+                        <% for(let room of roomListStr){%>
+                            <option value="<%- room.id%>"> <%- room.room_number%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-12 border d-none option-container">
+
+                </div>
+                <div class="ms-auto table-searchbar-container col-md-4 col-sm-12"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <div class="card-header table-card-header d-flex align-items-center justify-content-between">
+            <div>
+                <h5>TIME TABLE</h5>
+            </div>
+            <div class="ms-auto me-2">
+                <!-- <button class="btn btn-primary pending-events-modal my-2" data-target="#pendingEventModal"><i class="fa-solid fa-list-ul"></i> Pending Events</button> -->
+                <a href="/admin/faculties/allocation-status" class="btn btn-light" target="_blank"><i class="fa-solid fa-chalkboard-user"></i> Faculty Status</a>
+            </div>
+            <div class="me-2">
+                <!-- <button class="btn btn-primary pending-events-modal my-2" data-target="#pendingEventModal"><i class="fa-solid fa-list-ul"></i> Pending Events</button> -->
+                <a href="/admin/time-table-simulation/time-table/div-allocation" class="btn btn-light" target="_blank"><i class="fa-solid fa-location-arrow"></i> Division Allocation Status</a>
+            </div>
+            <div class="me-2">
+                <!-- <button class="btn btn-primary pending-events-modal my-2" data-target="#pendingEventModal"><i class="fa-solid fa-list-ul"></i> Pending Events</button> -->
+                <a href="/admin/time-table-simulation/time-table/download" class="btn btn-primary"> <span class="fa fa-download"></span> Download</a>
+                
+            </div>
+        </div>
+
+        <div class="card-body" style="overflow-x: auto;">
+            <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+            </div> -->
+            <div class="timetable-container">
+       
+            </div>
+        </div>
+
+
+    </div>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="slotModal" tabindex="-1" aria-labelledby="slotModalLabel" aria-hidden="true" backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="slotModalLabel">Slot Details</h5>
+          <button type="button" class="btn-close" id="close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+          <button type="button" class="btn btn-primary" id="drop-slot">Drop Slot</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending event list modal -->
+  <div class="modal fade" id="pendingEventModal" tabindex="-1" aria-labelledby="pendingEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pendingEventModalLabel">Pending Event List</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table pending-events-table">
+                <thead>
+                    <th>Sr.No</th>
+                    <th>Program Name</th>
+                    <th>Academic Session</th>
+                    <th>Module Name</th>
+                    <th>Division</th>
+                    <th>Batch</th>
+                    <th>Event Type</th>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-primary" id="drop-slot">Drop Slot</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <%- include("../partials/footer") %>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            //ROOM FILTER
+            $('#room-name').on('change', function (){
+
+                let spanAppendCheck = true;
+                let spanFilterList = $(document).find('.span-filter');
+                $('.option-container').removeClass('d-none');
+                if(spanFilterList.length > 0){
+            
+                    spanFilterList.each((index, element) => {
+                        if($(element).attr('data-room-lid') == $(this).val()){
+
+                            spanAppendCheck = false
+                
+                        }
+                    })
+                }
+
+                if(spanAppendCheck){
+                    $('.option-container').append(`<span class="span-filter" data-room-lid="${$('#room-name option:selected').val()}">${$('#room-name option:selected').text()}<i class="fa-solid fa-xmark ms-auto ps-2 room-span-remove"></i></span>`);
+                }
+
+                filterRoom()
+                
+            })
+
+            $(document).on('click','.room-span-remove', function(){
+                $(this).parent().remove();
+                filterRoom()
+            })
+
+            function filterRoom(){
+
+                $(document).find('.room[data-room-lid]').addClass('d-none')
+                $(document).find('.span-filter').each(function (index, spanElement) {
+
+                    $(document).find('.room[data-room-lid]').each(function (index, RoomElement) {
+
+                        if($(spanElement).attr('data-room-lid') == $(RoomElement).attr('data-room-lid')){
+                            $(RoomElement).removeClass('d-none');
+                        }
+                    })
+
+                })
+
+                if( $(document).find('.span-filter').length < 1){
+                    
+                    $(document).find('.room[data-room-lid]').removeClass('d-none')
+                }
+
+            
+            }
+        
+
+        let socket = io();
+        socket.on('connect', () => {
+            console.log('Socket Connected::::::::::::>>', socket.connected)
+        });
+
+        socket.emit('join', 'Timetable rescheduling module')
+
+        let slugName = `<%-locals.slug %>`
+        let userId = `<%-locals.userId %>`
+
+        let currentTd;
+        let roomList = JSON.parse(`<%- roomList %>`);
+        let programListJson = JSON.parse(`<%- programListJson %>`);
+        let pendingEventPrograms = JSON.parse(`<%- pendingEventPrograms%>`);
+        let pendingEventProgramLi = JSON.parse(`<%- pendingEventPrograms%>`);
+
+        var pendingEventProgramLids = pendingEventProgramLi.map(function (obj) {
+            return obj.program_lid;
+        });
+
+        
+
+        //PENDING EVENT LIST FILTER
+        let penProgramOption=`<option value="">--Select Program--</option>`;
+        for(let program of pendingEventPrograms){
+
+            penProgramOption += `<option value="${program.program_lid}">${program.program_name}</option>`
+        }
+        $(document).find('#programs-for-pending-event').html(penProgramOption)
+
+
+        $(document).on('change', '#programs-for-pending-event', function () {
+
+            let programLid = $(this).val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/pending-events-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+            let sessionList = ``;
+            
+                ajaxApi(ApiObj).then(result => {
+
+                    if (result.length > 0) {
+
+                        sessionList +=
+                            `<option disabled selected value="">--Select Session--</option>`;
+                        result.forEach(element => {
+                            sessionList +=
+                                `<option value="${element.acad_session_lid}"> ${element.acad_session} </option>`
+                        });
+
+                    } else {
+                        sessionList +=
+                            `<option value=""> No Session Found! </option>`
+                    }
+                    sessionList += `</select>`;
+                    $(document).find("#session-for-pending-event")
+                        .html(sessionList)
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('error', error);
+                })
+
+            $(document).find('.pending-event').addClass('d-none');
+            $(document).find(`.pending-event[data-program-lid="${programLid}"]`).removeClass('d-none');
+            
+        })
+
+        $(document).on('change', '#session-for-pending-event', function () {
+
+            let sessionLid = $(this).val();
+            let programLid = $('#programs-for-pending-event').val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/pending-events-module',
+                type: 'POST',
+                data: {
+                    programLid: programLid,
+                    sessionLid: sessionLid
+                },
+                dataType: 'JSON'
+            }
+            let moduleList = ``;
+
+                ajaxApi(ApiObj).then(result => {
+
+                    if (result.length > 0) {
+
+                        moduleList +=
+                            `<option disabled selected value="">--Select Session--</option>`;
+                        result.forEach(element => {
+                            moduleList +=
+                                `<option value="${element.course_lid}"> ${element.module_name} </option>`
+                        });
+
+                    } else {
+                        moduleList +=
+                            `<option value=""> No Module Found! </option>`
+                    }
+                 
+                    $(document).find("#module-for-pending-event")
+                        .html(moduleList)
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('error', error);
+                })
+
+            $(document).find('.pending-event').addClass('d-none');
+            $(document).find(`.pending-event[data-session-lid="${sessionLid}"][data-program-lid="${programLid}"]`).removeClass('d-none');
+
+            })
+
+        $(document).on('change', '#module-for-pending-event', function() {
+
+            let moduleLid = $(this).val();
+            let programLid = $('#programs-for-pending-event').val();
+            let sessionLid = $('#session-for-pending-event').val();
+
+            $(document).find('.pending-event').addClass('d-none');
+            $(document).find(`.pending-event[data-session-lid="${sessionLid}"][data-program-lid="${programLid}"][data-module-lid="${moduleLid}"]`).removeClass('d-none');
+        })
+        //PENDING EVENT FILTER END//
+
+        //PENDING EVENT LIST   
+        $('.pending-events-modal').on('click', function () {
+           
+
+            if ($("#day").val()) {
+                let programLid = $("#program-name").val();
+                let acadSessionLid = $("#session-name").val();
+
+                let ApiObj = {
+                    url: '/admin/time-table-simulation/time-table/pending-events',
+                    type: 'POST',
+                    data: {
+                        programLid: programLid,
+                        acadSessionLid: acadSessionLid,
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+
+                    let tableRow = ``;
+                    let count = 1;
+                    if (result.length > 0) {
+
+                        for (let penEvent of result) {
+                            tableRow += `<tr>`
+                            tableRow += `<td> ${count++}`
+                            tableRow += `<td> ${penEvent.program_name}`
+                            tableRow += `<td> ${penEvent.acad_session}`
+                            tableRow += `<td> ${penEvent.module_name}`
+                            tableRow += `<td> ${penEvent.division}`
+                            tableRow += `<td> ${penEvent.batch}`
+                            tableRow += `<td> ${penEvent.event_name}`
+                            tableRow += `<tr>`
+                        }
+
+                    } else {
+                        tableRow += `<tr> No Data Found </tr>`
+                    }
+
+                    $('#pendingEventModal .pending-events-table tbody').html(tableRow);
+                    $('#pendingEventModal').modal('show');
+                    //  }, 2000)
+                    //   $(this).attr('disabled','disabled');
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                })
+            } else {
+                alert('Please Select Program, Session and Day')
+            }
+
+        })
+
+        // SEARCH
+        $('#searchkeyword').on('input', function () {
+
+            let searchStr = $(this).val().toLowerCase()
+
+            if (searchStr.length > 0) {
+                $(document).find('.room[data-room-no]').addClass('d-none')
+                $(document).find('.room[data-room-no]').each(function (index, element) {
+                    $(element).find('.event').each(function (index, element) {
+                        if ($(element).text().toLowerCase().includes(searchStr)) {
+                            $(element).addClass('event-info').parent().parent().removeClass('d-none')
+                        } else {
+                            $(element).removeClass('event-info')
+                        }
+                    })
+
+                })
+            } else {
+                $('.room[data-room-no]').removeClass('d-none')
+                $('.room[data-room-no] .event').removeClass('event-info')
+            }
+
+            filterRoom()
+
+        })
+
+        //DRAG EVENT
+
+        //Getting session List Ajax
+        $("#program-name").on('change', function () {
+            let programLid = $(this).val();
+
+            if (!$('#day').attr('disabled')) {
+                $('#day').val("")
+                $('#day').attr('disabled', 'disabled');
+
+            }
+
+            let ApiObj = {
+                url: '/admin/programs/sessions/program-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let sessionList = ``;
+
+                if (result.length > 0) {
+                    sessionList +=
+                        `<option disabled selected value="">--Select Session--</option> <option value="">All Sessions</option>`;
+                    result.forEach(element => {
+                        sessionList += `<option value="${element.id}">
+                                                    ${element.acad_session} 
+                                                    </option>`
+                    });
+                } else {
+                    // if($('#program-name').val() !== ""){
+                    sessionList +=
+                        `<option value=""> No Session Found! </option>`
+                    // }
+                    // else{
+                    //     sessionList += `<option value=""> All Session </option>`
+                    // }
+                }
+                sessionList += `</select>`;
+                $("#session-name").html(sessionList)
+            }).catch(error => {
+                // showError(error.responseJSON)
+            })
+        })
+
+
+        $("#session-name").on('change', function () {
+            if ($('#day').attr('disabled')) {
+                $('#day').removeAttr('disabled');
+            }
+            $('#day').val("")
+        })
+
+        let dayLid
+        $("#day").on('change', function () {
+
+            let programLid = $("#program-name").val();
+            let acadSessionLid = $("#session-name").val();
+            dayLid = $(this).val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/events', 
+                type: 'POST',
+                data: {
+                    programLid: programLid,
+                    acadSessionLid: acadSessionLid,
+                    dayLid: dayLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+               console.log('Event List Result::>>', result)
+                timeTableDisplay(result.eventList, result.allEventList)
+                $('#room-name').removeAttr('disabled');
+                filterRoom()
+           
+            }).catch(error => {
+                // showError(error.responseJSON)
+                console.log('Event list error::>>', error)
+            })
+        })
+
+        $(document).on('change', '#program-name-modal', function () {
+
+            let programLid = $(this).val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/pending-events-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+            let sessionList = ``;
+            if ($('#session-name').val()) {
+                sessionList +=
+                    `<option disabled selected value="">--Select Session--</option>`;
+                sessionList +=
+                    `<option value="${$('#session-name').val()}"> ${$('#session-name option:selected').text()}</option>`
+
+                $(document).find("#slotModal #session-name-modal").html(sessionList)
+            } else {
+                ajaxApi(ApiObj).then(result => {
+
+                    if (result.length > 0) {
+
+                        sessionList +=
+                            `<option disabled selected value="">--Select Session--</option>`;
+                        result.forEach(element => {
+                            sessionList +=
+                                `<option value="${element.acad_session_lid}"> ${element.acad_session} </option>`
+                        });
+
+
+                    } else {
+                        sessionList +=
+                            `<option value=""> No Session Found! </option>`
+                    }
+                    sessionList += `</select>`;
+                    $(document).find("#slotModal #session-name-modal")
+                        .html(sessionList)
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('On change program error', error);
+                })
+            }
+        })
+
+        $(document).on('change', '#program-name-for-faculty', function () {
+
+            let programLid = $(this).val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/pending-events-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+            let sessionList = ``;
+            if ($('#session-name').val()) {
+                sessionList +=
+                    `<option disabled selected value="">--Select Session--</option>`;
+                sessionList +=
+                    `<option value="${$('#session-name').val()}"> ${$('#session-name option:selected').text()}</option>`
+
+                $(document).find("#slotModal #session-name-modal").html(sessionList)
+            } else {
+                ajaxApi(ApiObj).then(result => {
+
+                    if (result.length > 0) {
+
+                        sessionList +=
+                            `<option disabled selected value="">--Select Session--</option>`;
+                        result.forEach(element => {
+                            sessionList +=
+                                `<option value="${element.acad_session_lid}"> ${element.acad_session} </option>`
+                        });
+
+
+                    } else {
+                        sessionList +=
+                            `<option value=""> No Session Found! </option>`
+                    }
+                    sessionList += `</select>`;
+                    $(document).find("#slotModal #session-name-modal")
+                        .html(sessionList)
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('On change session error', error);
+                })
+            }
+        })
+
+        $(document).on('change', '#session-name-modal', function () {
+
+            let programLid = $('#program-name-modal').val();
+            let acadSessionLid = $(this).val();
+
+            let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/pending-events',
+                type: 'POST',
+                data: {
+                    programLid: programLid,
+                    acadSessionLid: acadSessionLid,
+                },
+                dataType: 'JSON'
+            }
+
+            let pendingEventList;
+            ajaxApi(ApiObj).then(result => {
+                    if (result.length > 0) {
+
+                        for (let pendingEvents of result) {
+
+                            pendingEventList +=
+                                `<option data-module-lid="${pendingEvents.module_lid}" data-event-type-lid="${pendingEvents.event_type_lid}" data-division-lid="${pendingEvents.division_lid}" data-batch-lid="${pendingEvents.batch_lid}" data-program-lid="${pendingEvents.program_lid}" data-sesison-lid="${pendingEvents.session_lid}" data-division-name="${pendingEvents.division}" data-batch-name="${pendingEvents.batch}">${pendingEvents.module_name} - ${pendingEvents.event_type_abbr} || ${pendingEvents.division}(${pendingEvents.batch}-${pendingEvents.event_name})</option>`
+                        }
+                    } else {
+                        pendingEventList =
+                            `<option> No Pending Events </option>`
+                    }
+                    console.log('Pending event list:::', pendingEventList)
+                    $(document).find('#pending-events').html(
+                        pendingEventList);
+                })
+                .catch(err => {
+                    console.log('err', err)
+                })
+        })
+
+        // socket.on('pending-event-response', function (response) {
+        //     console.log('drop response>>> ', response)
+        //     if (response.status == 1) {
+        //         console.log('pending event list socket response::>>', response)
+        //     }})
+
+
+        //DROP EVENT SURAJ
+        //$(document).on('click', '#drop-slot', function() 
+        $("#slotModal").on('click', '#drop-slot', function () {
+            let eventLid = $(this).attr('data-event-lid');
+            socket.emit('drop-event-request', slugName, userId, eventLid);
+            // socket.emit('pending-event-request', slugName);
+        })
+
+        
+
+        socket.on('drop-event-response', function (response) {
+
+            console.log("response>>> ", response)
+          
+            if (response.status == 1) {
+                console.log('Drop successful')
+                let pendingEventFromDrop = `<div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${response.data[0].program_lid}" data-session-lid="${response.data[0].acad_session_lid}" data-module-lid="${response.data[0].course_lid}" data-event-type-lid="${response.data[0].event_type_lid}" data-event-lid="${response.data[0].event_lid}">
+                <div class="d-flex justify-content-center align-items-center"><i class="fa-solid fa-circle-dot pending-list-bullet"></i></div>
+                <p class="flex-fill text-center">${response.data[0].program_name}<br>
+                ${response.data[0].acad_session} <br>
+                ${response.data[0].module_name} <br>
+                ${response.data[0].division}-${response.data[0].batch} (${response.data[0].event_type})
+                </p>
+                </div>` 
+              
+                $(document).find('.pending-event-container').append(pendingEventFromDrop)
+                $(document).find(`.event[data-event-lid="${response.data[0].event_lid}"]`).remove();
+             
+                $("#slotModal").modal('hide');
+                // showSuccess(response)
+            }else{
+                console.log('Drop unsuccessful')
+                showError(response)
+            }
+           
+        });
+
+        //SCHEDULE EVENT
+        $(document).on('click', '#schedule-slot', function () {
+            let roomLid = $(this).attr("data-room-id");
+            let dayLid = $("#day").val();
+            let startSlotId = $(this).attr("data-start-slot-id");
+            let endSlotId = $(this).attr("data-end-slot-id");
+            let eventLid = $(this).attr("data-event-lid");
+            let facultyLid = $(this).attr("data-faculty-lid");
+            let targetEventLid = $(this).attr("data-target-event-lid");
+            let swapEventLid = $(this).attr("data-swap-event-lid");
+            let actionType = $(this).attr('data-action-type');
+            
+            let swapEventStartSlotId = $(document).find(`.event[data-event-lid="${swapEventLid}"]`).attr('data-start-time')
+            let swapEventRoomId = $(document).find(`.event[data-event-lid="${swapEventLid}"]`).attr('data-room-lid')
+            let swapEventFacultyLid = $(document).find(`.event[data-event-lid="${swapEventLid}"]`).attr('data-faculty-lid')
+
+            let targetEventStartSlotId = $(document).find(`.event[data-event-lid="${targetEventLid}"]`).attr('data-start-time')
+            let targetEventRoomLid = $(document).find(`.event[data-event-lid="${targetEventLid}"]`).attr('data-room-lid')
+            let targetEventFacultyLid = $(document).find(`.event[data-event-lid="${targetEventLid}"]`).attr('data-faculty-lid')
+
+
+            // let swapEventEndSlotId = $(document).find(`.event [data-lid="${swapEventLid}"]`).attr('"data-start-slot-id')
+            let positionIndex = targetProp.finalPositionIndex;
+            let initialPositionIndex = targetProp.index;
+
+           
+
+            let obj = {
+                roomLid: roomLid,
+                startSlotLid: startSlotId,
+                endSlotLid: endSlotId,
+                dayLid: dayLid,
+                eventLid: eventLid,
+                facultyLid: facultyLid,
+                actionType: actionType,
+                targetEventLid: targetEventLid,
+                swapEventLid: swapEventLid,
+                positionIndex: positionIndex,
+                initialPositionIndex: initialPositionIndex,
+                swapEventStartSlotId: swapEventStartSlotId,
+                swapEventRoomId: swapEventRoomId,
+                swapEventFacultyLid: swapEventFacultyLid,
+                targetEventStartSlotId: targetEventStartSlotId,
+                targetEventRoomLid: targetEventRoomLid,
+                targetEventFacultyLid: targetEventFacultyLid
+            }
+
+            console.log("OBJ>>>> ", obj)
+
+            console.log('ACTION TYPE>>>> ', dragObj.actionType)
+            socket.emit('schedule-event-request', slugName, userId, obj);
+        })
+
+        socket.on('schedule-event-response', function (response) {
+
+            console.log('schedule-event-response::::::::::::::::', response)
+            
+
+            if (response.data.status == 1 && response.data.data.length > 0) {
+
+                if(response.actionType == 'drag') {
+                    console.log('>>> Drag and drop')
+                    appendDragElement(response.data.data[0]);
+                    dragObj.targetElem.remove();
+                    dragObj.swapClone = null;
+                    dragObj.swapElem = null;
+                    dragObj.clonedTarget = null;
+                }
+                else if(response.actionType == 'allocate') {
+                    console.log('>>> ALLOCATED')
+
+                    let responseObj = response.data.data[0];
+                    let eventElement = document.createElement('div');
+                    eventElement.setAttribute('class', 'event room-slot-item');
+                    eventElement.setAttribute('data-event-lid', responseObj.event_lid);
+                    eventElement.setAttribute('data-room-lid', responseObj.room_lid);
+                    eventElement.setAttribute('data-module-name', responseObj.module_name);
+                    eventElement.setAttribute('data-module-lid', responseObj.course_lid);
+                    eventElement.setAttribute('data-division-name', responseObj.division);
+                    eventElement.setAttribute('data-batch-name', responseObj.batch);
+                    eventElement.setAttribute('data-event-type', responseObj.event_type);
+                    eventElement.setAttribute('data-session-name', responseObj.acad_session);
+                    eventElement.setAttribute('data-session-lid', responseObj.acad_session_lid);
+                    eventElement.setAttribute('data-program-name', responseObj.program_name);
+                    eventElement.setAttribute('data-program-lid', responseObj.program_lid);
+                    eventElement.setAttribute('data-start-time', responseObj.start_time_lid);
+                    eventElement.setAttribute('data-end-time', responseObj.end_time_lid);
+                    eventElement.setAttribute('data-faculty-lid', responseObj.faculty_lid);
+                    eventElement.setAttribute('data-faculty-name', responseObj.faculty_name);
+                    eventElement.style.position = 'absolute'
+                    eventElement.style.width = 'var(--eventWidth)'
+                    eventElement.style.left = `${(responseObj.start_time_lid - timeTablestartSlot) * timetableProp.pxPerSlot}px`
+
+                    eventElement.innerHTML = `${responseObj.program_name} ${responseObj.acad_session}<br><hr>${responseObj.module_name}<br><hr>${responseObj.division} - ${responseObj.batch} (${responseObj.event_type}) <br><hr> ${responseObj.faculty_name}<span class="badge bg-info start-time">${timeJson[responseObj.start_time_lid - timeTablestartSlot].start_time}</span> <i class="fa-solid fa-arrows-left-right"></i><span class="badge bg-info end-time">${timeJson[responseObj.start_time_lid - timeTablestartSlot + 11].end_time}</span><div class="break" style="left: 156px; top: 0px; bottom: 0px; width: 13px; "></div>`;
+                
+                    //Remove Temporary element 
+                    if(document.querySelector(`.event[data-event-lid="${responseObj.event_lid}"]`)){
+                        document.querySelector(`.event[data-event-lid="${responseObj.event_lid}"]`).remove();
+                    }
+
+                    //Append Actual element
+                    if(response.positionIndex > 0){
+                        document.querySelectorAll(`.room[data-room-lid='${responseObj.room_lid}'] .room-slots .room-slot-item:not(.active)`)[response.positionIndex-1].insertAdjacentElement("afterend", eventElement)
+                    }else{
+                        console.log('::>>', document.querySelectorAll(`.room[data-room-lid='${responseObj.room_lid}'] .room-slots`))
+                        document.querySelector(`.room[data-room-lid='${responseObj.room_lid}'] .room-slots`).append(eventElement)
+                    }
+                    
+                    //Remove from pending list
+                    document.querySelector(`.pending-event-container .pending-event[data-event-lid="${responseObj.event_lid}"]`).remove();
+
+
+                }
+                else if (response.actionType == 'swap') {
+                    console.log('>>> Swap')
+                    let tarId = parseInt(response.targetElemId)
+                    let targetElemData = response.data.data.filter(e => {
+                       return e.event_lid == tarId
+                    })
+                    let swapElemData = response.data.data.filter(e => {
+                       return e.event_lid != tarId
+                    })
+
+                    appendDragElement(targetElemData[0]);
+                    appendSwapElement(targetElemData[0], swapElemData[0], response.initialPositionIndex);
+
+                    dragObj.targetElem.remove();
+                    dragObj.swapClone = null;
+                    dragObj.swapElem = null;
+                    dragObj.clonedTarget = null;
+                }
+
+            $("#slotModal").modal('hide')
+
+            } else {
+                showError(response)
+            }
+        });
+
+
+        //Click on event-element
+        $(document).on('click', '.event', function() {
+
+            if(dragObj.actionType !== 'clicked') {
+                return false;
+            }
+
+            $('#slotModal .modal-body').html($(this).text());
+            $('#slotModal .modal-footer').html(`<button type="button" class="btn btn-primary" id="drop-slot" data-event-lid="${$(this).attr("data-event-lid")}" data-start-slot="${$(this).attr("data-start-time")}" data-end-slot="${$(this).attr("data-end-time")}">Drop Slot</button>`)
+            $('#slotModal').modal('show');
+        })
+
+        let eventListJson;
+        let roomJson = JSON.parse(`<%-roomList%>`)
+        let pendingEventListJson = JSON.parse(`<%- pendingEventList%>`)
+
+        //CREATING PENDING EVENT ELEMENTS LIST
+        let pendingEventElement=``;
+        for(let pendingEvent of pendingEventListJson) {
+
+            pendingEventElement += `<div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${pendingEvent.program_lid}" data-session-lid="${pendingEvent.acad_session_lid}" data-module-lid="${pendingEvent.course_lid}" data-event-type-lid="${pendingEvent.event_type_lid}" data-event-lid="${pendingEvent.id}" data-division-lid="${pendingEvent.division_lid}">
+                <div class="d-flex justify-content-center align-items-center"><i class="fa-solid fa-circle-dot pending-list-bullet"></i></div>
+            <p class="text-center flex-fill">${pendingEvent.program_name}<br>
+                ${pendingEvent.acad_session} <br>
+                ${pendingEvent.module_name}<br>
+                ${pendingEvent.division}-${pendingEvent.batch} (${pendingEvent.event_type})
+            </p>
+          </div>`
+        }
+        
+        let pendingEventContainer = document.querySelector('.pending-event-container');
+        pendingEventContainer.innerHTML = pendingEventElement;
+
+        let cssRoot = document.querySelector(':root');
+        let styleRoot = getComputedStyle(cssRoot);
+
+        document.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', onDrag)
+        document.addEventListener('mouseup', dragEnd)
+
+        let timetableProp = {
+            totalSlots: 116,
+            pxPerSlot: 13,
+            roomNoWidth: 50,
+        }
+
+        cssRoot.style.setProperty('--timetableWidth', `${timetableProp.totalSlots * timetableProp.pxPerSlot + 50 }px`);
+        cssRoot.style.setProperty('--roomNoWidth', `${timetableProp.roomNoWidth}px`);
+        cssRoot.style.setProperty('--breakIntervalWidth', `${timetableProp.pxPerSlot}px`);
+        cssRoot.style.setProperty('--eventWidth', `${(timetableProp.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
+        cssRoot.style.setProperty('--roomSlotWidth', `${timetableProp.totalSlots * timetableProp.pxPerSlot}px`);
+
+        let timeJson = JSON.parse(`<%- timeSlotList%>`);
+        
+        let targetProp = {};
+
+        let dragObj = {
+            initialClientX: null,
+            initialClientY: null,
+            isMouseDown: false,
+            targetElem: null,
+            isDraggable: false,
+            isDroppable: true,
+            isDragging: false
+        }
+
+
+        let timeTablestartSlot = timeJson[0].id;
+        let fixedBreakSlotStart = 115
+        let fixedBreakSlotStart2 = 175
+        let isPenEventSelected;
+
+        let penElem = document.createElement('div');
+
+        // SELECT AND UNSELECT PENDING EVENTS WITH CREATING SHADOW OBJECT
+        $(document).on('click','.pending-event', function (e) {
+
+            if ($(this).hasClass('selected-pending-event')) {
+                $(this).removeClass('selected-pending-event')
+                $(this).removeAttr('data-selected')
+            } else {
+                $('.pending-event').removeClass('selected-pending-event')
+                $('.pending-event').removeAttr('data-selected')
+                $(this).addClass('selected-pending-event')
+                $(this).attr('data-selected', 'true')
+
+            }
+
+            penElem.setAttribute('class', 'pen-element d-none');
+            penElem.innerHTML = `${$(document).find('.selected-pending-event').text()}`
+
+            penElem.style.top = e.clientY - 75 + 'px';
+            penElem.style.left = e.clientX - 84.5 + 'px';
+
+            document.body.append(penElem)
+
+            // if ($(document).find(`.pending-event[data-selected='true']`).length > 0) {
+            //     isPenEventSelected = true;
+            //     let penElem = document.createElement('div');
+            //     penElem.setAttribute('class', 'pen-element d-none');
+            //     penElem.innerHTML = `B.Com. (Hons.)-7401 - Semester III <br><hr> Business Law <br><hr> A - 1 (TH)`
+            //     document.body.append(penElem)
+
+
+            // } else {
+            //     isPenEventSelected = false;
+            // }
+
+
+        })
+
+        //APPENDING PENDING ELEMENT IN TIME TABLE FUNCTION
+        $(document).on('click', '.pen-element', function (e) {
+            
+            let currentRoom = getCurrentRoom(document.elementsFromPoint(e.clientX, e.clientY));
+
+            //check for collision
+            let tRect = penElem.getBoundingClientRect();
+            let currentRoomElems = currentRoom.querySelectorAll(`.room-slot-item:not(.active)`);
+
+            
+           dragObj.actionType = 'allocate';
+          
+
+            
+            for (let elem of currentRoomElems) {
+
+                console.log("check collision:::")
+                let eRect = elem.getBoundingClientRect();
+
+
+                if (elem.classList.contains('occupied-event') ||  elem.classList.contains('event')) {
+
+                    // console.log('trect>>> ', tRect)
+                    // console.log('erect>>> ', eRect)
+
+                    if (((tRect.left - 2) >= eRect.left && (tRect.left + 2) < eRect.right) || ((tRect.right - 2) > eRect.left && tRect.right  <= eRect.right) || (tRect.right  >= eRect.right && tRect.left < eRect.right)) {
+                        
+                        console.log('collision occurred with event')
+
+                        return;
+                        break;
+                    }
+
+                }
+                
+                
+                if (elem.classList.contains('fixed-break')) {
+
+                    // console.log('trect>>> ', tRect)
+                    // console.log('erect>>> ', eRect)
+
+                    if (((tRect.left - 2) >= eRect.left && (tRect.left + 5) < eRect.right) || ((tRect.right - 15) > eRect.left && tRect.right  <= eRect.right) || (tRect.right)  >= (eRect.right) && (tRect.left + 5) < (eRect.right)) {
+                        
+                        console.log('collision occurred with fixed break', ((tRect.left - 2) >= eRect.left && (tRect.left + 5) < eRect.right))
+
+                        return;
+                        break;
+                    }
+
+                } 
+                   
+            }
+
+            let programLid = $(document).find('.selected-pending-event').attr('data-program-lid')
+            let sessionLid = $(document).find('.selected-pending-event').attr('data-session-lid')
+            let moduleLid = $(document).find('.selected-pending-event').attr('data-module-lid')
+            let eventTypeLid = $(document).find('.selected-pending-event').attr('data-event-type-lid')
+            let eventLid = $(document).find('.selected-pending-event').attr('data-event-lid')
+            let divisionLid = $(document).find('.selected-pending-event').attr('data-division-lid')
+            let currentRoomLid = currentRoom.parentNode.getAttribute('data-room-lid');
+            let startSlotIndex = Math.round((e.clientX - dragObj.tableLeftPosition - 50 - 84.5 + (timetableProp.pxPerSlot/2))/timetableProp.pxPerSlot) > 0 
+            ? Math.round((e.clientX - dragObj.tableLeftPosition - 50 - 84.5 + (timetableProp.pxPerSlot/2))/timetableProp.pxPerSlot)
+            : 0
+            let endSlotIndex = Math.abs(Math.round((e.clientX - dragObj.tableLeftPosition - 50 - 84.5 + (timetableProp.pxPerSlot/2) + (12 * timetableProp.pxPerSlot))/timetableProp.pxPerSlot))
+            console.log('startSlotIndex::>>', Math.round((e.clientX - dragObj.tableLeftPosition - 50 - 84.5 + (timetableProp.pxPerSlot/2))/timetableProp.pxPerSlot))
+            let startSLotId = timeJson[startSlotIndex].id;
+            let endSlotId = timeJson[endSlotIndex - 1].id;
+
+            // console.log('current>>>>>>>>>>>>>> left:::', startSLotId, endSlotId);
+
+            
+            let ApiObj = {
+                        url: '/admin/faculties/works/get-faculty-work-events',
+                        type: 'POST',
+                        data: {
+                            programLid: programLid,
+                            sessionLid: sessionLid,
+                            moduleLid: moduleLid,
+                            divisionLid: divisionLid,
+                            startSlotLid: startSLotId,
+                            endSlotLid: endSlotId,
+                            dayLid: dayLid
+                        },
+                        dataType: 'JSON'
+                    }
+
+            ajaxApi(ApiObj).then(result => {
+                    console.log('Faculty available::>>>')
+                    let facultyList = ``;
+                    let otherFacultyDetail = `<h5>Other faculties for the selected lecture:</h5><ul>`;
+                    facultyList += `<select id="faculty-work-event-list" class="form-select my-4">`
+                    if (result.result.length > 0) {
+                        
+                        facultyList +=
+                            `<option disabled  selected value="">--Select Faculty--</option>`;
+                        
+                            for  (let faculty of result.result){
+
+                                facultyList +=
+                                `<option value="${faculty.faculty_lid}"> ${faculty.faculty_name} </option>`
+                            }
+
+                    } else {
+                        facultyList +=
+                            `<option value=""> No Faculty Found! </option>`
+                    }
+                    if (result.facultyAllocationDetails.length > 0) {
+                        
+                        
+                            for  (let otherFaculty of result.facultyAllocationDetails){
+
+                                otherFacultyDetail +=
+                                `<li> ${otherFaculty.faculty_name} : ${otherFaculty.lecture_count} Lectures Allocated </li>`
+                            }
+
+                    } else {
+                        otherFacultyDetail +=
+                        `<li> No Other Faculty Allocated </li>`
+                    }
+                    facultyList += `</select>`;
+                    otherFacultyDetail += `</ul>`
+                    $(document).find("#slotModal .modal-body").html(otherFacultyDetail + facultyList)
+                    // $('#slotModal .modal-body').append(`<div class="my-2"><button type="button" class="btn btn-warning d-block mx-auto w-50" id="allot-faculty">Allot Faculty</button><div>`);
+                    $(document).find("#slotModal .modal-header #close-btn").attr('data-close-type','close-allocate')
+                    $('#slotModal .modal-footer').html(
+                        `<button type="button" class="btn btn-success" id="schedule-slot" data-start-slot-id="${startSLotId}" data-end-slot-id="${endSlotId}" data-room-id="${currentRoomLid}"  data-day-lid="${dayLid}" data-event-lid="${eventLid}" disabled="true" data-action-type="allocate">Schedule Slot</button>`
+                            );
+                    $('#slotModal').modal('show');
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('Faculty Availability error', error);
+                })
+
+
+
+            $(document).on('change','#faculty-work-event-list', function() {
+                console.log('this value', $(this).val())
+                $(document).find('#schedule-slot').attr('data-faculty-lid', `${$(this).val()}`);
+                $(document).find('#schedule-slot').removeAttr('disabled');
+            })
+
+            let eventElemt = document.createElement('div');
+            eventElemt.setAttribute('class', 'event room-slot-item')
+            eventElemt.setAttribute('data-event-lid', `${eventLid}`)
+            let pendingEventInnerContent = $(document).find('.selected-pending-event p').html();
+
+            // eventElemt.innerHTML = `${pendingEventInnerContent}<span class="badge bg-info start-time">${timeJson[startSlotIndex].start_time}</span>
+            // <i class="fa-solid fa-arrows-left-right"></i>
+            // <span class="badge bg-info end-time">${timeJson[endSlotIndex - 1].end_time}</span>
+            // <div class="break" style="left: 156px; top: 0px; bottom: 0px; width: 13px; "></div>`;
+
+            //==========================================
+
+            // let startSLotId = timeJson[startSlotIndex].id;
+            // let endSlotId = timeJson[endSlotIndex - 1].id;
+
+        
+
+            //let durationWidth = ((timeJson[dragObj.endSlotIndex + 1].id - timeJson[dragObj.startSlotIndex].id + 1) * timetableProp.pxPerSlot)
+
+
+           // $(dragObj.targetElem).find('.break').removeClass('d-none');
+
+           eventElemt.style.position = 'absolute';
+           eventElemt.style.top = '0';
+
+            if(endSlotId == 114 || endSlotId == 174 || endSlotId == 205) {
+                
+                console.log('INSIDE IFF CONDITION 1')
+               
+                eventElemt.style.width = 156 + 'px';
+                eventElemt.style.left =  `${(startSLotId - timeTablestartSlot + 1) * timetableProp.pxPerSlot}px`;
+
+
+               setTimeout(function () {
+                   //alert('CALLING SHOWN')
+                    document.querySelector('#schedule-slot').setAttribute('data-start-slot-id', `${startSLotId + 1}`);
+                    document.querySelector('#schedule-slot').setAttribute('data-end-slot-id', `${endSlotId + 1}`);
+                }, 800)
+
+                eventElemt.innerHTML = `${pendingEventInnerContent}<span class="badge bg-info start-time">${timeJson[ startSLotId + 1- timeTablestartSlot].start_time}</span>
+                <i class="fa-solid fa-arrows-left-right"></i>
+                <span class="badge bg-info end-time">${timeJson[endSlotId + 1- timeTablestartSlot].end_time}</span>
+                <div class="break" style="left: 156px; top: 0px; bottom: 0px; width: 13px; "></div>`;
+
+                $(eventElemt).find('.break').addClass('d-none');
+
+            } else if (endSlotId == 115 || endSlotId == 175 || endSlotId == 206) {
+
+                console.log('INSIDE IFF CONDITION 2')
+                $(eventElemt).find('.break').addClass('d-none');
+                eventElemt.style.width = 156 + 'px';
+                eventElemt.style.left =  `${(startSLotId - timeTablestartSlot) * timetableProp.pxPerSlot}px`;
+
+               setTimeout(function () {
+                  
+                    document.querySelector('#schedule-slot').setAttribute('data-start-slot-id', `${startSLotId}`);
+                    document.querySelector('#schedule-slot').setAttribute('data-end-slot-id', `${endSlotId}`);
+                }, 800)
+
+                eventElemt.innerHTML = `${pendingEventInnerContent}<span class="badge bg-info start-time">${timeJson[ startSLotId - timeTablestartSlot].start_time}</span>
+                <i class="fa-solid fa-arrows-left-right"></i>
+                <span class="badge bg-info end-time">${timeJson[endSlotId - timeTablestartSlot].end_time}</span>
+                <div class="break" style="left: 156px; top: 0px; bottom: 0px; width: 13px; "></div>`;
+                $(eventElemt).find('.break').addClass('d-none');
+
+
+            } else {
+                console.log('INSIDE ELSE CONDITION')
+                eventElemt.style.width = 169 + 'px';
+                eventElemt.style.left = `${(startSLotId - timeTablestartSlot) * timetableProp.pxPerSlot}px`
+                 eventElemt.innerHTML = `${pendingEventInnerContent}<span class="badge bg-info start-time">${timeJson[ startSLotId - timeTablestartSlot].start_time}</span>
+                <i class="fa-solid fa-arrows-left-right"></i>
+                <span class="badge bg-info end-time">${timeJson[endSlotId - timeTablestartSlot].end_time}</span>
+                <div class="break" style="left: 156px; top: 0px; bottom: 0px; width: 13px; "></div>`;
+                $(eventElemt).find('.break').addClass('d-none');
+            }
+
+
+            //============================================
+
+
+            let imgnBoundingElems = [];
+
+            for (let elem of currentRoomElems) {
+
+                let eRect = elem.getBoundingClientRect();
+
+                if ((tRect.left >= eRect.right)) {
+                    imgnBoundingElems.push(elem);
+                }
+            }
+
+
+            if (imgnBoundingElems.length > 0) {
+                //APPEND ACCORDING TO THE POSITION OF THE OTHER ELEMENT
+                targetProp.finalPositionIndex = imgnBoundingElems.length;
+                imgnBoundingElems[imgnBoundingElems.length - 1].insertAdjacentElement("afterend", eventElemt);
+            } else if (currentRoomElems.length > 0) {
+                //APPEND AT FIRST POSITION
+                targetProp.finalPositionIndex = 0;
+                currentRoomElems[0].insertAdjacentElement("beforebegin", eventElemt);
+            } else {
+                //APPEND IN EMPTY ROOM CONDITION
+                currentRoom.append(eventElemt);
+            }
+
+            penElem.remove();
+
+        }) 
+
+
+
+        //DISPLAY TIMETABLE LOOP
+        function timeTableDisplay(eventListJson, allEventListJson) {
+            let fixedBreadWidth;
+            let roomSlot;
+            let eventStartSlot;
+            let eventLeftPosition;
+            let roomHtml = ``;
+            for (let room of roomJson) {
+
+                roomHtml += `<div class="d-flex room" data-room-lid="${room.id}" data-room-no="${room.room_number}">
+                    <div class="room-no" data-room-lid="${room.id}" data-room-type-lid="${room.room_type_id}">
+                        ${room.room_number}
+                    </div>
+                    <div class="room-slots">
+
+                    </div>
+                    </div>`
+            }
+
+            let timeTableBox = document.querySelector('.timetable-container');
+            timeTableBox.innerHTML = roomHtml;
+
+            let eventWidth;
+
+            for (let event of eventListJson) {
+
+                if (!event.is_break) {
+
+                    roomSlot = document.querySelector(`.room[data-room-lid = "${event.room_lid}"] .room-slots`)
+
+                    eventStartSlot = event.start_slot;
+                    eventLeftPosition = (eventStartSlot - timeTablestartSlot) * timetableProp.pxPerSlot
+
+                    let breakElement = (eventLeftPosition + (timetableProp.pxPerSlot * 13) >= (timetableProp
+                            .totalSlots * timetableProp.pxPerSlot)) || event.end_slot == fixedBreakSlotStart ?
+                        `<div class="break d-none" style="left: ${timetableProp.pxPerSlot * 12}px; top: 0; bottom:0; width:${timetableProp.pxPerSlot}px"></div>` :
+                        `<div class="break" style="left: ${timetableProp.pxPerSlot * 12}px; top: 0; bottom:0; width:${timetableProp.pxPerSlot}px"></div>`
+
+                   
+
+                    if(event.end_slot === (116 - 1) || event.end_slot === (176 - 1) || event.end_slot === (207 - 1)) {
+                        eventWidth = (event.end_slot - event.start_slot + 1) * timetableProp.pxPerSlot;
+                    } else {
+                        eventWidth = (event.end_slot - event.start_slot + 2) * timetableProp.pxPerSlot;
+                    }
+                   // eventWidth = 169;
+
+                    //  eventWidth = (eventLeftPosition + (timetableProp.pxPerSlot * 13) >= (timetableProp.totalSlots * timetableProp.pxPerSlot)) || event.end_slot == fixedBreakSlotStart ?
+                    // `${(event.end_slot - event.start_slot + 1) * timetableProp.pxPerSlot}px;` :
+                    // `${(event.end_slot - event.start_slot + 2) * timetableProp.pxPerSlot}px;` 
+
+
+                    let roomSlotItem = document.createElement('div');
+                    roomSlotItem.setAttribute("class", "event room-slot-item")
+                    roomSlotItem.setAttribute("style",
+                        `left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${eventWidth}px;`
+                        )
+                    roomSlotItem.setAttribute("data-event-lid", `${event.event_lid}`)
+                    roomSlotItem.setAttribute("data-room-lid", `${event.room_lid}`)
+                    roomSlotItem.setAttribute("data-module-name", `${event.module_name}`)
+                    roomSlotItem.setAttribute("data-module-lid", `${event.course_lid}`)
+                    roomSlotItem.setAttribute("data-division-name", `${event.division}`)
+                    roomSlotItem.setAttribute("data-batch-name", `${event.batch}`)
+                    roomSlotItem.setAttribute("data-event-type-lid", `${event.event_type_lid}`)
+                    roomSlotItem.setAttribute("data-session-name", `${event.acad_session}`)
+                    roomSlotItem.setAttribute("data-session-lid", `${event.acad_session_lid}`)
+                    roomSlotItem.setAttribute("data-program-name", `${event.program_name}`)
+                    roomSlotItem.setAttribute("data-program-lid", `${event.program_lid}`)
+                    roomSlotItem.setAttribute("data-start-time", `${event.start_slot}`)
+                    roomSlotItem.setAttribute("data-end-time", `${event.end_slot}`)
+                    roomSlotItem.setAttribute("data-faculty-lid", `${event.faculty_lid ? event.faculty_lid : ''}`)
+                    roomSlotItem.setAttribute("data-faculty-name", `${event.faculty_name ? event.faculty_name : ''}`)
+
+                    roomSlotItem.innerHTML =
+                        `${event.program_name} - ${event.acad_session} <br><hr> ${event.module_name} <br><hr> ${event.division} - ${event.batch} (${event.event_type})<br><hr> ${event.faculty_name} <span class="badge bg-info start-time">${timeJson[eventStartSlot - timeTablestartSlot].start_time}</span>
+                <i class="fa-solid fa-arrows-left-right"></i><span class="badge bg-info end-time">${timeJson[eventStartSlot - timeTablestartSlot + 11].end_time}</span> ${breakElement}`;
+
+                    roomSlot.append(roomSlotItem);
+                } else {
+
+                    roomSlot = document.querySelector(`.room[data-room-lid = "${event.room_lid}"] .room-slots`);
+                    eventLeftPosition = (event.start_slot - timeTablestartSlot) * timetableProp.pxPerSlot;
+
+                    let fixedBreak = document.createElement('div');
+                    fixedBreak.setAttribute("class", "fixed-break room-slot-item")
+                    fixedBreak.setAttribute("style", `left: ${eventLeftPosition}px; top: 0;`)
+                    fixedBreak.setAttribute("data-break", `${event.is_break}`)
+                    fixedBreak.setAttribute("data-break-id", `${event.break_id}`)
+                    fixedBreak.innerText = 'BREAK';
+                    fixedBreadWidth = (event.end_slot - event.start_slot) * timetableProp.pxPerSlot + timetableProp
+                        .pxPerSlot;
+
+                    roomSlot.append(fixedBreak);
+                }
+            }
+
+            for (let event of allEventListJson) {
+
+                if (document.querySelector(`.event[data-event-lid="${event.event_lid}"]`)) {
+                    console.log('event-count');
+                } else {
+                    if (!event.is_break) {
+
+                        roomSlot = document.querySelector(`.room[data-room-lid = "${event.room_lid}"] .room-slots`)
+
+                        eventStartSlot = event.start_slot;
+                        eventLeftPosition = (eventStartSlot - timeTablestartSlot) * timetableProp.pxPerSlot
+
+                        if(event.end_slot === (116 - 1) || event.end_slot === (176 - 1)) {
+                            occRoomWidth = (event.end_slot - event.start_slot + 1) * timetableProp.pxPerSlot;
+                        } else {
+                            occRoomWidth = (event.end_slot - event.start_slot + 2) * timetableProp.pxPerSlot;
+                        }
+
+
+                        let occupiedRoomSlotItem = document.createElement('div');
+                        occupiedRoomSlotItem.setAttribute("class", "occupied-event room-slot-item")
+                        occupiedRoomSlotItem.setAttribute("style", `left: ${eventLeftPosition}px ;top: 0; text-align:center; width: ${occRoomWidth}px`)
+                        occupiedRoomSlotItem.setAttribute("data-event-lid", `${event.event_lid}`)
+                        occupiedRoomSlotItem.setAttribute("data-module-name", `${event.module_name}`)
+                        occupiedRoomSlotItem.setAttribute("data-module-lid", `${event.course_lid}`)
+                        occupiedRoomSlotItem.setAttribute("data-division-name", `${event.division}`)
+                        occupiedRoomSlotItem.setAttribute("data-batch-name", `${event.batch}`)
+                        occupiedRoomSlotItem.setAttribute("data-event-type-lid", `${event.event_type_lid}`)
+                        occupiedRoomSlotItem.setAttribute("data-session-name", `${event.acad_session}`)
+                        occupiedRoomSlotItem.setAttribute("data-session-lid", `${event.acad_session_lid}`)
+                        occupiedRoomSlotItem.setAttribute("data-program-name", `${event.program_name}`)
+                        occupiedRoomSlotItem.setAttribute("data-program-lid", `${event.program_lid}`)
+                        occupiedRoomSlotItem.setAttribute("data-start-time", `${event.start_slot}`)
+                        occupiedRoomSlotItem.setAttribute("data-end-time", `${event.end_slot}`)
+                        occupiedRoomSlotItem.setAttribute("data-faculty-lid",
+                            `${event.faculty_lid ? event.faculty_lid : ''}`)
+
+                        occupiedRoomSlotItem.innerHTML = `OCCUPIED`;
+
+                        roomSlot.append(occupiedRoomSlotItem);
+                    }
+                }
+            }
+
+
+            cssRoot.style.setProperty('--fixedBreakWidth', `${fixedBreadWidth}px`);
+        }
+
+
+   
+        let previousScrollY = 0;
+        let fixedBreakBounding
+        let fixedBreakTwoBounding
+
+        function dragStart(e) {
+
+            dragObj.tableLeftPosition = document.querySelector('.timetable-container').getBoundingClientRect().left;
+            dragObj.timetableRect = document.querySelector('.timetable-container').getBoundingClientRect();
+
+           
+            if (e.target.classList.contains('room-slots')) e.preventDefault();
+
+            dragObj.relativeClientX = e.clientX - dragObj.tableLeftPosition
+
+            if (e.buttons != 1) {
+                return false;
+            }
+
+            dragObj.initialClientX = dragObj.relativeClientX;
+            dragObj.initialClientY = e.clientY;
+            document.querySelectorAll('.room-slots').forEach(e => {
+                e.style.outline = "none"
+            })
+
+
+
+            if (e.target.classList.contains('event')) {
+
+                dragObj.actionType = 'clicked';
+
+                fixedBreakBounding = null//document.querySelector('.fixed-break').getBoundingClientRect();
+                fixedBreakTwoBounding = null//document.querySelector('.fixed-break[data-break-id="2"]').getBoundingClientRect();
+
+                console.log("IS DRAGGABLE");
+
+                dragObj.isMouseDown = true;
+
+                dragObj.targetElem = e.target;
+                dragObj.firstRoom = dragObj.targetElem.parentElement
+                dragObj.targetElem.classList.add('active')
+
+                dragObj.initialRoom = getCurrentRoom(document.elementsFromPoint(e.clientX, e.clientY));
+                
+                dragObj.initialRoom.style.cssText = `outline: 3px solid #ff8400`;
+
+                e.target.style.zIndex = 100;
+
+                targetProp.index = Array.from(dragObj.initialRoom.children).indexOf(dragObj.targetElem);
+
+                targetProp.oldOffsetX = e.offsetX;
+                targetProp.oldOffsetY = e.offsetY;
+                targetProp.width = dragObj.targetElem.clientWidth
+
+                targetProp.initialX = e.target.offsetLeft;
+                targetProp.initialY = e.target.offsetTop;
+                targetProp.initialBounding = dragObj.targetElem.getBoundingClientRect();
+                targetProp.initialClientX = dragObj.relativeClientX;
+                targetProp.initialClientY = e.clientY;
+                dragObj.isDraggable = true;
+                dragObj.intialXposition = Math.round(targetProp.initialBounding.left - dragObj.tableLeftPosition - timetableProp.roomNoWidth)
+
+                dragObj.startSlotIndex = (Math.round((targetProp.initialBounding.left - dragObj.tableLeftPosition -
+                    timetableProp.roomNoWidth) / timetableProp.pxPerSlot));
+
+                if (dragObj.targetElem.style.width == 'var(--eventNoBreakWidth)') {
+                    dragObj.endSlotIndex = (Math.round((targetProp.initialBounding.right - dragObj.tableLeftPosition -
+                        timetableProp.roomNoWidth - timetableProp.pxPerSlot) / timetableProp.pxPerSlot))
+                } else {
+
+                    dragObj.endSlotIndex = (Math.round((targetProp.initialBounding.right - dragObj.tableLeftPosition -
+                        timetableProp.roomNoWidth - timetableProp.pxPerSlot) / timetableProp.pxPerSlot)) - 1;
+                }
+
+                dragObj.targetElem.querySelector('.start-time').innerHTML = timeJson[dragObj.startSlotIndex].start_time;
+                dragObj.targetElem.querySelector('.end-time').innerHTML = timeJson[dragObj.endSlotIndex + 1].end_time;
+
+
+            } else {
+                // if (true) {
+                //     console.log('pending events')
+                //     document.addEventListener('click', function (e) {
+
+
+                //         let tarEle = document.elementsFromPoint(e.clientX, e.clientY);
+                //         //console.log('tar:::', document.elementsFromPoint(e.clientX, e.clientY));
+                //         getCurrentRoom(tarEle)
+                //         //console.log('fff', getCurrentRoom(tarEle));
+
+                //     })
+                // } else {
+
+                    console.log('Not draggable')
+                    dragObj.isDraggable = false;
+                // }
+            }
+
+        }
+
+        function onDrag(e) {
+
+            dragObj.relativeClientX = e.clientX - dragObj.tableLeftPosition
+            let errorFactor = e.clientX - 78 - dragObj.tableLeftPosition - dragObj.relativeClientX 
+
+            if(document.querySelectorAll('.pending-event[data-selected]').length > 0 && getCurrentRoom(document.elementsFromPoint(e.clientX, e.clientY))){
+               
+
+                penElem.classList.remove('d-none')
+                if(e.clientX < (dragObj.tableLeftPosition + 50 + 75)){
+                    // penElem.classList.add('d-none')
+                    penElem.style.left = dragObj.tableLeftPosition + 50 + 'px'
+                }
+                else{
+                    penElem.style.left = (Math.round((e.clientX - 84.5)/timetableProp.pxPerSlot)*timetableProp.pxPerSlot) + (timetableProp.pxPerSlot/2) + 'px';
+                }
+
+                if(window.pageYOffset-previousScrollY >= 0){
+                    penElem.style.top = e.clientY - 75 + window.pageYOffset +'px';
+                }else{
+                    penElem.style.top = e.clientY - 75 -(previousScrollY - window.pageYOffset) +'px';
+                }
+            
+
+  
+            previousScrollY = window.pageYOffset;
+
+            }
+
+            if (!dragObj.isDraggable || !dragObj.isMouseDown || dragObj.relativeClientX >= (timetableProp.totalSlots *
+                    timetableProp.pxPerSlot) + timetableProp.roomNoWidth || dragObj.relativeClientX <= timetableProp
+                .roomNoWidth) {
+                return false;
+
+            } else {
+
+                dragObj.actionType = 'drag'
+
+
+                let tRect = dragObj.targetElem.getBoundingClientRect();
+
+                if (e.clientX !== dragObj.clientX || e.clientY !== dragObj.clientY) {
+
+                    dragObj.isDragging = true;
+                }
+
+                // let tRect = dragObj.targetElem.getBoundingClientRect();
+
+
+                dragObj.currentRoom = getCurrentRoom(document.elementsFromPoint(e.clientX, e.clientY)) || dragObj.currentRoom;
+
+                // if(!dragObj.currentRoom) {
+                //     return false;
+                // }
+
+                if (dragObj.currentRoom != dragObj.initialRoom) {
+                    dragObj.initialRoom.style.cssText += `outline: unset`;
+                    dragObj.currentRoom.style.cssText += `outline: 3px solid #ff8400`;
+                    dragObj.initialRoom = dragObj.currentRoom;
+                }
+
+
+                targetProp.movedX = dragObj.relativeClientX - targetProp.oldOffsetX - timetableProp.roomNoWidth;
+
+                if(tRect.top -  dragObj.timetableRect.top < -20) {
+                    targetProp.movedY = 0;
+                } else {
+                    targetProp.movedY = e.clientY - targetProp.initialClientY;
+                }
+            
+                targetProp.endErrorCorrection = 13;
+                console.log('moved X::', targetProp.movedX)
+                console.log('target width::', targetProp.width)
+
+                targetProp.movedX = targetProp.movedX > (timetableProp.totalSlots * timetableProp.pxPerSlot) - targetProp.width + targetProp.endErrorCorrection
+                    ? (timetableProp.totalSlots * timetableProp.pxPerSlot) - 156
+                    : targetProp.movedX;
+
+                dragObj.targetElem.style.left = (Math.round(targetProp.movedX / timetableProp.pxPerSlot) * timetableProp.pxPerSlot) >= 0 
+                    ? Math.round(targetProp.movedX / timetableProp.pxPerSlot) * timetableProp.pxPerSlot + 'px'
+                    : '0px'
+
+                // if(window.pageYOffset-previousScrollY >= 0){
+                //     dragObj.targetElem.style.top = targetProp.movedY + window.pageYOffset +'px';
+                // }else{
+                //     dragObj.targetElem.style.top = targetProp.movedY - (previousScrollY - window.pageYOffset) +'px';
+                // }
+                dragObj.targetElem.style.top =  `${targetProp.movedY}px`
+
+           
+                // if (((tRect.left >= fixedBreakBounding.left && tRect.left < fixedBreakBounding.right) || (tRect.right >
+                //         fixedBreakBounding.left && tRect.right <= fixedBreakBounding.right) || (tRect.right >=
+                //         fixedBreakBounding.right && tRect.left < fixedBreakBounding.right)) || 
+                //     ((tRect.left >= fixedBreakTwoBounding.left && tRect.left < fixedBreakTwoBounding.right) || (tRect.right >
+                //     fixedBreakTwoBounding.left && tRect.right <= fixedBreakTwoBounding.right) || (tRect.right >=
+                //     fixedBreakTwoBounding.right && tRect.left < fixedBreakTwoBounding.right))) {
+
+               if (1 !== 1) {
+
+                  //SET IS BREAK KEY
+                        
+                  dragObj.isOverBreak = true;
+
+                    cssRoot.style.setProperty('--eventNoBreakWidth', `${(timetableProp.pxPerSlot * 12)}px`);
+                  
+                    let breakEle =  dragObj.targetElem.querySelector('.break')
+                    
+                    breakEle.classList.add('d-none');
+                    dragObj.targetElem.style.width = '156px';
+                    console.log('over the break:::::::::')
+
+                } else {
+
+                    dragObj.isOverBreak = false;
+                    dragObj.targetElem.querySelector('.break').classList.remove('d-none');
+                    dragObj.targetElem.style.width = '169px';
+                }
+
+                console.log('total length>>', (timetableProp.totalSlots * timetableProp.pxPerSlot))
+                console.log('target element left position>>', (targetProp.movedX ))
+
+
+                //No break condition for room being placed at end
+                if ((timetableProp.totalSlots * timetableProp.pxPerSlot) - (dragObj.targetElem.offsetLeft + 13 * 13)  < 2) {
+
+                    console.log('element at end::>>')
+                    dragObj.targetElem.querySelector('.break').classList.add('d-none');
+
+                   dragObj.targetElem.style.left = Math.round(targetProp.movedX / timetableProp.pxPerSlot) * timetableProp.pxPerSlot + 'px'
+                   dragObj.targetElem.style.width = `var(--eventNoBreakWidth)`
+
+                    dragObj.targetElem.querySelector('.end-time').style.right = 0
+                    dragObj.targetElem.querySelector('.fa-arrows-left-right').style.right = 'calc(78px - 7px)'
+
+                    if (((timetableProp.totalSlots * timetableProp.pxPerSlot) - (Math.round(targetProp.movedX /
+                                timetableProp.pxPerSlot) * timetableProp
+                            .pxPerSlot + (timetableProp.pxPerSlot * 12))) > 0) {
+
+                        dragObj.targetElem.querySelector('.break').classList.remove('d-none')
+                        dragObj.targetElem.querySelector('.end-time').style.right = `var(--breakIntervalWidth)`
+                        dragObj.targetElem.querySelector('.fa-arrows-left-right').style.right =
+                            'calc(var(--breakIntervalWidth) + 78px - 7px)'
+                        // dragObj.targetElem.style.width = `var(--eventWidth)`;
+                    }
+                } else {
+
+                    if (!dragObj.isOverBreak)
+                        dragObj.targetElem.querySelector('.break').classList.remove('d-none');
+                    //dragObj.targetElem.style.width = `var(--eventWidth)`;
+                    dragObj.targetElem.querySelector('.end-time').style.right = `var(--breakIntervalWidth)`
+                    dragObj.targetElem.querySelector('.fa-arrows-left-right').style.right =
+                        'calc(var(--breakIntervalWidth) + 78px - 7px)'
+
+                }
+
+                dragObj.leftSlotTime = Math.round(targetProp.movedX / timetableProp.pxPerSlot) >= 0 ? Math.round(targetProp
+                    .movedX / timetableProp.pxPerSlot) : 0
+
+                dragObj.targetElem.querySelector('.start-time').innerHTML = timeJson[dragObj.leftSlotTime].start_time;
+                dragObj.targetElem.querySelector('.end-time').innerHTML = timeJson[(dragObj.leftSlotTime + 11)].end_time;
+                // dragObj.targetElem.querySelector('.start-time').css.background = "#0d6efd !important"
+                // dragObj.targetElem.querySelector('.end-time').css.background = "#0d6efd !important"
+            }
+
+        }
+
+        function dragEnd(e) {
+
+            dragObj.isMouseDown = false;
+
+            if (!dragObj.isDraggable || !dragObj.targetElem || !dragObj.isDragging) {
+
+                return false;
+            }
+
+            dragObj.isDraggable = false;
+            dragObj.isMouseDown = false;
+            dragObj.isDragging = false;
+
+
+            //CHECK FOR OVERLAPPING ELEMENTS AND SET ISDROPPABLE
+
+            dragObj.tRect = dragObj.targetElem.getBoundingClientRect();
+            dragObj.currentRoomElems = dragObj.currentRoom.querySelectorAll(`.room-slot-item:not(.active)`);
+
+            for (let elem of dragObj.currentRoomElems) {
+
+                let eRect = elem.getBoundingClientRect();
+
+                if (elem.classList.contains('fixed-break') || elem.classList.contains('occupied-event')) {
+
+                    console.log("INSIDE LOOP TO CHECK COLLISION BREAK")
+
+                    if ((dragObj.tRect.left >= eRect.left && dragObj.tRect.left < eRect.right) || (dragObj.tRect.right > eRect.left && dragObj.tRect
+                            .right <= eRect.right) || (dragObj.tRect.right >= eRect.right && dragObj.tRect.left < eRect.right)) {
+
+                        console.log("COLLISION OCCURRED")
+                        dragObj.targetElem.querySelector('.start-time').innerHTML = timeJson[dragObj.startSlotIndex]
+                            .start_time;
+                        dragObj.targetElem.querySelector('.end-time').innerHTML = timeJson[dragObj.endSlotIndex]
+                            .end_time;
+                        dragObj.targetElem.querySelector('.break').classList.remove('d-none');
+                        dragObj.isDroppable = false;
+                        break;
+                    }
+
+                } else {
+
+                    // SWAP CONDITION CHECK
+                    
+                    if ((Math.abs(dragObj.tRect.left - eRect.left) <= 4) && ((Math.abs(dragObj.tRect.right - eRect.right) <= 4))) {
+                        
+                        dragObj.swapElem = elem;
+
+                        dragObj.actionType = 'swap';
+                        dragObj.swapElemIndex = Array.from(dragObj.currentRoom.children).indexOf(elem);
+                        
+                        dragObj.isDroppable = true
+   
+                        break;
+
+                    } else if ((dragObj.tRect.left >= eRect.left && dragObj.tRect.left < eRect.right) || (dragObj.tRect.right > eRect.left &&
+                    dragObj.tRect.right <= eRect.right) || (dragObj.tRect.right >= eRect.right && dragObj.tRect.left < eRect.right)) {
+                        console.log("COLLISION OCCURRED WITH EVENT")
+                        dragObj.isDroppable = false;
+                        break;
+                    }
+
+                    else {
+                        dragObj.actionType = 'drag';
+                    }
+
+                }
+            }
+
+
+           if (!dragObj.isDroppable) {
+
+                let startTimeObj =  timeJson.filter(elem => elem.id == dragObj.targetElem.getAttribute('data-start-time'));
+                let endTimeObj =  timeJson.filter(elem => elem.id == dragObj.targetElem.getAttribute('data-end-time'));
+
+                dragObj.targetElem.style.left = targetProp.initialX + 'px';
+                dragObj.targetElem.style.top = targetProp.initialY + 'px';
+                dragObj.targetElem.style.zIndex = 'unset';
+                dragObj.targetElem.classList.remove('active')
+
+                // dragObj.targetElem.querySelector('.start-time').innerHTML = startTimeObj[0].start_time;
+
+                // dragObj.targetElem.querySelector('.end-time').innerHTML = endTimeObj[0].end_time;
+
+                rollbackDrag();
+
+                dragObj.isDroppable = true;
+                return false;
+            }
+
+
+            if(dragObj.actionType == 'drag') {
+
+
+                $(document).find("#slotModal .modal-body").html(dragObj.targetElem.innerText)
+                // $(document).find("#slotModal .modal-header #close-btn").attr('data-close-type','close-drag')
+
+                $(document).find("#slotModal .modal-header #close-btn").attr('data-event-lid',`${dragObj.targetElem.getAttribute('data-event-lid')}`)
+
+                $('#slotModal .modal-footer').html(
+                    `<button type="button" class="btn btn-success" id="schedule-slot" data-start-slot-id="${timeJson[dragObj.leftSlotTime].id}" data-end-slot-id="${timeJson[dragObj.leftSlotTime + 11].id}" data-room-id="${dragObj.currentRoom.parentNode.getAttribute('data-room-lid')}"  data-day-lid="${dayLid}" data-event-lid="${dragObj.targetElem.getAttribute('data-event-lid')}" data-action-type="drag" >Confirm Slot</button>`);
+
+
+            } 
+            else if(dragObj.actionType == 'swap') {
+
+                $(document).find("#slotModal .modal-body").html(`<h4>Swap the Events</h4>`)
+                            
+                $('#slotModal .modal-footer').html(
+                    `<button type="button" class="btn btn-success" id="schedule-slot" data-target-event-lid="${dragObj.targetElem.getAttribute('data-event-lid')}" data-swap-event-lid="${dragObj.swapElem.getAttribute('data-event-lid')}" data-action-type="swap">Confirm Swap</button>`);  
+            }
+
+        
+            $('#slotModal').modal('show');
+
+
+        }
+
+        function getCurrentRoom(elementList) {
+            for (let elem of elementList) {
+                if (elem.classList.contains('room-slots')) {
+                    return elem;
+                }
+            }
+        }
+
+        //Revert to old position on Modal close
+        $('#close-btn').on('click', function () {
+
+            if(dragObj.actionType == 'drag' || dragObj.actionType == 'swap'){
+                rollbackDrag();
+            }
+
+            else if(dragObj.actionType == 'allocate') {
+                $(document).find(`.event[data-event-lid="${$(document).find('.selected-pending-event').attr('data-event-lid')}"]`).remove();
+                $(document).find('.selected-pending-event').removeClass('selected-pending-event');
+            }
+        });
+        
+        function showError(errors) {
+
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+        function showSuccess(errors) {
+
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function rollbackDrag() {
+
+            let startTimeObj =  timeJson.filter(elem => elem.id == dragObj.targetElem.getAttribute('data-start-time'));
+            let endTimeObj =  timeJson.filter(elem => elem.id == dragObj.targetElem.getAttribute('data-end-time'));
+
+            $(dragObj.targetElem).css('left',`${dragObj.startSlotIndex * 13}px`);
+            $(dragObj.targetElem).css('top',`0px`);
+            $(dragObj.targetElem).css('z-index',`unset`);
+            $(dragObj.targetElem).find('.start-time').text(`${startTimeObj[0].start_time}`)
+            $(dragObj.targetElem).find('.end-time').text(`${endTimeObj[0].end_time}`)
+
+            let durationWidth = ((timeJson[dragObj.endSlotIndex + 1].id - timeJson[dragObj.startSlotIndex].id + 1) * timetableProp.pxPerSlot)
+
+            $(dragObj.targetElem).find('.break').removeClass('d-none');
+            $(dragObj.targetElem).removeClass('active');
+
+            if(dragObj.targetElem.getAttribute('data-end-time') == (116 - 1) || dragObj.targetElem.getAttribute('data-end-time') == (176 - 1) || dragObj.targetElem.getAttribute('data-end-time') == (207-1) ) {
+                
+                $(dragObj.targetElem).find('.break').addClass('d-none');
+                $(dragObj.targetElem).css('width', `${durationWidth}px`);
+            } else {
+                // console.log('INSIDE ELSE CONDITION', Math.round(12 * 13 + 13))
+
+                $(dragObj.targetElem).css('width', `${Math.round(12 * 13 + 13)}px`);
+            }
+ 
+        }
+
+        function appendDragElement(data) {
+
+            dragObj.targetElem =  document.querySelector(`.event[data-event-lid="${data.event_lid}"]`);
+            tRect = document.querySelector(`.event[data-event-lid="${data.event_lid}"]`).getBoundingClientRect();
+            currentRoomElems = document.querySelectorAll(`.room[data-room-lid='${data.room_lid}'] .room-slots .room-slot-item:not(.active)`);
+
+            let imgnBoundingElems = [];
+
+            for (let elem of currentRoomElems) {
+
+                let eRect = elem.getBoundingClientRect();
+
+                if ((tRect.left >= eRect.right)) {
+                    imgnBoundingElems.push(elem);
+                }
+            }
+            
+            dragObj.clonedTarget = dragObj.targetElem.cloneNode(true);
+            dragObj.clonedTarget.classList.remove('active');
+            dragObj.clonedTarget.style.top = 0;
+            dragObj.clonedTarget.style.left = ((data.start_time_lid - timeTablestartSlot) * timetableProp.pxPerSlot) >= 0 
+            ? ((data.start_time_lid - timeTablestartSlot) * timetableProp.pxPerSlot) + 'px' 
+            : '0px'
+
+            dragObj.clonedTarget.querySelector('.start-time').innerHTML = data.start_time;
+            dragObj.clonedTarget.querySelector('.end-time').innerHTML = data.end_time;
+            dragObj.clonedTarget.setAttribute('data-start-time', data.start_time_lid);
+            dragObj.clonedTarget.setAttribute('data-end-time', data.end_time_lid);
+            dragObj.clonedTarget.setAttribute('data-room-lid', data.room_lid);
+            dragObj.clonedTarget.style.zIndex = 'unset';
+            
+
+            if(data.end_time_lid == (116 - 1) || data.end_time_lid == (176 - 1) || data.end_time_lid == (207 - 1)) {
+                dragObj.clonedTarget.style.width = '156px';
+            } else {
+                dragObj.clonedTarget.style.width = '169px';
+            }
+
+            if (imgnBoundingElems.length > 0) {
+                imgnBoundingElems[imgnBoundingElems.length - 1].insertAdjacentElement("afterend", dragObj.clonedTarget);
+            } else if (currentRoomElems.length > 0) {
+                currentRoomElems[0].insertAdjacentElement("beforebegin", dragObj.clonedTarget);
+            } else {
+                console.log('condition when no room-slot-items are present in room-slot')
+                dragObj.currentRoom.append(dragObj.clonedTarget);
+            }
+                
+        }
+
+        function appendSwapElement(targetElemData, swapElemData, initialPositionIndex) {
+
+
+            console.log('swapElemData>> ', swapElemData)
+            console.log('targetElemData>> ', targetElemData)
+            
+            dragObj.swapElem = document.querySelector(`.event[data-event-lid ="${swapElemData.event_lid}"]`)
+            let swapClone = dragObj.swapElem.cloneNode(true);
+            swapClone.classList.remove('active');
+            swapClone.style.left = ((swapElemData.start_time_lid - timeTablestartSlot) * timetableProp.pxPerSlot) + 'px';
+            swapClone.style.zIndex = 'unset';
+            swapClone.style.top = 0;
+            swapClone.setAttribute('data-start-time', swapElemData.start_time_lid);
+            swapClone.setAttribute('data-end-time', swapElemData.end_time_lid);
+            swapClone.setAttribute('data-room-lid', swapElemData.room_lid);
+            // if (swapClone.style.width == '169px') {
+                swapClone.querySelector('.break').classList.remove('d-none');
+            // }
+
+            if(swapElemData.end_time_lid == (116 - 1) || swapElemData.end_time_lid == (176 - 1)) {
+                swapClone.style.width = '156px';
+            } else {
+                swapClone.style.width = '169px';
+            }
+
+
+            if(targetElemData.end_time_lid == (116 - 1) || targetElemData.end_time_lid == (176 - 1)) {
+                dragObj.clonedTarget.style.width = '156px';
+            } else {
+                dragObj.clonedTarget.style.width = '169px';
+            }
+
+            dragObj.currentRoom = document.querySelector(`.room[data-room-lid="${targetElemData.room_lid}"] .room-slots`);
+            dragObj.firstRoom = document.querySelector(`.room[data-room-lid="${swapElemData.room_lid}"] .room-slots`)
+            targetProp.index = initialPositionIndex;
+            if (dragObj.currentRoom !== dragObj.firstRoom) {
+                dragObj.firstRoom.insertBefore(swapClone, dragObj.firstRoom.childNodes[targetProp.index + 1])
+            } else {
+                dragObj.currentRoom.insertBefore(swapClone, dragObj.currentRoom.childNodes[targetProp.index + 1])
+            }
+
+            swapClone.querySelector('.start-time').innerHTML = swapElemData.start_time;
+            swapClone.querySelector('.end-time').innerHTML = swapElemData.end_time;
+
+            dragObj.clonedTarget.querySelector('.start-time').innerHTML = targetElemData.start_time;
+            dragObj.clonedTarget.querySelector('.end-time').innerHTML = targetElemData.end_time;
+
+            dragObj.swapElem.remove();
+        }
+
+         })
+    </script>
+<%- include("../partials/footerEnd") %>

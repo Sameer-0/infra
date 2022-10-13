@@ -1,0 +1,473 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+
+    <%- include("../partials/facultySubMenu") %>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>FACULTY LIST</h5>
+            </div>
+            <div>
+                <!-- <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#open-faculty-modal"><i
+                        class="fas fa-plus"></i></button> -->
+
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row" id="facultyTable">
+                <thead>
+                    <th>Faculty Id</th>
+                    <th>Faculty Name</th>
+                    <th>Is Processed</th>
+                </thead>
+                <tbody>
+                    <%for(let faculty of facultyList){%>
+                    <tr>
+                        <td><%- faculty.faculty_id %></td>
+                        <td><%- faculty.faculty_name %></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" class="changeStatus" data-id="<%- faculty.id %>"
+                                    data-status="<%- faculty.is_processed_status %>"
+                                    <%- faculty.is_processed_status == 'Yes' ? 'Checked' :  ''  %>>
+                                <span class="switch-slider round"></span>
+                            </label>
+                        </td>
+                       
+                    </tr>
+                    <%}%>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %></p>
+                </div>
+        <div>
+            <p id="pagination" class="pagination-search"></p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+<!-- ADD NEW BUILDING MODAL -->
+<!-- Modal -->
+<div class="modal fade" id="open-faculty-modal" tabindex="-1" aria-labelledby="open-faculty-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-lg">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="open-faculty-modal-title">Add New Faculty</h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="table-responsive">
+                    <table class="table " id="add-more-faculty-table">
+                        <thead>
+                            <th>Faculty id</th>
+                            <th>Faculty name</th>
+                            <th>Start time</th>
+                            <th>End time</th>
+                            <th>Organization</th>
+                            <th>Campus</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input name="faculty_id" id="faculty_id" type="number" class="form-control"
+                                        placeholder="Faculty id" required>
+                                </td>
+                                <td>
+                                    <input name="faculty_name" id="faculty_name" type="text" class="form-control"
+                                        placeholder="Faculty name" required>
+                                </td>
+                                <td>
+                                    <select class="select2" name="start_time_id" id="start_time_id" required>
+                                        <option disabled selected value>--Start Time--</option>
+                                        <% for(let time of timeList) { %>
+                                        <option value="<%- time.id %>">
+                                            <%- time.start_time %>
+                                        </option>
+                                        <% } %>
+
+                                    </select>
+                    </td>
+                    <td>
+                        <select class="select2" name="end_time_id" id="end_time_id" required>
+                            <option disabled selected value>--End Time--</option>
+                            <% for(let time of timeList) { %>
+                            <option value="<%- time.id %>">
+                                <%- time.end_time %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="select2" name="org_lid" id="org_lid" required>
+                            <option disabled selected value>--Organization--</option>
+                            <% for(let handler of orgList) { %>
+                            <option value="<%- handler.id %>">
+                                <%- handler.org_abbr %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="select2" name="campus_lid" id="campus_lid" required>
+                            <option disabled selected value>--Campus--</option>
+                            <% for(let campus of campusList) { %>
+                            <option value="<%- campus.id %>">
+                                <%- campus.campus_abbr %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td>
+                        <i class="far fa-edit d-none"></i>
+                        <i class="fas fa-trash-alt text-danger cursor-pointer removefaculty"></i>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id="errorMsg"></div>
+        <button type="button" class="btn btn-success  btn-sm" id="add-more-faculties"><i class="fas fa-plus"></i>Add More Faculty</button>
+        <button type="submit" class="btn  createFaculty modal-inputform-btn">Create Faculty</button>
+        <button type="submit" class="btn  updateFaculty modal-inputform-btn d-none">Update Building</button>
+    </div>
+</div>
+</div>
+
+</div>
+
+<%- include("../partials/footer") %>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({dropdownParent: $('#open-faculty-modal')});
+        // Add more rows for orgnization
+        $('#add-more-faculties').on('click', function () {
+            console.log("Organization Added::::")
+            let lastTr = $('#add-more-faculty-table tbody tr:last-child')
+            let faculty_id = lastTr.find(`select[name='faculty_id']`).val()
+            let faculty_name = lastTr.find(`select[name='faculty_name']`).val()
+            let start_time_id = lastTr.find(`select[name='start_time_id']`).val()
+            let end_time_id = lastTr.find(`select[name='end_time_id']`).val()
+            let org_lid = lastTr.find(`select[name='org_lid']`).val();
+            let campus_lid = lastTr.find(`select[name='campus_lid']`).val();
+
+            let clonedTr = lastTr.clone();
+            clonedTr.find(`input[name='faculty_id']`).val('')
+            clonedTr.find(`input[name='faculty_name']`).val('')
+            clonedTr.find(`select[name='start_time_id']`).val(start_time_id).trigger('change')
+            clonedTr.find(`select[name='end_time_id']`).val(end_time_id).trigger('change')
+            clonedTr.find(`select[name='org_lid']`).val(org_lid).trigger('change')
+            clonedTr.find(`select[name='campus_lid']`).val(campus_lid).trigger('change')
+            $('#add-more-faculty-table tbody').append(clonedTr)
+        })
+
+        $('#add-more-faculty-table').on('click', '.removefaculty', function () {
+            let trLength = $('#add-more-faculty-table tbody tr').length;
+            if (trLength > 1) {
+                $(this).closest('tr').remove()
+            } else {
+                alert('Cannot delete this room.')
+            }
+        })
+
+
+
+        //Create New Faculty Entry
+        $(".createFaculty").on('click', function () {
+            let facultyElems = $('#add-more-faculty-table tbody tr');
+            let facultyCount = facultyElems.length;
+            let facultyJson = [];
+            facultyElems.each(function (index, elem) {
+                let faculty_id = $(elem).find(`input[name='faculty_id']`).val()
+                let faculty_name = $(elem).find(`input[name='faculty_name']`).val();
+                let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+                let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+                let org_lid = $(elem).find(`select[name='org_lid']`).val();
+                let campus_lid = $(elem).find(`select[name='campus_lid']`).val();
+
+                if (index < facultyCount - 1) {
+                    let obj = {
+                        faculty_id: faculty_id,
+                        faculty_name: faculty_name,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        org_lid: org_lid,
+                        campus_lid: campus_lid
+                    }
+                    facultyJson.push(obj)
+                } else {
+                    let obj = {
+                        faculty_id: faculty_id,
+                        faculty_name: faculty_name,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        org_lid: org_lid,
+                        campus_lid: campus_lid
+                    }
+                    facultyJson.push(obj)
+                }
+            })
+
+            console.log('facultyJson::::::::::::>>', facultyJson)
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/faculties/faculty/create',
+                data: {
+                    inputJSON: JSON.stringify(facultyJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                // location.reload()
+                showSuccess(result);
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: "/management/faculties/faculty/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    console.log('search data::::::::',data.data)
+                    showAjaxTable(data.data) // Facilty List
+                }
+            })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/management/faculties/faculty/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                        console.log(data.data);
+                    }
+                })
+            })
+
+
+        //Create 
+        $('#facultyTable').on('change', '.changeStatus', function () {
+
+            if ($(this).is(':checked')) {
+                //console.log('Yes')
+                chnageStatus($(this).attr('data-id'), 1)
+            } else {
+                //console.log('No')
+                chnageStatus($(this).attr('data-id'), 0)
+            }
+        })
+
+
+        function chnageStatus(id, status) {
+            let ApiObj = {
+                url: '/management/faculties/faculty/processing',
+                type: 'POST',
+                data: {
+                    id: id,
+                    status: status
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                loadDays()
+            }).catch(error => {
+
+            })
+        }
+
+
+        function loadDays() {
+            let ApiObj = {
+                url: '/management/faculties/faculty/GetAll',
+                type: 'POST',
+                data: {},
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                showAjaxTable(result.result)
+            }).catch(error => {
+            })
+        }
+
+
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/management/faculties/faculty/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    showAjaxTable(data.data)
+                }
+            })
+        });
+
+
+
+        function showError(errors) {
+            console.log('error::::::::::',errors)
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : errors.description,
+                    message: errors.data,
+                    type: 'alert-danger',
+                    buttons: {
+                        positive:{
+                        text: "Okay",
+                        action: function(){
+                        document.querySelector('.simple-alert').remove();
+                        }
+                            },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                        }
+                            }
+                        }
+                    }
+                simpleAlert.alert(obj);
+            }
+
+
+        function showSuccess(errors) {
+            console.log('error::::::::::',errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+            
+        }
+
+
+
+        function showAjaxTable(facultiesList) {
+            let AjaxTable = `<table class="table custom_row" id="facultyTable">
+                <thead>
+                    <th>Faculty Id</th>
+                    <th>Faculty Name</th>
+                    <th>Is Processed</th>
+                </thead>
+                    <tbody>`;
+
+            if (facultiesList.length > 0) {
+                for (faculty of facultiesList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>${faculty.faculty_id}</td>
+                        <td>${faculty.faculty_name}</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" class="changeStatus" data-id="${faculty.id}"
+                                    data-status="${ faculty.is_processed_status }"
+                                    ${ faculty.is_processed_status == 'Yes' ? 'Checked' :  ''  }>
+                                <span class="switch-slider round"></span>
+                            </label>
+                        </td>
+                        
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                                <td colspan="8">No Data Found</td>
+                            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#facultyTable").html(AjaxTable);
+        }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

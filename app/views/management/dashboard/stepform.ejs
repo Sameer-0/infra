@@ -1,0 +1,414 @@
+<div class="step-form">
+
+    <div class="d-flex justify-content-between pt-3 pb-4 time-line stages" style="overflow-x: scroll;">
+        <div class="arrow-pointer stage active" data-step="1"> Campus</div>
+        <div class="arrow-pointer stage pending" data-step="2">Organization </div>
+        <div class="arrow-pointer stage pending" data-step="3"> Building</div>
+        <div class="arrow-pointer stage pending" data-step="4"> Room</div>
+        <div class="arrow-pointer stage pending" data-step="5"> Faculty</div>
+    </div>
+
+    <div class="step-form-body">
+
+        <!-- Campus Step Form -->
+        <form   class="step active-form" id="campus-form" data-step="1">
+            <div class="modal-header table-card-header">
+                <h5 class="modal-title text-white" id="add-org-modal-title">Add New Campus</h5>
+                <button type="button" class="btn add-btn btn-sm" id="add-more-campus"><i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="error-show pt-3 errorHtml"></div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" id="add-more-campus-table">
+                    <thead>
+                        <th>Campus Id</th>
+                        <th>Campus Abbr</th>
+                        <th>Campus Name</th>
+                        <th>Campus Description</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input name="Id" id="Id" type="hidden" class="form-control" placeholder="Campus Id">
+                                <input type="hidden" id="campusActive" name="campusActive">
+                                <input name="campusId" id="campusId" type="number" class="form-control"
+                                    placeholder="Campus Id" required>
+                            </td>
+                            <td>
+                                <input name="campusAbbr" id="campusAbbr" type="text" class="form-control"
+                                    placeholder="Campus Abbr" required>
+                            </td>
+                            <td>
+                                <input name="campusName" id="campusName" type="text" class="form-control"
+                                    placeholder="Campus Name" required>
+                            </td>
+                            <td>
+                                <input name="campusDesc" id="campusDesc" type="text" class="form-control"
+                                    placeholder="Campus Description">
+                            </td>
+                            <td>
+                                <i class="far fa-edit d-none"></i>
+                                <i class="fas fa-trash-alt text-danger cursor-pointer remove-campus"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+        <!-- organization -->
+        <form   class="step d-none" id="org-form" data-step="2">
+            <div class="modal-header table-card-header ">
+                <h5 class="modal-title text-white" id="add-org-modal-title">Add New Organization</h5>
+                <button type="button" class="btn add-btn btn-sm" id="add-more-orgnization"><i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="error-show pt-3 errorHtml"></div>
+            <div class="table-responsive">
+                <table class="table table-bordered organizationTable" id="add-more-org-table">
+                    <thead>
+                        <th>Organization Id</th>
+                        <th>Organization Abbr</th>
+                        <th>Organization Name</th>
+                        <th>Organization Complete Name</th>
+                        <th>Organization Type</th>
+                        <th>Campus</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input name="orgLid" id="orgLid" type="hidden">
+                                <input name="orgId" id="orgId" type="number" class="form-control"
+                                    placeholder="Organization Id" required>
+                            </td>
+                            <td>
+                                <input name="orgAbbr" id="orgAbbr" type="text" class="form-control"
+                                    placeholder="Organization Abbr" required>
+                            </td>
+                            <td>
+                                <input name="orgName" id="orgName" type="text" class="form-control"
+                                    placeholder="Organization Name" required>
+                            </td>
+                            <td>
+                                <input name="orgCompleteName" id="orgCompleteName" type="text" class="form-control"
+                                    placeholder="Organization Complete Name" required>
+                            </td>
+                            <td>
+                                <select name="orgType" id="orgType" class="select2 modalSelect2">
+                                    <option value="">--select--</option>
+                                    <% for(let orgType of orgtypeList) { %>
+                                        <option value="<%- orgType.id %>">
+                                            <%- orgType.name %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="campus" id="campus" class="select2 modalSelect2">
+                                    <option value="">--select--</option>
+                                    <% for(let campus of campusList) { %> 
+                                        <option value="<%- campus.id %>">
+                                            <%- campus.campus_abbr %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </td>
+                            <td>
+                                <i class="far fa-edit d-none"></i>
+                                <i class="fas fa-trash-alt text-danger cursor-pointer remove-organization"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </form>
+
+        <!-- Building Step Form -->
+        <form action="/management/building" method="post" class="step d-none" id="building-form" data-step="3">
+            <div class="modal-header table-card-header">
+                <h5 class="modal-title" id="add-building-modal-title">Add New Building</h5>
+                <button type="button" class="btn add-btn btn-sm" id="add-more-building"><i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="error-show pt-3 errorHtml"></div>
+                <input type="hidden" id="roomId" name="roomId">
+                <div class="table-responsive ">
+                    <table class="table " id="add-more-building-table">
+                        <thead>
+                            <th>Building Name</th>
+                            <th>Building Number</th>
+                            <th>Total Floor Count</th>
+                            <th>Owner</th>
+                            <th>Start time</th>
+                            <th>End time</th>
+                            <th>Handled by</th>
+                            <th>Campus</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="active" id="active">
+                                    <input name="building_name" id="building_name" type="text" class="form-control"
+                                        placeholder="Building Name" required>
+                                </td>
+                                <td>
+                                    <input name="building_number" id="building_number" type="text"
+                                        class="form-control" placeholder="Building Number" required>
+                                </td>
+                                <td>
+                                    <input name="total_floors" id="total_floors" type="number" class="form-control"
+                                        placeholder="Total Floor Count" required>
+                                </td>
+
+                                <td> 
+                                    <select name="owner_id" id="owner_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let owner of orgList) { %>
+                                            <option value="<%- owner.id %>">
+                                                <%- owner.org_abbr %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="start_time_id" id="start_time_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let time of timeList) { %>
+                                            <option value="<%- time.id %>">
+                                                <%- time.start_time %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="end_time_id" id="end_time_id" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let time of timeList) { %>
+                                            <option value="<%- time.id %>">
+                                                <%- time.end_time %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="handled_by" id="handled_by" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let handler of orgList) { %>
+                                            <option value="<%- handler.id %>">
+                                                <%- handler.org_abbr %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="campus_lid" id="campus_lid" class="select2 modalSelect2">
+                                        <option value="">--select--</option>
+                                        <% for(let campus of campusList) { %>
+                                            <option value="<%- campus.id %>">
+                                                <%- campus.campus_abbr %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-building"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- Room step form -->
+        <form action="/management/rooms" method="post" class="step d-none" id="room-form" data-step="4">
+            <div class="modal-header table-card-header">
+                <h5 class="modal-title" id="add-room-modal-title">Add New Room</h5>
+                <button type="button" class="btn add-btn btn-sm" id="add-more-room"><i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <div class="modal-body" id="add-room-modal">
+                <div class="error-show pt-3 errorHtml"></div>
+                <input type="hidden" id="roomId" name="roomId">
+
+                <div class="row mt-4 ">
+                    <div class="col-md-4">
+                        <label>Campuses</label>
+                        <select name="campus_lid" id="campus_lid" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let campus of campusList) { %>
+                                <option value="<%- campus.id %>">
+                                    <%- campus.campus_abbr %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Building</label> 
+                        <select name="building_lid"  id="building_lid" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let building of buildingList) { %>
+                                <option value="<%- building.building_id %>">
+                                    <%- building.building_name %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Handled By</label>
+                        <select name="handled_by" id="handled_by" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let org of orgList) { %>
+                                <option value="<%- org.id %>">
+                                    <%- org.org_abbr %>/<%- org.org_id %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered " id="add-more-room-table">
+                        <thead>
+                            <th>Room No</th>
+                            <th>Room Type</th>
+                            <th>Floor</th>
+                            <th>Capacity</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Is Basement</th>
+                            <!-- <th>Is Processed</th> -->
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="hidden" id="roomId" name="roomId">
+                                    <input type="number" name="room_number" id="room_number" class="form-control"
+                                        palceholder="Enter Room no." required>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="room_type_id" id="room_type_id">
+                                        <option disabled selected value="">--Room Type--</option>
+                                        <% for(let roomType of roomTypeList) { %>
+                                        <option value="<%- roomType.roomtypeid %>">
+                                            <%- roomType.name %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="floor_number" id="floor_number" class="form-control"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="capacity" id="capacity" class="form-control" required>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="start_time_id" id="start_time_id" required>
+                                        <option disabled selected value>--Start Time--</option>
+                                        <% for(let time of timeList) { %>
+                                        <option value="<%- time.id %>">
+                                            <%- time.start_time %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="end_time_id" id="end_time_id" required>
+                                        <option disabled selected value>--End Time--</option>
+                                        <% for(let time of timeList) { %>
+                                        <option value="<%- time.id %>">
+                                            <%- time.end_time %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="is_basement" id="is_basement" required>
+                                        <option value="" selected>--Select--</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                                <!-- <td>
+                                    <select class="form-select modalSelect2" name="is_processed" id="is_processed"
+                                        required>
+                                        <option selected value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td> -->
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-room"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+
+        <!-- Faculty step form -->
+        <form action="/management/faculties" method="post" class="step d-none" id="faculty-form" data-step="5">
+            
+
+            <div class="card table-card">
+                <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5>FACULTY POOL</h5>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <!-- <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#open-faculty-modal"><i
+                                class="fas fa-plus"></i></button> -->
+                        <button class="btn btn-danger me-2 fetchFacultyFromSAP" type="button"><i class="fa fa-download"></i> Fetch From SAP</button> 
+                       
+                    </div>
+                </div>
+        
+                <div class="card-body table-responsive">
+                    <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                            type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div> -->
+                    <table class="table custom_row" id="facultyTable">
+                        <thead>
+                            <th>Faculty Id</th>
+                            <th>Faculty Name</th>
+                            <th>Campus</th>
+                            <th>Organization</th>
+                            <th>Faculty type</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </thead>
+                        <tbody>
+                        
+                        </tbody>
+        
+                    </table>
+        
+        </div>
+        </div>
+
+        </form>
+
+    </div>
+
+
+
+</div>
+<div class="step-form-footer">
+    <div class="btn-container d-flex justify-content-end">
+        <button type="button" class="nxt-btn" id="next-step">Next</button>
+    </div>
+</div>
+</div>

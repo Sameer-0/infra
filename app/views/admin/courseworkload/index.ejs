@@ -1,0 +1,201 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="row my-3 gx-3 gy-3 row1-data">
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/courseworkload">
+            <div class="card row1-data-card text-center">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <img src="/icon_imgs/fetchcourse.png" alt="">
+                        <p class="fw-normal pt-1">FETCH COURSE WORKLOAD</p>
+                    </div>
+            </div>
+        </a>
+        </div>
+
+
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/courseworkload/workload">
+            <div class="card row1-data-card text-center">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <img src="/icon_imgs/biology.png" alt="">
+                        <p class="fw-normal pt-1">COURSE WORKLOAD</p>
+                    </div>
+            </div>
+        </a>
+        </div>
+
+    </div>
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase ">
+            <h5>Fetch course workload from sap</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label>Select Year</label>
+                    <input type="text" readonly class="form-control" id="acadYear" value="<%- acadYear %>">
+                </div>
+                <div class="col-md-3">
+                    <label>Select Program</label>
+
+                    <select class="select2" id="programLid" name="programLid">
+                        <option value="">Select program</option>
+                        <% for(let program of programList) {%>
+                        <option value="<%-program.program_id %>"><%-program.program_name %></option>
+                        <%}%>
+                    </select>
+                   
+                </div>
+                <div class="col-md-3">
+                    <label>Select Session</label>
+                    <select class="select2" id="acadSessionLid" name="acadSessionLid">
+                        <option value="">Select Session</option>
+                        <% for(let acadsession of AcadSessionList) {%>
+                            <option value="<%- acadsession.acadSessionId %>"><%- acadsession.acad_session %></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-danger mt-4 fetchFromSAP"><i class="fa fa-download"></i> Fetch From SAP</button>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+
+    <div class="card table-card mt-3">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>COURSE WORKLOAD</h5>
+            </div>
+            <div>
+                <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-holiday-modal">
+                    <i class="fas fa-plus"></i></button> -->
+                <!-- <button class="btn ms-auto select-delete-holidays add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-holiday add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div id="errorHtml"></div>
+            <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div> -->
+            <table class="table custom_row table-bordered" id="courseWorkloadTable">
+                <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>sap_acad_session</th>
+                            <th>acad_year</th>
+                            <th>campus_abbr</th>
+                            <th>campus_city</th>
+                            <th>campus_id</th>
+                            <th>division_no</th>
+                            <th>dur_sess_hrs</th>
+                            <th>dur_sess_min</th>
+                            <th>lec_type</th>
+                            <th>module_code</th>
+                            <th>module_desc</th>
+                            <th>module_objid</th>
+                            <th>multiple_flag</th>
+                            <th>org_abbre</th>
+                            <th>org_unit</th>
+                            <th>prog_code</th>
+                            <th>prog_objid</th>
+                            <th>session_week</th>
+                            <th>sess_desc</th>
+                            <th>teaching_hrs_term</th>
+                            <th>term_sess</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    <% for (let list of courseWorkloadList) { %>
+                        <tr>
+                            <td><%-list.id%></td>
+                            <td><%-list.sap_acad_session%></td>
+                            <td><%-list.acad_year%></td>
+                            <td><%-list.campus_abbr%></td>
+                            <td><%-list.campus_city%>
+                            <td><%-list.campus_id%></td>
+                            <td><%-list.division_no%></td>
+                            <td><%-list.ur_sess_hrs%></td>
+                            <td><%-list.dur_sess_min%></td>
+                            <td><%-list.lec_type%></td>
+                            <td><%-list.module_code%></td>
+                            <td><%-list.module_desc%></td>
+                            <td><%-list.module_objid%></td>
+                            <td><%-list.multiple_flag%></td>
+                            <td><%-list.org_abbre%></td>
+                            <td><%-list.org_unit%></td>
+                            <td><%-list.prog_code%></td>
+                            <td><%-list.prog_objid%></td>
+                            <td><%-list.session_week%></td>
+                            <td><%-list.sess_desc%></td>
+                            <td><%-list.teaching_hrs_term%></td>
+                            <td><%-list.term_sess%></td>
+                        </tr>
+                    <% } %>         
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<%- include("../partials/footer") %>
+
+
+<script>
+    $(document).ready(function () {
+        let username = `<%- locals.userId %>`;
+        $('.select2').select2();
+
+        //Fetch from SAP
+        $(".fetchFromSAP").on('click', function () {
+            let acadYear = $("#acadYear").val()
+            let programLid = $("#programLid").val()
+            let acadSessionLid = $("#acadSessionLid").val()
+            console.log('Cllicke', acadYear, programLid, acadSessionLid)
+            let ApiObj = {
+                url: '/admin/courseworkload',
+                type: 'POST',
+                data: {
+                    acadYear: acadYear,
+                    programLid: programLid,
+                    acadSessionLid: acadSessionLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('Response ::::::::::::::::::::::', result.data)
+                location.reload();
+            }).catch(error => {
+                console.log('Error ::::::::::::::::::::::', error)
+                // showError(error.responseJSON)
+            })
+        })
+    })
+</script>
+<%- include("../partials/footerEnd") %>

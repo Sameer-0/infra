@@ -1,0 +1,359 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+
+    <!-- <div class="row my-3 gx-3 gy-3 row1-data">
+        <div class="col-xl-2 col-lg-4 col-md-6 ">
+            <a href="/admin/schooltiming/types">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/room-type.PNG" alt="">
+                        <p class="fw-normal pt-1">TYPES</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div> -->
+
+
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>SCHOOL TIMING TYPE LIST</h5>
+            </div>
+            <div>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-school-time-type-modal"><i
+                        class="fas fa-plus"></i></button>
+              <button class="btn ms-auto delete-school-timingtype add-btn "><i class="fas fa-trash"></i></button>
+                 <!--  <button class="btn ms-auto bulk-delete-campuses add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div> -->
+                <div id="errorHtml"></div>
+            <table class="table table-bordered custom_row" id="schoolTimeTypeTable">
+                <thead>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <%let count = 1;%> 
+                    <% for(let type of typeList) {%>
+                    <tr>
+                    <td><%-count++%></td>
+                    <td><%-type.name%></td>
+                    <td><%-type.description%></td>
+                    <td>
+                        <input type="checkbox" data-schooltiming-type-id="<%- type.id %>" class="delete-school-type">
+                    </td>
+                    </tr>
+                    <%}%>
+                </tbody>
+            </table>
+
+</div>
+</div>
+</div>
+
+
+<!--ADD Modal -->
+<div class="modal fade" id="add-school-time-type-modal" tabindex="-1" aria-labelledby="add-school-time-type-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-school-time-type-modal-title">ADD TYPE</h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Enter Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Enter Name">
+                    <input type="hidden" id="Id">
+                </div>
+                <div class="mb-3">
+                    <label for="abbr" class="form-label">Enter Description</label>
+                    <input type="text" class="form-control" id="description" placeholder="Enter description">
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <span class="errorMsg"></span>
+                    <button type="submit" class="btn  createSchoolTimeType modal-inputform-btn">Create</button>
+                    <button type="submit" class="btn  updateSchoolTimeType modal-inputform-btn d-none">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+<%- include("../partials/footer") %>
+<script>
+    $(document).ready(function () {
+
+        $('.createSchoolTimeType').on('click', function () {
+                $.ajax({
+                    url: '/admin/schooltiming/types',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        name: $('#name').val(),
+                        description: $('#description').val(),
+                    },
+                    success: (data) => {
+                        console.log('data', data);
+                        showSuccess(data);
+                        
+                    },
+                    error: err => {
+                        showError(err.responseJSON)
+                    }
+                }) 
+        })
+
+            //EDIT PROGRAM TYPE
+            $("#schoolTimeTypeTable").on('click', '.edit-school-time-type', function () {
+                $(".createSchoolTimeType").addClass('d-none')
+                $(".updateSchoolTimeType").removeClass('d-none')
+                $("#add-event-modal-title").html('UPDATE TYPE')
+                console.log('CLicl', $(this).attr('data-time-type-id'))
+
+                $.ajax({
+                    url: '/admin/schooltiming/types/findOne',
+                    method: 'GET',
+                    type: 'JSON',
+                    data: {
+                        id: $(this).attr('data-time-type-id')
+                    },
+                    success: data => {
+                        console.log(data)
+                        let obj = data.result;
+                        console.log('Sessionobj', obj)
+                        $('#name').val(obj.name)
+                        $('#description').val(obj.description)
+                        $('#Id').val(obj.id)
+                        $("#add-school-time-type-modal").modal('show')
+                    },
+                    error: err => {
+                        showError(err.responseJSON)
+                    }
+                })
+            })
+
+
+
+
+            // UPDATE PROGRAM TYPE
+            $(".updateSchoolTimeType").on('click', function () {
+                $.ajax({
+                    url: '/admin/schooltiming/types',
+                    method: 'PUT',
+                    type: 'JSON',
+                    data: {
+                        id: $("#Id").val(),
+                        name: $('#name').val(),
+                        description: $('#description').val()
+                    },
+                    success: (data) => {
+                        if (data.status == 200) {
+                            location.reload()
+                        } else {
+                            $(".errorMsg").html(data.message)
+                        }
+                    },
+                    error: err => {
+                        showError(err.responseJSON)
+                    }
+                })
+            })
+
+
+        function loadAll() {
+            let ApiObj = {
+                url: '/admin/divisions/getAll',
+                type: 'GET',
+                data: {},
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('Result::::::::::::::::::::', result.result)
+                AjaxTable(result.result)
+            }).catch(error => {
+
+            })
+        }
+
+
+        // SEARCH PROGRAM TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "GET",
+                url: "/admin/divisions/search",
+                data: {
+                    keyword: keyword
+                },
+                success: function (data) {
+                    console.log(data)
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+        //Delete program type
+        $('.delete-school-timingtype').on('click', function () {
+                let deleteids = []
+                $('.delete-school-type:checked').each(function () {
+                    let obj = {
+                        id: $(this).attr("data-schooltiming-type-id"),
+                    }
+                    deleteids.push(obj) 
+                })
+
+           
+
+                if (deleteids.length > 0) {
+
+                    let ApiObj = {
+                        url: '/admin/schooltiming/types/delete', 
+                        type: 'POST',
+                        data: {
+                            Ids: JSON.stringify(deleteids)
+                        },
+                        dataType: 'JSON'
+                    }
+                    ajaxApi(ApiObj).then(result => {
+             console.log('result:::error', result)
+                        showSuccess(result)
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                } else {
+                    alert('Select Fields')
+                }
+            }) 
+
+
+        function AjaxtTable(divisionList) {
+            let AjaxTable = `<table class="table table-bordered custom_row" id="schoolTimeTypeTable">
+                <thead>
+                    <th>#</th>
+                    <th>Division</th>
+                    <th>Division no</th>
+                    <th>Division count</th>
+                    <th>Count for theory batch</th>
+                    <th>Count for practical batch</th>
+                    <th>Count for tutorial batch</th>
+                    <th>Count for workshop batch</th>
+                    <th>Module name</th>
+                    <th>Action</th>
+                </thead>`;
+            if (divisionList.length > 0) {
+                let count = 1;
+                for (let division of divisionList) {
+                    AjaxTable +=
+                        `<tr>
+                            <td>${count++}</td>
+                        <td>${division.division}</td>
+                        <td>${division.division_num}</td>
+                        <td>${division.division_count}</td>
+                        <td>${division.count_for_theory_batch}</td>
+                        <td>${division.count_for_practical_batch}</td>
+                        <td>${division.count_for_tutorial_batch}</td>
+                        <td>${division.count_for_workshop_batch}</td>
+                        <td>${division.module_name}</td>
+                        <td><label class="switch">
+                            <input type="checkbox" class="changeStatus" data-id="${division.id }"
+                                data-status="${division.status}"
+                                ${division.status == 'Yes' ? 'Checked' :  '' }>
+                            <span class="switch-slider round"></span>
+                        </label></td>
+                            </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#schoolTimeTypeTable").html(AjaxTable);
+        }
+
+        function showError(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message:[{'Message':'Success'}],
+                type: 'alert-success',
+                buttons: {
+                    positive: { 
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

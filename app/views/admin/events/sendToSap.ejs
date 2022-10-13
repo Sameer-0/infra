@@ -1,0 +1,47 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="row my-3 gx-3 gy-3 row1-data">
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <button id="create-events">Send Events To SAP</button>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/footer") %>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        let socket = io();
+        socket.on('connect', () => {
+            console.log('Socket Connected::::::::::::>>', socket.connected)
+        });
+
+
+        $('#create-events').on('click', function(){
+            socket.emit('create-sap-events')
+        })
+
+        socket.on('res-create-sap-events', data => {
+            alert("Events creation completed!")
+        });
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

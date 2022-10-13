@@ -1,0 +1,42 @@
+
+.card{
+    background-color: transparent!important;
+}
+
+.card-header{
+    background-color: #fff;
+}
+
+input{
+    
+    border: 1px solid rgb(180, 180, 180);
+    padding: 3px 6px;
+    border-radius: 2px;
+}
+
+.wrapper {
+   
+    height: 100vh;
+  
+    
+}
+
+
+.table-header{
+    background: rgb(213, 52, 57);
+    padding:5px; 
+    color:#ffffff; 
+    margin-bottom: 5px;
+}
+
+
+
+.custom_row tbody tr{
+    border-bottom: 10px solid;
+    border-color: transparent;
+    box-shadow: rgb(0 0 0 / 18%) 0px -6px 16px -17px;
+    background:#ffffff;
+   -webkit-transform: translate(0,0);
+   -moz-transform: translate(0,0);
+}
+

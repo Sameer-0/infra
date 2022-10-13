@@ -1,0 +1,903 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--MAIN CONTENT START-->
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+    <div class="errorHtml"></div>
+    <!-- <div class="row gy-3 gx-3 mb-3 row2-data">
+        <div class="col-xl-6 col-md-10">
+            <div class="card  row2-data-card">
+                <div class="card-body">
+                    <h6>Total Room Occupied</h6>
+                    <div id="chart1"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <div class="card row2-data-card">
+                <div class="card-body">
+                    <h6>Total Room</h6>
+                    <div id="chart1"></div>
+                    <h1><%- roomcount %> </h1>
+                    <div id="count">Room Count</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <div class="card row2-data-card">
+                <div class="card-body">
+                    <h6>Total Room Occupied</h6>
+                    <div id="chart1"></div>
+                    <h1>60</h1>
+                    <div id="count">Lectures Count</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <div class="card row2-data-card">
+                <div class="card-body">
+                    <h6>Room Available for booking</h6>
+                    <div id="chart1"></div>
+                    <h1>40 </h1>
+                    <div id="count">Task Count</div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>ROOM DATA</h5>
+            </div>
+            <div>
+                
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-room-modal"><i
+                        class="fas fa-plus"></i></button>
+                        <button class="btn btn-danger ms-auto generate_room_slot"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i>
+                </button><input type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+            </div>
+
+            <table class="table custom_row" id="roomTable">
+                <thead>
+                    <th>Room No</th>
+                    <th>Building</th>
+                    <th>Type</th>
+                    <th>Floor</th>
+                    <th>Capacity</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Is Basement</th>
+                    <th>Handled By</th>
+                    <!-- <th>Campus</th> -->
+                    <th>Is Processed</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% for (let room of roomList) { %>
+                    <tr>
+                        <td><%- room.room_number %></td>
+                        <td><%- room.building_name %></td>
+                        <td><%- room.room_type %></td>
+                        <td><%- room.floor_number %></td>
+                        <td><%- room.capacity %></td>
+                        <td><%- room.start_time %></td>
+                        <td><%- room.end_time %></td>
+                        <td><%- room.is_basement %></td>
+                        <td><%- room.handled_by %></td>
+                        <!-- <td><%- room.campus %></td> -->
+                        <td>
+                            <% if(room.is_processed == "1") {%>
+                            <div class="form-check form-switch switch-checkbox">
+                                <input class="form-check-input " type="checkbox" role="switch"
+                                    id="flexSwitchCheckChecked" disabled checked>
+
+                            </div>
+                            <%}else{%>
+                            <div class="form-check form-switch switch-checkbox">
+                                <input class="form-check-input is_processed_click" type="checkbox" role="switch"
+                                    data-is-processed="<%-room.is_processed%>" data-room-id="<%- room.roomid %>" disabled>
+                            </div>
+                            <%}%>  
+                        </td>
+                        <td>
+                            <a class="edit-room" data-room-id="<%- room.roomid %>"><i
+                                class="fas fa-edit text-dark cursor-pointer"></i></a>
+                            <a class="delete-room" data-id="<%- room.roomid %>"><i
+                                    class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>
+
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- roomcount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD NEW ROOM MODAL-->
+<div class="modal fade" id="add-room-modal" aria-labelledby="add-room-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-room-modal-title">Add New Room</h5>
+                <button type="button" class="btn fs-4 text-dark" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="errorHtml"></div>
+                <div class="row mt-4 ">
+
+                    <div class="col-md-4">
+                        <label>Campuses</label>
+
+                        <select name="campus_lid" id="campus_lid" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let campus of campusList) { %>
+                            <option value="<%- campus.id %>">
+                                <%- campus.campus_abbr %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Building</label>
+
+                        <select name="building_lid" id="building_lid" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let building of buildingList) { %>
+                            <option value="<%- building.building_id %>">
+                                <%- building.building_name %>
+                            </option>
+                            <% } %>
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Handled By</label>
+
+                        <select name="handled_by" id="handled_by" class="select2 modalSelect2">
+                            <option>--select--</option>
+                            <% for(let org of orgList) { %>
+                            <option value="<%- org.id %>">
+                                <%- org.org_abbr %>/<%- org.org_id %>
+                            </option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="mb-5" />
+
+                <div class="error">
+
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="add-more-room-table">
+                        <thead>
+                            <th>Room No</th>
+                            <th>Room Type</th>
+                            <th>Floor</th>
+                            <th>Capacity</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Is Basement</th>
+                            <!-- <th>Is Processed</th> -->
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="hidden" id="roomId" name="roomId">
+                                    <input type="number" name="room_number" id="room_number" class="form-control"
+                                        palceholder="Enter Room no." required>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2 form-select" name="room_type_id" id="room_type_id">
+                                        <option disabled selected value="">--Room Type--</option>
+                                        <% for(let roomType of roomTypeList) { %>
+                                        <option value="<%- roomType.roomtypeid %>">
+                                            <%- roomType.name %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="floor_number" id="floor_number" class="form-control"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="capacity" id="capacity" class="form-control" required>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2 form-select" name="start_time_id" id="start_time_id"
+                                        required>
+                                        <option disabled selected value="">--Start Time--</option>
+                                        <% for(let time of timeList) { %>
+                                        <option value="<%- time.id %>">
+                                            <%- time.start_time %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2 form-select" name="end_time_id" id="end_time_id" required>
+                                        <option disabled selected value="">--End Time--</option>
+                                        <% for(let time of timeList) { %>
+                                        <option value="<%- time.id %>">
+                                            <%- time.end_time %>
+                                        </option>
+                                        <% } %>
+                                    </select> 
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2 form-select" name="is_basement" id="is_basement" required>
+                                        <option value="" selected>--Select--</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td>
+                                <!-- <td>
+                                    <select class="form-select modalSelect2" name="is_processed" id="is_processed"
+                                        required>
+                                        <option selected value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </td> -->
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-room"></i>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success  btn-sm" id="add-more-room"><i class="fas fa-plus"></i> Add
+                    More Room</button>
+                <button type="button" class="btn  modal-inputform-btn addRoom" id="insertRoom">Create Room</button>
+                <button type="button" class="btn  modal-inputform-btn updateRoom d-none">Update Room Data</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<%- include('../partials/notification') %>
+<%- include('../partials/alert') %>
+<%- include("../partials/footer") %>
+
+
+
+
+<script>
+    $(document).ready(function () {
+
+        $('.modalSelect2').select2({
+            dropdownParent: $('#add-room-modal')
+        });
+
+          //Add more rows in room
+          $('#add-more-room').on('click', function () {
+                console.log("Room Added::::1")
+
+                let lastTr = $('#add-more-room-table tbody tr:last-child');
+                lastTr.find('.modalSelect2').select2('destroy');
+
+                let roomNumber = lastTr.find(`input[name='room_number']`).val();
+                let roomTypeId = lastTr.find(`select[name='room_type_id']`).val();
+                let floorNumber = lastTr.find(`input[name='floor_number']`).val();
+                let capacity = lastTr.find(`input[name='capacity']`).val();
+                let startTimeId = lastTr.find(`select[name='start_time_id']`).val();
+                let endTimeId = lastTr.find(`select[name='end_time_id']`).val();
+                let isBasement = lastTr.find(`select[name='is_basement']`).val();
+                // let isProcessed = lastTr.find(`input[name='is_processed']`).val();
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='room_number']`).val('')
+                clonedTr.find(`select[name='room_type_id']`).val('')
+                clonedTr.find(`input[name='floor_number']`).val('')
+                clonedTr.find(`input[name='capacity']`).val('')
+                clonedTr.find(`select[name='start_time_id']`).val('')
+                clonedTr.find(`select[name='end_time_id']`).val('')
+                clonedTr.find(`select[name='is_basement']`).val('')
+                // clonedTr.find(`select[name='is_processed']`).val('')
+
+                $('#add-more-room-table tbody').append(clonedTr)
+                // $('#add-more-room-table tbody tr .modalSelect2').select2({dropdownParent:$('#add-room-modal')})
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-room-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-room-modal')
+                });
+            })
+
+            $('#add-more-room-table').on('click', '.remove-room', function () {
+                let trLength = $('#add-more-room-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+
+
+
+
+        $("#insertRoom").on('click', function () {
+            let roomElems = $('#add-more-room-table tbody tr');
+            let roomCount = roomElems.length;
+            let roomJson = [];
+            roomElems.each(function (index, elem) {
+                let building_lid = $('#building_lid').val();
+                let handled_by = $("#handled_by").val();
+                let room_number = $(elem).find(`input[name='room_number']`).val()
+                let room_type_id = $(elem).find(`select[name='room_type_id']`).val();
+                let floor_number = $(elem).find(`input[name='floor_number']`).val();
+                let capacity = $(elem).find(`input[name='capacity']`).val();
+                let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+                let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+                let is_basement = $(elem).find(`select[name='is_basement']`).val();
+               // let is_processed = $(elem).find(`select[name='is_processed']`).val();
+
+                if (index < roomCount - 1) {
+                    let obj = {
+                        building_lid: building_lid,
+                        handled_by: handled_by,
+                        room_number: room_number,
+                        room_type_id: room_type_id,
+                        floor_number: floor_number,
+                        capacity: capacity,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        is_basement: is_basement,
+                       // is_processed: is_processed
+                    }
+                    console.log('OBJ1::::::::::>>', obj)
+                    roomJson.push(obj)
+                } else {
+                    let obj = {
+                        building_lid: building_lid,
+                        handled_by: handled_by,
+                        room_number: room_number,
+                        room_type_id: room_type_id,
+                        floor_number: floor_number,
+                        capacity: capacity,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        is_basement: is_basement,
+                       // is_processed: is_processed
+                    }
+                    console.log('OBJ2::::::::::>>', obj)
+                    roomJson.push(obj)
+                }
+            })
+            console.log('roomJson:::::::>>', roomJson)
+            let ApiObj = {
+                url: '/management/rooms/create',
+                type: 'POST',
+                data: {
+                    inputJSON: JSON.stringify(roomJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('Result:::::::::::', result)
+
+                showSuccess(result);
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+
+        })
+
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            console.log('keyword::::::::::', keyword)
+            $.ajax({
+                type: "POST",
+                url: "/management/rooms/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    showAjaxTable(data.data)
+                },
+            })
+        }, 500));
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/management/rooms/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data)
+                    }
+                })
+            })
+
+
+        // Fetch Single Room
+        $('#roomTable').on('click', '.edit-room', function () {
+            $("#add-room-modal-title").html('Update Room')
+            $("#insertRoom").addClass('d-none')
+            $("#add-room").addClass('d-none')
+            $(".updateRoom").removeClass('d-none')
+            $("#add-more-room").addClass('d-none')
+            $.ajax({
+                url: '/management/rooms/findone',
+                method: 'POST',
+                type: 'JSON',
+                data: {
+                    id: $(this).attr('data-room-id')
+                },
+                success: data => {
+                    let roomData = data.roomData;
+                    console.log('success: ', roomData)
+                    $("#roomId").val(roomData.roomid)
+                    $("#room_number").val(roomData.room_number)
+                    $("#building_lid").val(roomData.building_lid).trigger('change'),
+                        $("#room_type_id").val(roomData.room_type_id).trigger('change')
+                    $("#floor_number").val(roomData.floor_number)
+                    $("#capacity").val(roomData.capacity)
+                    $("#start_time_id").val(roomData.start_time_id)
+                    $("#end_time_id").val(roomData.end_time_id)
+                    $("#handled_by").val(roomData.handled_by)
+                    $("#is_basement").val(roomData.is_basement)
+                    $("#is_processed").val(roomData.is_processed)
+                    $("#add-room-modal").modal('show')
+                },
+                error: err => {
+                    console.log('Error: ', err)
+                }
+            })
+        })
+
+        // Update Room
+        $(".updateRoom").on('click', function () {
+            let roomElems = $('#add-more-room-table tbody tr');
+            let roomCount = roomElems.length;
+            let roomJson = [];
+            roomElems.each(function (index, elem) {
+                let id = $(elem).find(`input[name='roomId']`).val();
+                let building_lid = $('#building_lid').val();
+                let handled_by = $("#handled_by").val();
+                let room_number = $(elem).find(`input[name='room_number']`).val()
+                let room_type_id = $(elem).find(`select[name='room_type_id']`).val();
+                let floor_number = $(elem).find(`input[name='floor_number']`).val();
+                let capacity = $(elem).find(`input[name='capacity']`).val();
+                let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+                let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+                let is_basement = $(elem).find(`select[name='is_basement']`).val();
+                let is_processed = $(elem).find(`select[name='is_processed']`).val();
+
+                if (index < roomCount - 1) {
+                    let obj = {
+                        id: id,
+                        building_lid: building_lid,
+                        handled_by: handled_by,
+                        room_number: room_number,
+                        room_type_id: room_type_id,
+                        floor_number: floor_number,
+                        capacity: capacity,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        is_basement: is_basement,
+                        is_processed: is_processed
+                    }
+                    roomJson.push(obj)
+                } else {
+                    let obj = {
+                        id: id,
+                        building_lid: building_lid,
+                        handled_by: handled_by,
+                        room_number: room_number,
+                        room_type_id: room_type_id,
+                        floor_number: floor_number,
+                        capacity: capacity,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        is_basement: is_basement,
+                        is_processed: is_processed
+                    }
+                    roomJson.push(obj)
+                }
+            })
+            console.log('roomJson:::::::>>', roomJson)
+            let ApiObj = {
+                url: '/management/rooms/update',
+                type: 'POST',
+                data: {
+                    inputJSON: JSON.stringify(roomJson)
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('Result:::::::::::', result)
+                showSuccess(result);
+
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        // is_processed API
+        //roomTable
+        $("#roomTable").on('click', '.is_processed_click', function () {
+            let ApiObj = {
+                url: '/management/rooms_isprocessed',
+                type: 'POST',
+                data: {
+                    id: $(this).attr("data-room-id"),
+                    is_processed: $(this).attr("data-is-processed")
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                location.reload()
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //delete-room
+        //Delete Faculty API
+        $("#roomTable").on('click', '.delete-room', function () {
+            let id = $(this).attr("data-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/management/rooms/room/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+
+        //Getting capus Bulding List
+        $("#campus_lid").on('change', function () {
+            let campus_lid = $(this).val()
+            let ApiObj = {
+                url: '/management/rooms/buildinglist',
+                type: 'POST',
+                data: {
+                    campus_lid: campus_lid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let buildingList =
+                    `<select class="form-select" name="campus_lid" id="campus_lid">`;
+
+                if (result.data.length > 0) {
+                    buildingList +=
+                        `<option disabled selected value="">--Select Campus--</option>`;
+                    result.data.forEach(element => {
+                        buildingList += `<option value="${element.id}">
+                                ${element.building_name}
+                            </option>`
+                    });
+                } else {
+                    buildingList += `<option value="">
+                                No Building Found!
+                            </option>`
+                }
+                buildingList += `</select>`;
+                $("#building_lid").html(buildingList)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        //Pagination
+
+
+        //Pagination Here
+        let pageCount = `<%- roomcount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/management/rooms/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    showAjaxTable(data.data)
+                }
+            })
+        });
+
+
+        $("#building_lid").on('change', function () {
+            console.log('Building API::::::::::::::>')
+            let building_id = $(this).val()
+            let ApiObj = {
+                url: '/management/rooms/room/getroomtimeslots',
+                type: 'POST',
+                data: {
+                    id: building_id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+
+
+                let startTime = ``;
+                let endTime = ``;
+
+                if (result.data.length > 0) {
+                    startTime += `<option disabled selected value="">--Select Time--</option>`;
+                    endTime += `<option disabled selected value="">--Select Time--</option>`;
+
+                    result.data.forEach(element => {
+                        startTime +=
+                            `<option value="${element.id}">${element.start_time}</option>`;
+                        endTime +=
+                            `<option value="${element.id}">${element.end_time}</option>`;
+                    });
+                } else {
+                    startTime += `<option value="">No Slot Found!</option>`;
+                    endTime += `<option value="">No Slot Found!</option>`;
+
+                }
+                $("#add-room-modal  #start_time_id").html(startTime);
+                $("#add-room-modal  #end_time_id").html(endTime);
+                
+                $('#building_lid').prop('disabled', 'disabled');
+            }).catch(error => {
+                showError(error.responseJSON);
+            })
+        })
+
+
+                // Fetch Single Room
+            $('#roomTable').on('click', '.edit-room', function () {
+            $("#add-room-modal-title").html('Update Room')
+            $("#insertRoom").addClass('d-none')
+            $("#add-room").addClass('d-none')
+            $(".updateRoom").removeClass('d-none')
+            $("#add-more-room").addClass('d-none')
+            $.ajax({
+                url: '/management/rooms/findone',
+                method: 'POST',
+                type: 'JSON',
+                data: {
+                    id: $(this).attr('data-room-id')
+                },
+                success: data => {
+                    let roomData = data.roomData;
+                    console.log('success::::::::::::::::::::>> ', roomData)
+                    $("#roomId").val(roomData.roomid)
+                    $("#room_number").val(roomData.room_number)
+                    $("#building_lid").val(roomData.building_lid).trigger('change'),
+                    $("#room_type_id").val(roomData.room_type_id).trigger('change')
+                    $("#floor_number").val(roomData.floor_number)
+                    $("#capacity").val(roomData.capacity)
+                  
+                    $("#add-room-modal #handled_by").val(roomData.handled_by).trigger('change')
+                    
+                    $("#is_basement").val(roomData.is_basement)
+                    $("#is_processed").val(roomData.is_processed)
+                    $("#add-room-modal").modal('show')
+
+                    setTimeout(function(){
+                        $("#add-room-modal #start_time_id").val(roomData.start_time_id).trigger('change')
+                    $("#add-room-modal #end_time_id").val(roomData.end_time_id).trigger('change')
+                    },1000)
+                },
+                error: err => {
+                    console.log('Error: ', err)
+                }
+            })
+        })
+
+
+        
+        $(".generate_room_slot").on('click',function(){
+            let apiObj = {
+                type:"POST",
+                url:"/management/rooms/room/refresh",
+                data: {},
+                dataType:"JSON"
+            }
+            ajaxApi(apiObj).then(result => {
+                console.log('result ::::::::::::::::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                console.log('Error ::::::::::::::::::::::', error)
+                showError(error.responseJSON)
+            })
+        })
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showAjaxTable(roomList) {
+            let quoteAjax = `<table class="table table-bordered" id="roomTable">
+                    <thead>
+                                <th>Room No</th>
+                                <th>Building</th>
+                                <th>Type</th>
+                                <th>Floor</th>
+                                <th>Capacity</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Is Basement</th>
+                                <th>Handled By</th>
+                                <th>Campus</th>
+                                <th>Is Processed</th>
+                                <th>Action</th>
+                             
+                    </thead>
+                    <tbody>`;
+
+            if (roomList.length > 0) {
+                for (room of roomList) {
+                    quoteAjax +=
+                        ` <tr>
+                                <td>${room.room_number}</td>
+                                <td>${room.building_name}</td>
+                                <td>${room.room_type}</td>
+                                <td>${room.floor_number}</td>
+                                <td>${room.capacity}</td>
+                                <td>${room.start_time}</td>
+                                <td>${room.end_time}</td>
+                                <td>${room.is_basement}</td>
+                                <td>${room.handled_by}</td>
+                                <td>${room.campus}</td>
+                                <td>`
+                    if (room.is_processed == '1') {
+                        quoteAjax += `<div class="form-check form-switch switch-checkbox">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                    id="flexSwitchCheckChecked" checked disabled>
+
+                            </div>`
+                    } else {
+                        quoteAjax += `<div class="form-check form-switch switch-checkbox">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                    id="flexSwitchCheckChecked" disabled>
+                            </div>`
+                    }
+                    quoteAjax += `</td>
+                    <td>
+                            <a class="edit-room" data-room-id="${room.roomid}"><i class="fas fa-edit text-dark cursor-pointer"></i></a>
+                            <a class="delete-room" data-id="${room.roomid}"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                            </tr>`;
+                }
+            } else {
+                quoteAjax +=
+                    ` <tr><td colspan="12">No Data Found</td></tr>`;
+            }
+            quoteAjax += `<tbody></table>`
+            $("#roomTable").html(quoteAjax);
+        }
+
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

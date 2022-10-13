@@ -1,0 +1,2495 @@
+<%- include("../partials/head") %>
+  <%- include("../partials/leftSidebar") %>
+    <%- include("../partials/header") %>
+      <%- include("../partials/loader") %>
+
+        <div class="col-12 dashboardContent">
+          <!--DASHBOARD CONTENT START-->
+          <div class="card">
+            <div class="card-header">
+              <h1 class="f-20">Time Sheet for Whole Semester</h1>
+            </div>
+            <div class="card-body">
+              <div id='calendar'></div>
+            </div>
+          </div>
+
+          <!--DASHBOARD CONTENT END-->
+
+          <div class="modal fade full-screen-modal" data-modalDate="" id="simulatedDataModal" tabindex="-1"
+            role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="simulatedDataModalTitle">Time Sheet</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="p-0 mb-3 col-md-4 col-12">
+                    <input type="search" id="search-filter" class="form-control" placeholder="Search">
+                  </div>
+                  <table class="table table-responsive table-bordered time-table-daywise scroll">
+                    <thead class="thead-dark" id="timetable-head">
+                      <tr>
+                        <th scope="col">Room No</th>
+                        <% for (let sVal of slotData) { %>
+                          <th scope="col">
+                            <%- sVal.starttime %> to <%- sVal.endtime %>
+                          </th>
+                          <% } %>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for (let room of roomList) { %>
+                        <tr data-room="<%- room.room_uid %>">
+                          <td>
+                            <%- room.roomno %>
+                          </td>
+                          <% for (slot of slotData) { %>
+                            <td class="position-relative" data-slot="<%- slot.slotName %>"
+                              data-utd="<%- slot.slotName %>-<%- room.room_uid %>" data-uuid="" data-facultyId=""
+                              data-acad-session="" data-acad-year="" data-div="" data-programId="" data-start-time=""
+                              data-end-time="" data-uniqueIdForSap="" data-sapFlag="" data-sapEventId=""
+                              data-eventType="" data-eventName="" data-moduleId=""></td>
+                            <% } } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal Reschedule Event-->
+          <div class="modal fade full-screen-modal" id="editSimulatedModalData" tabindex="-1" role="dialog"
+            aria-labelledby="editSimulatedModalDataTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header bg-info">
+                  <h5 class="modal-title text-white" id="editSimulatedModalDataTitle">Reschedule Event</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body px-3">
+                  <div class="row">
+                    <div class="col-lg-6 border-right">
+                      <h5 class="text-center">Current</h5>
+                      <hr />
+                      <ul class="list-unstyled" id="resModalData">
+                        <li><strong>Current Date:</strong> <span class="current-date"></span></li>
+                        <li><strong>Program Name:</strong> <span id="editProgramName"></span></li>
+                        <li><strong>Class Room:</strong> <span class="class-room"></span></li>
+                        <li><strong>Class Timing:</strong> <span class="class-timing"></span></li>
+                      </ul>
+
+                      <div class="radio-buttons-group" id="flag-radio-group">
+                        <% for (let flag of rescheduleFlag) { %>
+                          <div class="custom-control custom-radio" data-flag="<%- flag.name %>">
+                            <input type="radio" id="<%- flag.name %>" name="scheduleType" value="<%- flag.id %>"
+                              class="custom-control-input" data-sap-flag="<%- flag.denotedBy %>">
+                            <label class="custom-control-label cursor-pointer" for="<%- flag.name %>">
+                              <%- flag.name %>
+                            </label>
+                          </div>
+                          <% } %>
+                      </div>
+
+                      <div id="rescheduleWrapper" class="mt-3 d-none">
+                        <select class="form-control mb-3 dropped-slot">
+                        </select>
+                        <select class="slotPicker form-control mb-3 dropped-faculty" disabled>
+                          <option value selected disabled>--Select Faculty--</option>
+                        </select>
+                      </div>
+
+                      <hr />
+                      <label>Select Reason <strong class="text-danger">*</strong></label>
+                      <select id="dropReason" class="form-control mb-3 modal-selct2">
+                        <option value disabled selected>Select Reason</option>
+                        <% for(let reason of cancellationReasons) {%>
+                          <option value="<%- reason.sapId %>">
+                            <%- reason.reasonText %>
+                          </option>
+                          <% } %>
+                      </select>
+                      <textarea id="cancellationDesc" class="form-control mb-3"></textarea>
+
+                    </div>
+                    <div class="col-lg-6 blur" id="reschedule-to-wrapper">
+                      <h5 class="text-center">Reschedule To</h5>
+                      <hr />
+
+                      <div id="replace-faculty-wrapper" class="d-none">
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input cursor-pointer"
+                            id="replace-faculty-checkbox">
+                          <label class="custom-control-label cursor-pointer" for="replace-faculty-checkbox">Replace
+                            faculty for a date range</label>
+                        </div>
+                        <hr />
+                      </div>
+
+                      <div id="cancel-wrapper" class="d-none">
+
+                        <div class="custom-control custom-radio">
+                          <input type="radio" id="cancel-e" name="cancel-type" class="custom-control-input" value="cae">
+                          <label class="custom-control-label cursor-pointer" for="cancel-e">
+                            Cancel Against Extra Class
+                          </label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                          <input type="radio" id="cancel-bulk" name="cancel-type" class="custom-control-input"
+                            value="bulk">
+                          <label class="custom-control-label cursor-pointer" for="cancel-bulk">
+                            Bulk Cancel
+                          </label>
+                        </div>
+
+                        <div class="custom-control custom-checkbox d-none">
+                          <input type="checkbox" id="bulk-cancel-without-report" class="custom-control-input" value="Z">
+                          <label class="custom-control-label cursor-pointer" for="bulk-cancel-without-report">
+                            Cancel without report
+                          </label>
+                        </div>
+                        <hr />
+
+                        <div class="d-none cancel-against-e">
+                          <select class="form-control mb-3 modal-selct2 extra-lecture" disabled>
+                            <option value selected disabled>--Select Extra Lecture--</option>
+                          </select>
+                        </div>
+
+                      </div>
+
+                      <div id="bulk-modify" class="d-none">
+                        <div class="mb-3">
+                          <label>From Date: <strong class="text-danger">*</strong></label>
+                          <input type="date" min="<%- dateRange.minDate %>" max="<%- dateRange.maxDate %>"
+                            id="modify-from-date" class="form-control" />
+                          <!-- <select id="modify-from-date" class="form-control modal-selct2">
+                            <option selected disabled value>--Select Date--</option>
+                            <% for (let date of semesterDates) { %>
+                              <option value="<%- date.dateString %>">
+                                <%- date.dateString %>
+                              </option>
+                              <% } %>
+                          </select> -->
+                        </div>
+                        <div class="mb-3">
+                          <label>To Date: <strong class="text-danger">*</strong></label>
+                          <input type="date" min="" max="<%- dateRange.maxDate %>" id="modify-to-date"
+                            class="form-control" />
+                          <!-- <select id="modify-to-date" class="form-control modal-selct2" disabled>
+                            <option selected disabled value>--Select Date--</option>
+                            <% for (let date of semesterDates) { %>
+                              <option value="<%- date.dateString %>">
+                                <%- date.dateString %>
+                              </option>
+                              <% } %>
+                          </select> -->
+                        </div>
+                        <div class="mb-3">
+                          <label>Faculty: <strong class="text-danger">*</strong></label>
+                          <select id="replace-faculty-dropdown" class="form-control" disabled>
+                            <option disabled selected value>--Select Faculty--</option>
+                          </select>
+                        </div>
+
+                        <div class="mb-3">
+                          <button class="btn btn-md btn-dark d-none" id="fetch-bulk-cancel">Fetch lectures</button>
+                        </div>
+
+                      </div>
+
+                      <div id="normal-modify" class="d-none">
+                        <div class="mb-3">
+                          <label>To Date: <strong class="text-danger">*</strong></label>
+                          <select id="reschedule-date-dropdown" class="form-control modal-selct2" disabled>
+                            <option selected disabled value>--Select Date--</option>
+                            <% for (let date of semesterDates) { %>
+                              <option value="<%- date.dateString %>">
+                                <%- date.dateString %>
+                              </option>
+                              <% } %>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label>Faculty: <strong class="text-danger">*</strong></label>
+                          <select id="reschedule-faculty-dropdown" class="form-control" disabled>
+                            <option disabled selected value>--Select Faculty--</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label>Select Time Slot: <strong class="text-danger">*</strong></label>
+                          <select id="reschedule-slot-dropdown" class="form-control" disabled>
+                            <option disabled selected value>--Select Time--</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label>Select Room: <strong class="text-danger">*</strong></label>
+                          <select id="reschedule-room-dropdown" class="form-control modal-selct2" disabled>
+                            <option disabled selected value>--Select Room--</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card col-12 d-none p-0" id="bulk-lecture-list-card">
+                      <div class="card-header cursor-pointer" data-toggle="collapse" data-target="#bulk-lecture-list">
+                        <h5> View Lectures</h5>
+                      </div>
+
+                      <div id="bulk-lecture-list" class="collapse show">
+                        <div class="card-body">
+                          <div class="lec-details">
+                            <ul>
+                              <li>SAP Event Id: <span class="event-id"></span></li>
+                              <li>Event Abbr: <span class="event-abbr"></span></li>
+                              <li>Existing Faculty: <span class="old-faculty"></span></li>
+                              <li>New Faculty: <span class="new-faculty"></span></li>
+                            </ul>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Date</th>
+                                  <th>Time</th>
+                                  <th>New Date</th>
+                                  <th>New Time</th>
+                                  <th>Room</th>
+                                  <th>New Room</th>
+                                  <th>Status</th>
+                                  <th>Remark</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="card col-12 d-none p-0" id="cancel-lecture-list-card">
+                      <div class="card-header cursor-pointer" data-toggle="collapse" data-target="#cancel-lecture-list">
+                        <h5> View Lectures</h5>
+                      </div>
+
+                      <div id="cancel-lecture-list" class="collapse show">
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table class="table table-bordered table-striped call-datatable">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Event Id</th>
+                                  <th>Event Name</th>
+                                  <th>Faculty Name</th>
+                                  <th>Faculty Id</th>
+                                  <th>Date</th>
+                                  <th>Time</th>
+                                  <th>Room</th>
+                                  <th>Status</th>
+                                  <th>Remark</th>
+                                  <th>Cancel <input id="cancel-all" type="checkbox" checked="checcked" />
+                                    <label>All</label>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer text-center">
+                  <button class="btn btn-sm btn-success m-auto" id="scheduleEventedSlot">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Reschedule Slot-->
+          <div class="modal fade" id="extraClassModal" tabindex="-1" role="dialog"
+            aria-labelledby="extraClassModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header bg-info">
+                  <h5 class="modal-title text-white" id="extraClassModalTitle">Extra/New Regular Class</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input id="cancelled-extra-class" type="radio" name="extra-class"
+                        class="custom-control-input cursor-pointer" value="EC" data-sap-flag="E">
+                      <label class="custom-control-label cursor-pointer" for="cancelled-extra-class">Extra Against
+                        Cancelled
+                        Lecture</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input id="new-extra-class" type="radio" name="extra-class"
+                        class="custom-control-input cursor-pointer" value="EN" data-sap-flag="E">
+                      <label class="custom-control-label cursor-pointer" for="new-extra-class">New Lecture</label>
+                    </div>
+                  </div>
+
+                  <hr />
+                  <ul class="list-unstyled" id="extraModalData">
+                    <li><strong>Class Room:</strong> <span class="class-room"></span></li>
+                    <li><strong>Class Timing:</strong> <span class="class-timing"></span></li>
+                  </ul>
+                  <hr />
+
+                  <div id="ec-wrapper" class="d-none">
+                    <select class="form-control mb-3 ec-modal-select2" id="selectDroppedSlot" disabled>
+                      <option value selected disabled>--Select Cancelled Lecture--</option>
+                    </select>
+                  </div>
+
+                  <div id="en-wrapper" class="d-none">
+                    <select class="slotPicker form-control mb-3" id="select-new-resch-type">
+                      <option value selected disabled>--Select Reschedule Flag--</option>
+                      <option value="E">New Extra Class</option>
+                      <option value="Y">New Regular Class</option>
+                    </select>
+
+                    <select class="slotPicker form-control mb-3 ec-modal-select2" id="select-new-ec-program">
+                      <option value selected disabled>--Select Program--</option>
+                      <% for (let program of programList) { %>
+                        <option value="<%- program.program_id %>" data-program-name="<%- program.programName %>">
+                          <%- program.programName %>/<%- program.program_id %>
+                        </option>
+                        <% } %>
+                    </select>
+
+                    <select class="slotPicker form-control mb-3 ec-modal-select2" id="select-new-ec-session" disabled>
+                      <option value selected disabled>--Select Acad Session--</option>
+                    </select>
+
+                    <select class="slotPicker form-control mb-3 ec-modal-select2" id="select-new-ec-div" disabled>
+                      <option value selected disabled>--Select Division--</option>
+                    </select>
+
+                    <select class="slotPicker form-control mb-3 ec-modal-select2" id="select-new-ec-lecture" disabled>
+                      <option value selected disabled>--Select Lecture--</option>
+                    </select>
+
+                    <select class="slotPicker form-control mb-3 ec-modal-select2" id="select-new-ec-faculty" disabled>
+                      <option value selected disabled>--Select Faculty--</option>
+                    </select>
+                  </div>
+
+                  <hr />
+                  <label>Select Reason <strong class="text-danger">*</strong></label>
+                  <select id="ec-drop-reason" class="form-control mb-3 ec-modal-select2">
+                    <option value disabled selected>Select Reason</option>
+                    <% for(let reason of cancellationReasons) {%>
+                      <option value="<%- reason.sapId %>">
+                        <%- reason.reasonText %>
+                      </option>
+                      <% } %>
+                  </select>
+                  <textarea id="ec-cancellation-desc" class="form-control mb-3"></textarea>
+                  <div class="col-12 text-center">
+                    <hr />
+                    <button class="btn btn-sm btn-success" id="scheduleExtraClass">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="modal fade" id="bulkChangeTimeModal" tabindex="-1" role="dialog"
+            aria-labelledby="bulkChangeTimeModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header bg-info">
+                  <h5 class="modal-title text-white" id="bulkChangeTimeModalTitle">Change Time</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3 old-details">
+                    <ul>
+                      <li><strong>Date:</strong> <span class="date"></span></li>
+                      <li><strong>Time:</strong> <span class="time"></span></li>
+                      <li><strong>Room:</strong> <span class="room"></span></li>
+                    </ul>
+                    <hr />
+                  </div>
+
+                  <div class="mb-3">
+                    <label>To Date: <strong class="text-danger">*</strong></label>
+                    <select class="form-control bulkChangeTimeModal-selct2 to-date">
+                      <option selected disabled value>--Select Date--</option>
+                      <% for (let date of semesterDates) { %>
+                        <option value="<%- date.dateString %>">
+                          <%- date.dateString %>/<%- date.dateNameString %>
+                              <%- date.status ? '/Holiday' : '' %>
+                        </option>
+                        <% } %>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label>Select Time Slot: <strong class="text-danger">*</strong></label>
+                    <select class="form-control to-time">
+                      <option disabled selected value>--Select Time--</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label>Select Room: <strong class="text-danger">*</strong></label>
+                    <select class="form-control bulkChangeTimeModal-selct2 to-room">
+                      <option disabled selected value>--Select Room--</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-md btn-dark change mx-auto d-block">Confirm</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%- include("../partials/footer") %>
+        <script src="/socket.io/socket.io.js"></script>
+          <script>
+            $(document).ready(function () {
+              //SOCKET IO
+
+              const socketUser = `<%- locals.username %>`
+              console.log('socketUser>>> ', socketUser)
+
+              const socket = io.connect(`https://<%- slug %>.timetable.svkm.ac.in:3000/`);
+
+              socket.on('connect', () => {
+                console.log(socket.connected)
+              });
+              socket.emit('join', 'Timetable rescheduling module')
+
+              $('#mutex').on('click', function () {
+                socket.emit('checkQueue', { name: "Kapil Sharma" })
+              })
+
+              socket.on('mutexCalled', async data => {
+                console.log('===============>>> Mutex Called')
+              })
+
+              //VARIABLES
+              let inputDate, slotName, roomNo, uuid, droppedFacultyId, openAgain;
+              let rescheduleObj = {
+                reschFlag: '',
+                fromDate: '',
+                toDate: '',
+                fromRoom: '',
+                toRoom: '',
+                fromSlot: '',
+                toSlot: '',
+                fromSlotUuid: '',
+                toSlotUuid: '',
+                fromFacultyId: '',
+                toFacultyId: '',
+                programId: '',
+                moduleId: '',
+                division: '',
+                acadSession: '',
+                acadYear: '',
+                fromStartTime: '',
+                toStartTime: '',
+                fromEndTime: '',
+                toEndTime: '',
+                uniqueIdForSap: '',
+                sapFlag: '',
+                sapEventId: '',
+                eventType: '',
+                eventName: '',
+                reasonId: '',
+                reasonDetail: '',
+                bulkModify: false,
+                dateRangeFrom: '',
+                dateRangeTo: ''
+              }
+
+              let slotTime = {
+                "slot1": {
+                  starttime: '07:30 AM',
+                  endtime: '08:30 AM',
+                  sapStartTime: '07:30:01 AM',
+                  sapEndTime: '08:30:00 AM'
+                },
+                "slot2": {
+                  starttime: '08:30 AM',
+                  endtime: '09:30 AM',
+                  sapStartTime: '08:30:01 AM',
+                  sapEndTime: '09:30:00 AM'
+                },
+                "slot3": {
+                  starttime: '10:00 AM',
+                  endtime: '11:00 AM',
+                  sapStartTime: '10:00:01 AM',
+                  sapEndTime: '11:00:00 AM'
+                },
+                "slot4": {
+                  starttime: '11:00 AM',
+                  endtime: '12:00 PM',
+                  sapStartTime: '11:00:01 AM',
+                  sapEndTime: '12:00:00 PM'
+                },
+                "slot5": {
+                  starttime: '12:30 PM',
+                  endtime: '01:30 PM',
+                  sapStartTime: '12:30:01 PM',
+                  sapEndTime: '01:30:00 PM'
+                },
+                "slot6": {
+                  starttime: '01:30 PM',
+                  endtime: '02:30 PM',
+                  sapStartTime: '01:30:01 PM',
+                  sapEndTime: '02:30:00 PM'
+                },
+                "slot7": {
+                  starttime: '03:00 PM',
+                  endtime: '04:00 PM',
+                  sapStartTime: '03:00:01 PM',
+                  sapEndTime: '04:00:00 PM'
+                },
+                "slot8": {
+                  starttime: '04:00 PM',
+                  endtime: '05:00 PM',
+                  sapStartTime: '04:00:01 PM',
+                  sapEndTime: '05:00:00 PM'
+                },
+                "slot9": {
+                  starttime: '05:00 PM',
+                  endtime: '06:00 PM',
+                  sapStartTime: '05:00:01 PM',
+                  sapEndTime: '06:00:00 PM'
+                },
+                "slot10": {
+                  starttime: '06:00 PM',
+                  endtime: '07:00 PM',
+                  sapStartTime: '06:00:01 PM',
+                  sapEndTime: '07:00:00 PM'
+                },
+                "slot11": {
+                  starttime: '07:00 PM',
+                  endtime: '08:00 PM',
+                  sapStartTime: '07:00:01 PM',
+                  sapEndTime: '08:00:00 PM'
+                },
+                "slot12": {
+                  starttime: '08:00 PM',
+                  endtime: '09:00 PM',
+                  sapStartTime: '08:00:01 PM',
+                  sapEndTime: '09:00:00 PM'
+                }
+
+              }
+
+              //Search Filter start
+              $('#search-filter').on('input', function () {
+
+                let searchStr = $(this).val().toLowerCase()
+
+                if (searchStr.length > 1) {
+                  $('tr[data-room]').addClass('d-none')
+                  $('tr[data-room]').each(function (iTr, thisTr) {
+                    $(thisTr).find('td:not(:first-child)').each(function (iTd, thisTd) {
+                      if ($(thisTd).html().toLowerCase().includes(searchStr)) {
+                        $(thisTd).addClass('bg-info').parent().removeClass('d-none')
+                      } else {
+                        $(thisTd).removeClass('bg-info')
+                      }
+                    })
+
+                  })
+                } else {
+                  $('tr[data-room]').removeClass('d-none')
+                  $('tr[data-room] td').removeClass('bg-info')
+                }
+              })
+              //Search Filter end
+
+
+
+              //INITIALIZE calendar
+              let calendar;
+              if ($('#calendar').length >= 1) {
+                var calendarEl = document.getElementById('calendar');
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                  plugins: ['dayGrid'],
+                  validRange: {
+                    start: '<%- dateRange.minDate %>',
+                    end: '<%- dateRange.maxDate %>'
+                  }
+                });
+                calendar.render();
+              }
+
+              $('.fc-next-button, .fc-prev-button, .fc-today-button').click(function () {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/check-days-lecture/',
+                  dataType: "json",
+                  data: {
+                    monthInt: getMonth() + 1
+                  },
+                  success: data => {
+                    console.log('on success: ', data)
+                    let dateList = data.dateList
+
+                    for (let date of dateList) {
+                      $(`#calendar td .fc-day[data-date='${date.dateStr}']`).append(
+                        '<i class="status fas fa-check-square"></i>')
+                    }
+
+
+                  },
+                  error: err => {
+                    console.log('on error: ', err)
+                  }
+                })
+
+
+                showTimesheetModal()
+                //console.log('The month is ====>>> ', getMonth() + 1)
+              })
+
+              function showTimesheetModal() {
+                $('.fc-day, .fc-day-top, .fc-past, .fc-future').click(function () {
+
+
+                  let thisDate = $(this).data('date').trim();
+
+                  console.log('selected date: ', $(this).data('date'))
+
+                  $.ajax({
+                    type: 'POST',
+                    url: '/simulation/getSimulatedData/',
+                    dataType: "json",
+                    data: {
+                      selectedDate: thisDate
+                    },
+
+                    success: function (data) {
+                      if (data.cause == "permission denied") {
+                        window.location = data.reqUrl
+                        return
+                      }
+
+                      console.log('data.date====>>>>> ', thisDate)
+                      console.log('data.date====>>>>> ', convertDate(thisDate, '-'))
+
+
+                      $("#simulatedDataModal").attr("data-modalDate", convertDate(thisDate, '-'))
+                      $("#simulatedDataModalTitle").html(convertDate(thisDate, '-'))
+
+                      let detailsData = data.data || [];
+
+                      console.log('data ====>>>>> ', detailsData)
+
+                      let uTds = $(`#simulatedDataModal tbody td:not(:first-child)`);
+
+                      uTds.html('');
+                      uTds.attr('data-uuid', '');
+                      uTds.attr('data-facultyId', '');
+                      uTds.attr('data-acad-session', '');
+                      uTds.attr('data-acad-year', '');
+                      uTds.attr('data-div', '');
+                      uTds.attr('data-programId', '');
+                      uTds.attr('data-start-time', '');
+                      uTds.attr('data-end-time', '');
+                      uTds.attr('data-uniqueIdForSap', '');
+                      uTds.attr('data-sapFlag', '');
+                      uTds.attr('data-sapEventId', '');
+                      uTds.attr('data-eventType', '');
+                      uTds.attr('data-eventName', '');
+                      uTds.attr('data-moduleId', '');
+                      uTds.attr('data-is-adjusted', '');
+                      uTds.attr('data-is-new-ec', '');
+
+
+                      for (let lec of detailsData) {
+                        let uTd = $(`td[data-utd="slot${lec.slotno}-${lec.room_uid}"]`);
+                        uTd.html(`${lec.eventName} ${lec.sapFlag ? `<span class="sap-flag-pill">${lec.sapFlag}</span>` : ''}`)
+                        uTd.attr('data-uuid', lec.uuid);
+                        uTd.attr('data-facultyId', lec.facultyId);
+                        uTd.attr('data-acad-session', lec.bookedAcadSession);
+                        uTd.attr('data-acad-year', lec.bookedAcadYear);
+                        uTd.attr('data-div', lec.bookedDiv);
+                        uTd.attr('data-programId', lec.bookedProgramId);
+                        uTd.attr('data-start-time', lec.starttime);
+                        uTd.attr('data-end-time', lec.endtime);
+                        uTd.attr('data-uniqueIdForSap', lec.uniqueIdForSAP);
+                        uTd.attr('data-sapFlag', lec.sapFlag);
+                        uTd.attr('data-sapEventId', lec.sapEventId);
+                        uTd.attr('data-eventType', lec.eventType);
+                        uTd.attr('data-eventName', lec.eventName);
+                        uTd.attr('data-moduleId', lec.eventId.split('-')[0].trim());
+                        uTd.attr('data-is-adjusted', Number(lec.is_adjusted_cancel));
+                        uTd.attr('data-is-new-ec', Number(lec.is_new_ec));
+                      }
+
+                      ; (async () => {
+
+                        $('#simulatedDataModal').modal('show');
+
+                        let scheduleLogic = await new Promise(resolve => {
+                          $(`#simulatedDataModal table tbody td:not(:first-child)`).click(function () {
+                            let $this = $(this)
+                            let tdIdx = $(this).index() + 1
+                            let slotFor = $this.attr('data-eventname')
+
+
+                            inputDate = $("#simulatedDataModalTitle").text().trim()
+                            slotName = $this.attr("data-slot")
+                            roomNo = $this.parent().attr("data-room")
+                            uuid = $this.attr("data-uuid")
+
+                            console.log('rescheduleObj::::::::::>>>>',rescheduleObj)
+
+                            if (slotFor) {
+
+                              rescheduleObj.fromDate = inputDate
+                              rescheduleObj.fromRoom = roomNo
+                              rescheduleObj.fromSlot = $this.attr('data-slot')
+                              rescheduleObj.fromSlotUuid = $this.attr('data-uuid')
+                              rescheduleObj.fromFacultyId = $this.attr('data-facultyid')
+                              rescheduleObj.acadSession = $this.attr('data-acad-session')
+                              rescheduleObj.acadYear = $this.attr('data-acad-year')
+                              rescheduleObj.division = $this.attr('data-div')
+                              rescheduleObj.programId = $this.attr('data-programid')
+                              rescheduleObj.fromStartTime = $this.attr('data-start-time')
+                              rescheduleObj.fromEndTime = $this.attr('data-end-time')
+                              rescheduleObj.uniqueIdForSap = $this.attr('data-uniqueidforsap')
+                              rescheduleObj.sapFlag = $this.attr('data-sapflag')
+                              rescheduleObj.sapEventId = $this.attr('data-sapeventid')
+                              rescheduleObj.eventType = $this.attr('data-eventtype')
+                              rescheduleObj.eventName = $this.attr('data-eventname')
+                              rescheduleObj.moduleId = $this.attr('data-moduleid')
+                              rescheduleObj.isAdjusted = $this.attr('data-is-adjusted')
+                              rescheduleObj.isNewEc = $this.attr('data-is-new-ec')
+
+                              console.log('rescheduleObj.isAdjusted: ', rescheduleObj.isAdjusted)
+
+                              $('#resModalData .current-date').text(inputDate)
+                              $('#resModalData .class-room').text($this.closest('tr').attr(
+                                'data-room'))
+                              $('#resModalData .class-timing').text($(
+                                `#timetable-head tr th:nth-child(${tdIdx})`).text().trim())
+
+
+                              $("#flag-radio-group .custom-radio[data-flag='Extra Class']")
+                                .addClass("d-none")
+                              $('#editSimulatedModalData #editProgramName').html(slotFor)
+
+                              if (rescheduleObj.isNewEc == '1') {
+                                $('#Modify').attr('disabled', true);
+                              } else {
+                                $('#Modify').attr('disabled', false);
+                              }
+
+                              $('#editSimulatedModalData').modal('show')
+
+
+                            } else {
+
+                              $('#extraModalData .class-room').text($this.closest('tr').attr(
+                                'data-room'))
+                              $('#extraModalData .class-timing').text($(
+                                `#timetable-head tr th:nth-child(${tdIdx})`).text().trim())
+
+                              //EXTRA CLASS LOGIC
+                              rescheduleObj.toDate = inputDate
+                              rescheduleObj.toRoom = roomNo
+                              rescheduleObj.toSlot = slotName
+                              rescheduleObj.toStartTime = slotTime[slotName].sapStartTime
+                              rescheduleObj.toEndTime = slotTime[slotName].sapEndTime
+                              rescheduleObj.toSlotUuid = $this.attr('data-uuid')
+                              rescheduleObj.fromDate = ""
+                              rescheduleObj.fromRoom = ""
+                              rescheduleObj.fromSlot = ""
+                              rescheduleObj.fromSlotUuid = ""
+                              rescheduleObj.fromFacultyId = ""
+                              rescheduleObj.acadSession = ""
+                              rescheduleObj.acadYear = ""
+                              rescheduleObj.division = ""
+                              rescheduleObj.programId = ""
+                              rescheduleObj.fromStartTime = ""
+                              rescheduleObj.fromEndTime = ""
+                              rescheduleObj.uniqueIdForSap = ""
+                              rescheduleObj.sapFlag = "E"
+                              rescheduleObj.sapEventId = ""
+                              rescheduleObj.eventType = ""
+                              rescheduleObj.eventName = ""
+                              rescheduleObj.moduleId = ""
+
+                              $("#extraClassModal").modal('show');
+
+                              console.log('Extra Class OBJ: ', rescheduleObj)
+                            }
+
+                          })
+                        })
+
+
+                      })()
+                    }
+                  })
+                })
+              }
+              showTimesheetModal()
+
+
+              //RESCHEDULE LOGIC
+              $(`input[name='scheduleType']`).on('change', function () {
+                console.log('Changed: ', $(this).val())
+                $('#reschedule-to-wrapper').addClass('blur');
+                $('#reschedule-date-dropdown').val('').change()
+                $('#reschedule-faculty-dropdown').val('')
+                $('#reschedule-slot-dropdown').val('')
+                $('#reschedule-room-dropdown').val('').change()
+                $('#reschedule-to-wrapper select').attr('disabled', true);
+                $('#dropReason').val('').change().attr('disabled', false);
+                $('#cancellationDesc').val('').attr('disabled', false);
+
+                $('#replace-faculty-wrapper').addClass('d-none')
+                $('#replace-faculty-checkbox').prop('checked', false)
+                $('#normal-modify').removeClass('d-none')
+                $('#cancel-wrapper').addClass('d-none')
+                $('#bulk-modify').addClass('d-none')
+                $(`#modify-from-date`).val('').change()
+                $(`#modify-to-date`).val('')//.change()
+                $('#bulk-lecture-list-card').addClass('d-none')
+                $('#cancel-lecture-list-card').addClass('d-none')
+                $('#fetch-bulk-cancel').addClass('d-none');
+                $('#replace-faculty-dropdown').attr('disabled', true)
+
+                $('#cancel-wrapper .cancel-against-e').addClass('d-none')
+                $('#cancel-wrapper .cancel-against-e .extra-lecture').val('');
+                $(`#cancel-wrapper input[name="cancel-type"]`).prop('checked', false);
+
+
+
+                let isBlurred = true;
+
+                let rescheduleType = $(this).val();
+
+                rescheduleObj.toDate = '';
+                rescheduleObj.toSlot = '';
+                rescheduleObj.toStartTime = '';
+                rescheduleObj.toEndTime = '';
+                rescheduleObj.toFacultyId = '';
+                rescheduleObj.toRoom = '';
+                rescheduleObj.reasonDetail = '';
+                rescheduleObj.reasonId = '';
+                rescheduleObj.bulkModify = false;
+
+                rescheduleObj.reschFlag = $(this).attr('data-sap-flag');
+
+                console.log('Changed Obj: ', rescheduleObj)
+
+                if (rescheduleType == 3 && isBlurred) {
+                  getFacultiesForModule();
+                  $('#reschedule-date-dropdown').attr('disabled', false);
+                  $('#reschedule-to-wrapper').removeClass('blur');
+                  isBlurred = false;
+                } else if (rescheduleType == 2) {
+                  $('#replace-faculty-wrapper').removeClass('d-none')
+                  rescheduleObj.toDate = rescheduleObj.fromDate
+                  rescheduleObj.toSlot = rescheduleObj.fromSlot
+                  rescheduleObj.toStartTime = rescheduleObj.fromStartTime
+                  rescheduleObj.toEndTime = rescheduleObj.fromEndTime
+                  console.log('modified Obj: ', rescheduleObj)
+                  getFacultiesRoomsForModify()
+                  $('#reschedule-to-wrapper').removeClass('blur');
+                  $('#reschedule-date-dropdown').val(rescheduleObj.fromDate).change();
+                  //$('#reschedule-slot-dropdown').val(rescheduleObj.fromSlot).change();
+                } else if (rescheduleType == 5) {
+                  $('#dropReason').val(12).change().attr('disabled', true);
+                  $('#cancellationDesc').val('').attr('disabled', true);
+                } else if (rescheduleType == 6) {
+                  $('#normal-modify').addClass('d-none')
+                  //$('#modify-from-date').attr('disabled', false)
+                  $('#reschedule-to-wrapper').removeClass('blur');
+                  $('#bulk-modify').removeClass('d-none')
+                } else if (rescheduleType == 1) {
+
+                  console.log('rescheduleObj.isAdjusted: ', rescheduleObj.isAdjusted)
+                  console.log('=====>>>>> KAPIL')
+                  if (rescheduleObj.isAdjusted == 1 || rescheduleObj.isNewEc == 1) {
+                    console.log('=====>>>>> disabling')
+                    $('#cancel-e').attr('disabled', true);
+                  } else {
+                    console.log('=====>>>>> enabling')
+                    $('#cancel-e').attr('disabled', false);
+                  }
+
+
+                  $('#normal-modify').addClass('d-none')
+                  $('#cancel-wrapper').removeClass('d-none')
+                  $('#reschedule-to-wrapper').removeClass('blur');
+
+                }
+
+              })
+
+              //bulk cancel
+              $(`#cancel-wrapper input[name="cancel-type"]`).on('change', function () {
+
+                let cancelType = $(this).val();
+
+                if (cancelType == 'bulk') {
+                  $('#modify-from-date').attr('disabled', false);
+                  $('#bulk-modify').removeClass('d-none');
+                  $('#cancel-wrapper .cancel-against-e').addClass('d-none');
+                  // $('#bulk-cancel-without-report').parent().removeClass('d-none');
+                  $('#fetch-bulk-cancel').removeClass('d-none');
+
+                } else if (cancelType == 'cae') {
+
+                  $('#bulk-modify').addClass('d-none')
+                  $(`#modify-from-date`).val('').change()
+                  $(`#modify-to-date`).val('')//.change()
+                  $('#replacing-lecture-count .count').text('0')
+                  $('#bulk-lecture-list-card').addClass('d-none')
+                  $('#cancel-lecture-list-card').addClass('d-none')
+                  $('#fetch-bulk-cancel').addClass('d-none');
+                  // $('#bulk-cancel-without-report').prop('checked', false);
+                  // $('#bulk-cancel-without-report').parent().addClass('d-none');
+
+                  $.ajax({
+                    type: 'POST',
+                    url: '/simulation/reschedule/get-new-extra-lectures/',
+                    dataType: "JSON",
+                    data: {
+                      facultyId: rescheduleObj.fromFacultyId,
+                      sapEventId: rescheduleObj.sapEventId,
+                      programId: rescheduleObj.programId,
+                      moduleId: rescheduleObj.moduleId,
+                      division: rescheduleObj.division,
+
+                    },
+                    success: data => {
+                      let lectureList = data.lectureList;
+                      console.log('lectureList: ', lectureList)
+
+                      let ajaxData = `<option value selected disabled>--Select Extra Lecture--</option>`;
+
+
+                      for (let lecture of lectureList) {
+                        ajaxData +=
+                          `<option value="${lecture.event_name}" data-lid="${lecture.id}" data-unx-lid="${lecture.unx_lid}" data-sap-event-id="${lecture.sap_event_id}" data-module-id="${lecture.module_id}" data-program-id="${lecture.program_id}" data-division="${lecture.div}" data-event-type="${lecture.event_type}" data-date="${lecture.date_str}" data-room-no="${lecture.room_uid}" data-acad-year="${lecture.acad_year}" data-acad-session="${lecture.acad_session}" data-faculty-id="${lecture.faculty_id}" data-start-time="${lecture.start_time}" data-end-time="${lecture.end_time}" data-slot-name=${lecture.slot_name}>${lecture.event_name} | ${lecture.start_time} to ${lecture.end_time} | ${lecture.date_str}</option>`;
+                      }
+                      $('#cancel-wrapper .cancel-against-e .extra-lecture').html(ajaxData).attr("disabled", false)
+
+                    },
+                    error: err => {
+                      console.log('Error: ', err)
+                    }
+                  })
+
+                  $('#cancel-wrapper .cancel-against-e').removeClass('d-none')
+
+                }
+
+                console.log('resflag====>>> ', rescheduleObj.reschFlag)
+              })
+
+              // $(`#bulk-cancel-without-report`).on('change', function () {
+              //   let isChecked = $(this).is(':checked');
+
+              //   if (isChecked) {
+              //     rescheduleObj.reschFlag = 'Z'
+              //   } else {
+              //     rescheduleObj.reschFlag = 'C'
+              //   }
+
+              //   console.log(rescheduleObj.reschFlag)
+
+              // })
+
+              $('#cancel-wrapper .cancel-against-e .extra-lecture').on('change', function () {
+
+                let $this = $(this);
+
+                rescheduleObj.lecLid = $this.find('option:selected').attr('data-lid');
+                rescheduleObj.sapEventId = $this.find('option:selected').attr('data-sap-event-id');
+                rescheduleObj.eventName = $this.find('option:selected').val();
+                rescheduleObj.programId = $this.find('option:selected').attr('data-program-id');
+                rescheduleObj.moduleId = $this.find('option:selected').attr('data-module-id');
+                rescheduleObj.acadYear = $this.find('option:selected').attr('data-acad-year');
+                rescheduleObj.acadSession = $this.find('option:selected').attr('data-acad-session');
+                rescheduleObj.division = $this.find('option:selected').attr('data-division');
+                rescheduleObj.eventType = $this.find('option:selected').attr('data-event-type');
+
+                rescheduleObj.toRoom = $this.find('option:selected').attr('data-room-no');
+                rescheduleObj.toStartTime = $this.find('option:selected').attr('data-start-time');
+                rescheduleObj.toEndTime = $this.find('option:selected').attr('data-end-time');
+                rescheduleObj.toSlot = $this.find('option:selected').attr('data-slot-name');
+                rescheduleObj.toFacultyId = $this.find('option:selected').attr('data-faculty-id');
+                rescheduleObj.toDate = $this.find('option:selected').attr('data-date');
+
+              })
+
+              $('#fetch-bulk-cancel').on('click', function () {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/fetch-bulk-cancel/',
+                  dataType: "JSON",
+                  data: {
+                    fromDate: convertDate(rescheduleObj.dateRangeFrom, '-'),
+                    toDate: convertDate(rescheduleObj.dateRangeTo, '-'),
+                    facultyId: $('#replace-faculty-dropdown').val(),
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+
+                    if ($.fn.DataTable.isDataTable('.call-datatable')) {
+                      $('.call-datatable').DataTable().destroy();
+                    }
+
+
+
+                    let bulkLectureTableStr = '';
+
+                    let count = 0;
+                    if (data.lectureList.length > 0) {
+                      for (let lecture of data.lectureList) {
+                        bulkLectureTableStr += `<tr data-lid="${lecture.id}" data-date="${lecture.date_str}" data-start-time="${lecture.start_time}" data-end-time="${lecture.end_time}" data-slot="${lecture.slot_name}" data-room="${lecture.room_uid}">
+                          <td>${++count}</td>
+                          <td>${lecture.sap_event_id ? lecture.sap_event_id : 'Not Created'}</td>
+                          <td>${lecture.event_name}</td>
+                          <td>${lecture.faculty_name}</td>
+                          <td>${lecture.faculty_id}</td>
+                          <td class="date">${lecture.date_str}</td>
+                          <td class="time">${lecture.start_time}-${lecture.end_time}</td>
+                          <td class="room">${lecture.room_no}</td>
+                          <td class="status" data-lid="${lecture.id}" data-date="${lecture.date_str}" data-room="${lecture.room_uid}" data-slot="${lecture.slot_name}"><i class="fas fa-exclamation-triangle text-warning"></i></td>
+                          <td class="remark" data-lid="${lecture.id}" data-date="${lecture.date_str}" data-room="${lecture.room_uid}" data-slot="${lecture.slot_name}"><i class="fas fa-exclamation-triangle text-warning"></i></td>
+                          <td>
+                            <input type='checkbox' class='is-bulk-cancel' style="width: 25px; height: 25px;" checked="checked"/>
+                          </td>
+                          </tr>
+                          `
+                      }
+
+
+                    } else {
+                      bulkLectureTableStr = `<tr><td colspan="11">No lecture found for the given date range.</td></tr>`
+                    }
+
+                    $('#cancel-lecture-list-card table tbody').html(bulkLectureTableStr)
+                    $('#cancel-lecture-list-card').removeClass('d-none')
+
+                    if (data.lectureList.length > 0) {
+                      callDatatable()
+                    }
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+              //bulk reschedule
+              $('#replace-faculty-checkbox').on('click', function () {
+                rescheduleObj.bulkModify = $(this).is(':checked')
+                console.log('rescheduleObj.bulkModify:  ', rescheduleObj.bulkModify)
+
+                if (rescheduleObj.bulkModify) {
+                  $('#normal-modify').addClass('d-none')
+                  $('#modify-from-date').attr('disabled', false)
+                  $('#bulk-modify').removeClass('d-none')
+                } else {
+                  $('#normal-modify').removeClass('d-none')
+                  $('#bulk-modify').addClass('d-none')
+                  $(`#modify-from-date`).val('').change()
+                  $(`#modify-to-date`).val('')//.change()
+                  $('#replacing-lecture-count .count').text('0')
+                  $('#bulk-lecture-list-card').addClass('d-none')
+
+                }
+              })
+
+              $(`#modify-from-date`).on('change', function () {
+                rescheduleObj.dateRangeFrom = $(this).val();
+                let modifyToDate = $('#modify-to-date')
+                modifyToDate.val('')//.change()
+                modifyToDate.attr('min', $(this).val())
+                modifyToDate.attr('disabled', false)
+              })
+
+              $(`#modify-to-date`).on('change', function () {
+                rescheduleObj.dateRangeTo = $(this).val();
+
+                if ($(`#modify-from-date`).val() && (rescheduleObj.reschFlag == 'M' || rescheduleObj.reschFlag == 'Y')) {
+                  $.ajax({
+                    type: 'POST',
+                    url: '/simulation/reschedule/get-replacing-faculties/',
+                    dataType: "JSON",
+                    data: {
+                      fromDate: rescheduleObj.dateRangeFrom,
+                      toDate: rescheduleObj.dateRangeTo,
+                      moduleId: rescheduleObj.moduleId,
+                      programId: rescheduleObj.programId,
+                      sapEventId: rescheduleObj.sapEventId,
+                      fromFacultyId: rescheduleObj.fromFacultyId,
+                      division: rescheduleObj.division,
+                      sapEventId: rescheduleObj.sapEventId,
+                    },
+                    success: data => {
+                      console.log('Success: ', data)
+                      let facultyListStr = `<option disabled selected value>--Select Faculty--</option>`
+
+                      for (let faculty of data.facultyList) {
+                        facultyListStr +=
+                          `<option value="${faculty.facultyId}" data-faculty-type="${faculty.type}">${faculty.facultyName} - ${faculty.facultyId}</option>`
+                      }
+
+                      let bulkLectureTableStr = ``;
+                      let count = 0;
+
+                      if (data.lectureList.length > 0) {
+                        for (let lecture of data.lectureList) {
+                          bulkLectureTableStr += `<tr data-lid="${lecture.id}" data-date="${lecture.date_str}" data-start-time="${lecture.start_time}" data-end-time="${lecture.end_time}" data-slot="${lecture.slot_name}" data-room="${lecture.room_no}" data-new-date="${lecture.date_str}"  data-new-room="${lecture.room_no}" data-new-slot="${lecture.slot_name}">
+                          <td>${++count}</td>
+                          <td class="date">${lecture.date_str}</td>
+                          <td class="time">${lecture.start_time}-${lecture.end_time}</td>
+                          <td class="new-date">${lecture.date_str}</td>
+                          <td class="new-time">${lecture.start_time}-${lecture.end_time}</td>
+                          <td class="room">${lecture.room_no}</td>
+                          <td class="new-room">${lecture.room_no}</td>
+                          <td class="status" data-lid="${lecture.id}" data-date="${lecture.date_str}" data-room="${lecture.room_no}" data-slot="${lecture.slot_name}"><i class="fas fa-exclamation-triangle text-warning"></i></td>
+                          <td class="remark" data-lid="${lecture.id}" data-date="${lecture.date_str}" data-room="${lecture.room_no}" data-slot="${lecture.slot_name}"><i class="fas fa-exclamation-triangle text-warning"></i></td>
+                          <td><button class="btn btn-sm btn-dark change-time">Change Time</button></td>
+                          </tr>
+                          `
+                        }
+
+                        $('#bulk-lecture-list .lec-details .event-id').text(data.lectureList[0].sap_event_id)
+                        $('#bulk-lecture-list .lec-details .event-abbr').text(data.lectureList[0].event_abbr)
+                        $('#bulk-lecture-list .lec-details .old-faculty').text(data.lectureList[0].faculty_name)
+                      } else {
+                        bulkLectureTableStr = `<tr><td colspan="10">No lecture found for the given date range.</td></tr>`
+                      }
+
+
+                      $('#bulk-lecture-list-card table tbody').html(bulkLectureTableStr)
+                      $('#bulk-lecture-list-card').removeClass('d-none')
+                      $('#replace-faculty-dropdown').html(facultyListStr).attr('disabled', false)
+                    },
+                    error: err => {
+                      console.log('Error: ', err)
+                    }
+                  })
+                } else {
+
+                  $.ajax({
+                    type: 'POST',
+                    url: '/simulation/reschedule/fetch-faculties-date-range/',
+                    dataType: "JSON",
+                    data: {
+                      fromDate: convertDate(rescheduleObj.dateRangeFrom, '-'),
+                      toDate: convertDate(rescheduleObj.dateRangeTo, '-'),
+                    },
+                    success: data => {
+                      console.log('Success: ', data)
+                      let facultyListStr = `<option disabled selected value>--Select Faculty--</option>`
+
+                      if (data.facultyList.length > 0) {
+                        for (let faculty of data.facultyList) {
+                          facultyListStr +=
+                            `<option value="${faculty.faculty_id}">${faculty.faculty_name} - ${faculty.faculty_id}</option>`
+                        }
+                      }
+
+                      $('#replace-faculty-dropdown').html(facultyListStr).attr('disabled', false)
+                      // $('#cancel-lecture-list-card table tbody').html(bulkLectureTableStr)
+                      // $('#cancel-lecture-list-card').removeClass('d-none')
+
+                    },
+                    error: err => {
+                      console.log('Error: ', err)
+                    }
+                  })
+
+                }
+
+
+
+                $('#replace-faculty-dropdown').attr('disabled', false)
+
+                console.log('RESOBJ:::>>>> ', rescheduleObj)
+              })
+
+              $(`#replace-faculty-dropdown`).on('change', function () {
+
+                if (rescheduleObj.reschFlag == 'M' || rescheduleObj.reschFlag == 'Y') {
+                  rescheduleObj.toFacultyId = $(this).val();
+                  $('#bulk-lecture-list-card .new-faculty').text($(this).find('option:selected').text().split('-')[0]
+                    .trim())
+                  $('#bulk-lecture-list .lec-details .new-faculty').text($(this).find('option:selected').text().split('-')[
+                    0].trim())
+                  $(`#bulk-lecture-list-card table tbody tr .remark`).html(
+                    `<i class="fas fa-exclamation-triangle text-warning"></i>`)
+
+                  $(".loaderBody").removeClass('d-none');
+
+                  socket.emit('facultyAvailabilityCheck', {
+                    socketUser: socketUser,
+                    startDate: rescheduleObj.dateRangeFrom,
+                    endDate: rescheduleObj.dateRangeTo,
+                    facultyId: rescheduleObj.toFacultyId,
+                    facultyType: $(this).find('option:selected').attr('data-faculty-type')
+                  })
+                }
+
+              })
+
+
+              let currenBulkTr;
+
+              $(document).on('click', '#bulk-lecture-list .change-time', function () {
+                currenBulkTr = $(this).closest('tr');
+                $('#bulkChangeTimeModal').modal('show')
+                $('#bulkChangeTimeModal .to-date').val(currenBulkTr.attr('data-date')).change()
+
+                $('.old-details .date').text(currenBulkTr.attr('data-date'))
+                $('.old-details .time').text(
+                  `${currenBulkTr.attr('data-start-time')} to ${currenBulkTr.attr('data-end-time')}`)
+                $('.old-details .room').text(currenBulkTr.attr('data-room'))
+              })
+
+              $('#bulkChangeTimeModal .to-date').on('change', function () {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-slots/',
+                  dataType: "JSON",
+                  data: {
+                    facultyId: rescheduleObj.toFacultyId,
+                    dateStr: $(this).val()
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let slotStr = `<option disabled selected value>--Select Time--</option>`
+
+                    for (let slot of data.slotList) {
+                      slotStr +=
+                        `<option value="${slot.slotName}" data-sap-start-time="${slot.sapStartTime}" data-sap-end-time="${slot.sapEndTime}">${slot.starttime} - ${slot.endtime}</option>`
+                    }
+
+                    $('#bulkChangeTimeModal .to-time').html(slotStr).attr('disabled', false)
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+
+              $('#bulkChangeTimeModal .to-time').on('change', function () {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-rooms/',
+                  dataType: "JSON",
+                  data: {
+                    dateStr: $('#bulkChangeTimeModal .to-date').val(),
+                    slotName: $(this).val()
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let roomStr = `<option selected disabled value>--Select Room--</option>`
+
+                    for (let room of data.roomList) {
+                      roomStr += `<option value="${room.room_no}">${room.room_no}</option>`
+                    }
+
+                    $('#bulkChangeTimeModal .to-room').html(roomStr).attr('disabled', false)
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+              $('#bulkChangeTimeModal .change').on('click', function () {
+
+
+                currenBulkTr.attr('data-new-room', $('#bulkChangeTimeModal .to-room').val())
+                currenBulkTr.attr('data-new-date', $('#bulkChangeTimeModal .to-date').val())
+                currenBulkTr.attr('data-new-slot', $('#bulkChangeTimeModal .to-time').val())
+
+                currenBulkTr.find('.new-time').text($('#bulkChangeTimeModal .to-time option:selected').text())
+                currenBulkTr.find('.new-date').text($('#bulkChangeTimeModal .to-date').val())
+                currenBulkTr.find('.new-room').text($('#bulkChangeTimeModal .to-room').val())
+                currenBulkTr.find('.remark').html(`<i class="fas fa-exclamation-triangle text-info"></i>`)
+
+
+                $('#bulkChangeTimeModal').modal('hide')
+
+
+              })
+
+
+              $('#dropReason').on('change', function () {
+                rescheduleObj.reasonId = $(this).val()
+                if ($(this).val() == 12 && rescheduleObj.reschFlag == 'C') {
+                  rescheduleObj.reschFlag = 'Z';
+                }
+
+                console.log('rescheduleObj.reschFlag>>>> ', rescheduleObj.reschFlag)
+              })
+
+              $('#cancellationDesc').on('input', function () {
+                rescheduleObj.reasonDetail = $(this).val()
+              })
+
+              $(`#reschedule-date-dropdown`).on('change', function () {
+                rescheduleObj.toDate = $(this).val();
+                $('#reschedule-faculty-dropdown').attr('disabled', false)
+              })
+
+
+
+              $(`#reschedule-faculty-dropdown`).on('change', function () {
+                rescheduleObj.toFacultyId = $(this).val();
+
+                if (rescheduleObj.reschFlag !== 'R') {
+                  return false;
+                }
+
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-slots/',
+                  dataType: "JSON",
+                  data: {
+                    facultyId: $(this).val(),
+                    dateStr: rescheduleObj.toDate
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let slotStr = `<option disabled selected value>--Select Time--</option>`
+
+                    for (let slot of data.slotList) {
+                      slotStr +=
+                        `<option value="${slot.slotName}" data-sap-start-time="${slot.sapStartTime}" data-sap-end-time="${slot.sapEndTime}">${slot.starttime} - ${slot.endtime}</option>`
+                    }
+
+                    $('#reschedule-slot-dropdown').html(slotStr).attr('disabled', false)
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+
+              $(`#reschedule-slot-dropdown`).on('change', function () {
+
+                if (rescheduleObj.reschFlag !== 'R') {
+                  return false;
+                }
+
+                rescheduleObj.toSlot = $(this).val()
+                rescheduleObj.toStartTime = $(this).find(`option:selected`).attr('data-sap-start-time')
+                rescheduleObj.toEndTime = $(this).find(`option:selected`).attr('data-sap-end-time')
+
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-rooms/',
+                  dataType: "JSON",
+                  data: {
+                    dateStr: rescheduleObj.toDate,
+                    slotName: $(this).val()
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let roomStr = `<option selected disabled value>--Select Room--</option>`
+
+                    for (let room of data.roomList) {
+                      roomStr += `<option value="${room.room_uid}">${room.room_no}</option>`
+                    }
+
+                    $('#reschedule-room-dropdown').html(roomStr).attr('disabled', false)
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+              $(`#reschedule-room-dropdown`).on('change', function () {
+                rescheduleObj.toRoom = $(this).val()
+              })
+
+
+              $("#rescheduleWrapper").on("change", ".dropped-slot", function () {
+                $(".loaderBody").removeClass('d-none');
+                let $this = $(this);
+                let optionSelected = $('option:selected', $this);
+
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/getFacultyList/',
+                  dataType: "json",
+                  data: {
+                    inputDate: inputDate,
+                    slotName: slotName,
+                    campusId: optionSelected.attr("data-campusid").trim(),
+                    programId: optionSelected.attr("data-programid").trim(),
+                    moduleId: optionSelected.attr("data-moduleid").trim()
+                  },
+                  success: function (data) {
+                    if (data.cause == "permission denied") {
+                      window.location = data.reqUrl
+                      return
+                    }
+                    let facultyList = data.facultyList;
+                    let faculty;
+                    let ajaxData = "";
+                    if (facultyList.length === 0) {
+                      ajaxData += `<option value selected disabled>--No faculty available--</option>`;
+                    } else {
+                      ajaxData += "<option value selected disabled>--Select Faculty--</option>";
+                      for (faculty of facultyList) {
+                        ajaxData += `<option value="${faculty.facultyId}">${faculty.facultyName}</option>`;
+                      }
+                    }
+
+                    $("#rescheduleWrapper .dropped-faculty").html(ajaxData).attr("disabled", false);
+                    $(".loaderBody").addClass('d-none');
+                  }
+                })
+              })
+
+
+              $('#extraClassModal').on('hidden.bs.modal', function (e) {
+                $('#simulatedDataModal').modal('hide');
+                openAgain = true;
+                $('#simulatedDataModal').on('hidden.bs.modal', function (e) {
+                  if (openAgain) {
+                    $(`#calendar td[data-date="${convertDate($('#simulatedDataModalTitle').text().trim(), '/')}"]`).click();
+                    openAgain = false;
+                    $('.loaderBody').addClass('d-none');
+                  }
+                })
+              })
+
+              $('#editSimulatedModalData').on('hidden.bs.modal', function (e) {
+                openAgain = true;
+
+                $('#simulatedDataModal').modal('hide')
+                $(`#flag-radio-group input[name='scheduleType`).prop('checked', false);
+                $("#rescheduleWrapper").addClass("d-none");
+
+                $('#reschedule-date-dropdown').val('').change()
+                $('#reschedule-faculty-dropdown').val('')
+                $('#reschedule-slot-dropdown').val('')
+                $('#reschedule-room-dropdown').val('').change()
+                $('#dropReason').val('').change()
+                $('#cancellationDesc').val('')
+
+
+                $("#rescheduleWrapper .dropped-faculty").attr("disabled", true).html(
+                  `<option value selected disabled>--Select Faculty--</option>`);
+
+                $('#reschedule-to-wrapper select, #reschedule-to-wrapper select').attr('disabled', true);
+                $('#reschedule-to-wrapper').addClass('blur');
+                $('#bulk-lecture-list-card').addClass('d-none')
+
+
+                $('#simulatedDataModal').on('hidden.bs.modal', function (e) {
+                  if (openAgain) {
+                    $(`#calendar td[data-date="${convertDate($('#simulatedDataModalTitle').text().trim(), '/')}"]`).click();
+                    openAgain = false;
+                    $('.loaderBody').addClass('d-none');
+                  }
+                })
+
+                // setTimeout(function () {
+                //   console.log('>>>>>>>>>>>> Opening new modal')
+
+
+                //   //$('.loaderBody').addClass('d-none')
+                // }, 100)
+
+              })
+
+
+              $("#scheduleEventedSlot").click(function () {
+
+                console.log('Obj >>>> ', rescheduleObj)
+
+                if (rescheduleObj.reschFlag === 'R') {
+
+                  if (rescheduleObj.fromSlot === rescheduleObj.toSlot && rescheduleObj.fromDate === rescheduleObj
+                    .toDate) {
+                    alert('This event cannot be reschedule as date and time are unchanged.')
+                  } else {
+
+                    if (!isValidReschedule()) {
+                      alert('Please fill all the mandatory fields.')
+                    } else {
+                      let isConfirmed = confirm('Do you really want to proceed with the event reschedule?')
+
+                      if (isConfirmed) {
+                        console.log('>>>>>>>>>>>>>>>> Rescheduling')
+                        $('.loaderBody').removeClass('d-none')
+                        socket.emit('rescheduleEventedSlot', {
+                          socketUser: socketUser,
+                          slugName: "<%- slug %>",
+                          resObj: rescheduleObj
+                        })
+                      }
+                    }
+
+                  }
+
+                } else if (rescheduleObj.reschFlag === 'C' && !$(`#cancel-wrapper input[name="cancel-type"]:checked`).val()) {
+                  if (!isValidCancel()) {
+                    alert('Please fill all the mandatory fields.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to cancel the event?')
+                    if (isConfirmed) {
+                      console.log('>>>>>>>>>>>>>>>> Cancelling the event')
+                      $('.loaderBody').removeClass('d-none')
+                      socket.emit('cancelEventedSlot', {
+                        socketUser: socketUser,
+                        slugName: "<%- slug %>",
+                        resObj: rescheduleObj
+                      })
+                    }
+                  }
+                } else if (rescheduleObj.reschFlag === 'C' && $(`#cancel-wrapper input[name="cancel-type"]:checked`).val() == 'cae') {
+                  if (!isValidCancelCae()) {
+                    alert('Please fill all the mandatory fields.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to cancel the event?')
+                    if (isConfirmed) {
+                      console.log('>>>>>>>>>>>>>>>> Cancelling the event')
+                      $('.loaderBody').removeClass('d-none')
+                      socket.emit('cancelEventedSlotCae', {
+                        socketUser: socketUser,
+                        slugName: "<%- slug %>",
+                        resObj: rescheduleObj
+                      })
+                    }
+                  }
+                } else if (rescheduleObj.reschFlag === 'C' && $(`#cancel-wrapper input[name="cancel-type"]:checked`).val() == 'bulk') {
+                  if (!isValidBulkCancel()) {
+                    alert('Please fill all the mandatory fields and make sure that there are lectures available to be cancelled.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to cancel all the marked events?')
+                    if (isConfirmed) {
+                      console.log('>>>>>>>>>>>>>>>> Cancelling the events')
+
+                      let resJson = []
+
+                      $('.is-bulk-cancel:checked').each(function () {
+                        resJson.push({
+                          lectureLid: $(this).closest('tr').attr('data-lid')
+                        })
+                      })
+
+                      console.log(resJson)
+
+                      $('.loaderBody').removeClass('d-none')
+                      socket.emit('cancelEventedSlotBulk', {
+                        socketUser: socketUser,
+                        slugName: "<%- slug %>",
+                        transJson: JSON.stringify(resJson),
+                        resObj: rescheduleObj
+                      })
+                    }
+                  }
+                } else if (rescheduleObj.reschFlag === 'Z' && $(`#cancel-wrapper input[name="cancel-type"]:checked`).val() != 'bulk') {
+                  let isConfirmed = confirm('Do you really want to cancel the event without report?')
+                  if (isConfirmed) {
+                    console.log('>>>>>>>>>>>>>>>> Cancelling the event without report')
+                    $('.loaderBody').removeClass('d-none')
+                    socket.emit('cancelEventedSlot', {
+                      socketUser: socketUser,
+                      slugName: "<%- slug %>",
+                      resObj: rescheduleObj
+                    })
+                  }
+                } else if (rescheduleObj.reschFlag === 'Z' && $(`#cancel-wrapper input[name="cancel-type"]:checked`).val() == 'bulk') {
+                  if (!isValidBulkCancel()) {
+                    alert('Please fill all the mandatory fields and make sure that there are lectures available to be cancelled.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to cancel all the events without report?')
+                    if (isConfirmed) {
+                      console.log('>>>>>>>>>>>>>>>> Bulk Cancelling the event without report')
+                      let resJson = []
+
+                      $('.is-bulk-cancel:checked').each(function () {
+                        resJson.push({
+                          lectureLid: $(this).closest('tr').attr('data-lid')
+                        })
+                      })
+
+                      console.log(resJson)
+
+                      $('.loaderBody').removeClass('d-none')
+                      socket.emit('cancelEventedSlotBulk', {
+                        socketUser: socketUser,
+                        slugName: "<%- slug %>",
+                        transJson: JSON.stringify(resJson),
+                        resObj: rescheduleObj
+                      })
+                    }
+                  }
+                } else if (rescheduleObj.reschFlag === 'M' && !rescheduleObj.bulkModify) {
+
+                  if (!isValidModify()) {
+                    alert('Please fill all the mandatory fields.')
+                  } else {
+
+                    if (rescheduleObj.fromFacultyId == rescheduleObj.toFacultyId && rescheduleObj.fromRoom ==
+                      rescheduleObj.toRoom) {
+                      alert('No changes in the schedule.')
+                    } else {
+
+                      let isConfirmed = confirm('Do you really want to modify the event?')
+                      if (isConfirmed) {
+                        console.log('>>>>>>>>>>>>>>>> Modifying the event')
+                        $('.loaderBody').removeClass('d-none')
+                        socket.emit('modifyEventedSlot', {
+                          socketUser: socketUser,
+                          slugName: "<%- slug %>",
+                          resObj: rescheduleObj
+                        })
+                      }
+                    }
+                  }
+
+                } else if (rescheduleObj.reschFlag === 'M' && rescheduleObj.bulkModify) {
+                  if (!isValidBulkModify()) {
+                    alert('Please fill all the mandatory fields.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to modify the event?')
+                    if (isConfirmed) {
+
+                      let resJson = []
+
+                      $('#bulk-lecture-list tbody tr').each(function () {
+
+                        resJson.push({
+                          id: $(this).attr('data-lid'),
+                          date: $(this).attr('data-date'),
+                          slot: $(this).attr('data-slot'),
+                          room: $(this).attr('data-room'),
+                          newDate: $(this).attr('data-new-date'),
+                          newSlot: $(this).attr('data-new-slot'),
+                          newRoom: $(this).attr('data-new-room')
+                        })
+                      })
+
+
+
+                      $('.loaderBody').removeClass('d-none')
+                      socket.emit('bulkModifyEventedSlot', {
+                        socketUser: socketUser,
+                        transJson: JSON.stringify(resJson),
+                        slugName: "<%- slug %>",
+                        resObj: rescheduleObj
+                      })
+
+                    }
+                  }
+                } else if (rescheduleObj.reschFlag === 'Y') {
+                  if (!isChangeTimetable()) {
+                    alert('Please fill all the mandatory fields.')
+                  } else {
+                    let isConfirmed = confirm('Do you really want to change the timetable?')
+                    if (isConfirmed) {
+
+                      let resJson = []
+
+                      $('#bulk-lecture-list tbody tr').each(function () {
+                        resJson.push({
+                          id: $(this).attr('data-lid'),
+                          date: $(this).attr('data-date'),
+                          slot: $(this).attr('data-slot'),
+                          room: $(this).attr('data-room'),
+                          newDate: $(this).attr('data-new-date'),
+                          newSlot: $(this).attr('data-new-slot'),
+                          newRoom: $(this).attr('data-new-room'),
+                          zFlag: 'Y'
+                        })
+                      })
+
+                      console.log(resJson)
+                      console.log(rescheduleObj.reschFlag)
+
+                      $('.loaderBody').removeClass('d-none')
+
+                      socket.emit('changeTimetable', {
+                        socketUser: socketUser,
+                        transJson: JSON.stringify(resJson),
+                        slugName: "<%- slug %>",
+                        resObj: rescheduleObj
+                      })
+
+                    }
+                  }
+                } else {
+                  alert('Please select a reschedule option.')
+                }
+              })
+
+
+
+
+              //EXTRA CLASS LOGIC
+
+              $(document).on('change', `#extraClassModal input[name='extra-class']`, function () {
+
+                console.log('>>>>>>>>>>Extra Class Changinf<<<<<<<<<<<<')
+
+                let extraClassType = $(this).val()
+
+                rescheduleObj.fromDate = ""
+                rescheduleObj.fromRoom = ""
+                rescheduleObj.fromSlot = ""
+                rescheduleObj.fromSlotUuid = ""
+                rescheduleObj.fromFacultyId = ""
+                rescheduleObj.acadSession = ""
+                rescheduleObj.acadYear = "2021"
+                rescheduleObj.division = ""
+                rescheduleObj.programId = ""
+                rescheduleObj.fromStartTime = ""
+                rescheduleObj.fromEndTime = ""
+                rescheduleObj.uniqueIdForSap = ""
+                rescheduleObj.sapFlag = "E"
+                rescheduleObj.sapEventId = ""
+                rescheduleObj.eventType = ""
+                rescheduleObj.eventName = ""
+                rescheduleObj.moduleId = ""
+                rescheduleObj.extraClassType = extraClassType
+                $('#select-new-ec-program').val('').change()
+                $('#ec-drop-reason').val('').change()
+
+
+                console.log('extraClassType: ', extraClassType)
+
+                rescheduleObj.reschFlag = "E"
+
+                if (extraClassType === 'EC') {
+
+                  $('#en-wrapper').addClass('d-none')
+                  $('#ec-wrapper').removeClass('d-none')
+
+                  $.ajax({
+                    type: 'GET',
+                    url: '/simulation/reschedule/get-cancelled-lectures',
+                    dataType: "json",
+                    success: function (data) {
+
+                      let lectureList = data.lectureList;
+                      console.log('lectureList: ', lectureList)
+
+                      let ajaxData = `<option value selected disabled>--Select Lecture--</option>`;
+
+
+                      for (let lecture of lectureList) {
+                        ajaxData +=
+                          `<option value="${lecture.event_name}" data-lid="${lecture.id}" data-transaction-id="${lecture.transaction_id}" data-sap-event-id="${lecture.sap_event_id}" data-module-id="${lecture.module_id}" data-program-id="${lecture.program_id}" data-division="${lecture.division}" data-event-type="${lecture.event_type}" data-date="${lecture.date_str}" data-room-no="${lecture.room_uid}" data-acad-year="${lecture.acad_year}" data-acad-session="${lecture.acad_session}" data-faculty-id="${lecture.faculty_id}" data-start-time="${lecture.start_time}" data-end-time="${lecture.end_time}" data-slot-name=${lecture.slot_name}>${lecture.event_name} | ${lecture.start_time} to ${lecture.end_time} | ${lecture.date_str}</option>`;
+                      }
+                      $("#selectDroppedSlot").html(ajaxData).attr("disabled", false)
+
+                    }
+                  })
+
+
+
+                } else {
+                  $('#ec-wrapper').addClass('d-none')
+                  $('#en-wrapper').removeClass('d-none')
+                }
+
+                console.log('RESOBJ: ', rescheduleObj)
+
+              })
+
+              $("#selectDroppedSlot").on('change', function () {
+                let $this = $(this)
+
+                console.log('changed: ', $this.val())
+                // $this.find('option:selected').attr('data-program-id')
+
+                rescheduleObj.transLid = $this.find('option:selected').attr('data-lid');
+                rescheduleObj.sapEventId = $this.find('option:selected').attr('data-sap-event-id');
+                rescheduleObj.eventName = $this.find('option:selected').val();
+                rescheduleObj.programId = $this.find('option:selected').attr('data-program-id');
+                rescheduleObj.moduleId = $this.find('option:selected').attr('data-module-id');
+                rescheduleObj.fromFacultyId = $this.find('option:selected').attr('data-faculty-id');
+                rescheduleObj.fromDate = $this.find('option:selected').attr('data-date');
+                rescheduleObj.acadYear = $this.find('option:selected').attr('data-acad-year');
+                rescheduleObj.acadSession = $this.find('option:selected').attr('data-acad-session');
+                rescheduleObj.fromRoom = $this.find('option:selected').attr('data-room-no');
+                rescheduleObj.fromStartTime = $this.find('option:selected').attr('data-start-time');
+                rescheduleObj.fromEndTime = $this.find('option:selected').attr('data-end-time');
+                rescheduleObj.fromSlot = $this.find('option:selected').attr('data-slot-name');
+                rescheduleObj.toFacultyId = $this.find('option:selected').attr('data-faculty-id');
+                rescheduleObj.division = $this.find('option:selected').attr('data-division');
+                rescheduleObj.eventType = $this.find('option:selected').attr('data-event-type');
+              })
+
+
+              $('#ec-drop-reason').on('change', function () {
+                rescheduleObj.reasonId = $(this).val()
+              })
+
+              $('#ec-cancellation-desc').on('input', function () {
+                rescheduleObj.reasonDetail = $(this).val()
+              })
+
+
+              //NEW EXTRA CLASS LOGIC
+
+              $('#select-new-ec-program').on('change', function () {
+                rescheduleObj.programId = $(this).val()
+
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-acad-sessions/',
+                  dataType: "JSON",
+                  data: {
+                    programId: $(this).val()
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let acadSessionListStr = `<option selected disabled value>--Select Acad Session--</option>`
+
+                    for (let session of data.sessionList) {
+                      acadSessionListStr +=
+                        `<option value="${session.acad_session}">${session.acad_session}</option>`
+                    }
+
+                    $('#select-new-ec-session').html(acadSessionListStr).attr('disabled', false)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              })
+
+              $('#select-new-ec-session').on('change', function () {
+                rescheduleObj.acadSession = $(this).val()
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-divisions/',
+                  dataType: "JSON",
+                  data: {
+                    programId: $('#select-new-ec-program').val(),
+                    acadSession: $(this).val(),
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let divisionListStr = `<option selected disabled value>--Select Division--</option>`
+
+                    for (let div of data.divisionList) {
+                      divisionListStr += `<option value="${div.div}">${div.div}</option>`
+                    }
+
+                    $('#select-new-ec-div').html(divisionListStr).attr('disabled', false)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+
+              })
+
+              $('#select-new-ec-div').on('change', function () {
+                rescheduleObj.division = $(this).val()
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-lectures/',
+                  dataType: "JSON",
+                  data: {
+                    programId: $('#select-new-ec-program').val(),
+                    acadSession: $('#select-new-ec-session').val(),
+                    division: $(this).val()
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let lectureListStr = `<option selected disabled value>--Select Lecture--</option>`
+
+                    for (let lecture of data.lectureList) {
+
+                      lectureListStr +=
+                        `<option value="${lecture.module_id}" data-sap-event-id="${lecture.sap_event_id}" data-event-name="${lecture.event_name}" data-event-abbr="${lecture.event_abbr}"  data-acad-year="${lecture.acad_year}" data-event-type="${lecture.event_type}" data-unique-id-for-sap="${lecture.unique_id_for_sap}" data-uuid="${lecture.uuid}" data-event-id="${lecture.event_id}">${lecture.event_name}</option>`
+                    }
+
+                    $('#select-new-ec-lecture').html(lectureListStr).attr('disabled', false)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+
+              })
+
+
+              $('#select-new-ec-lecture').on('change', function () {
+                rescheduleObj.moduleId = $(this).val()
+                rescheduleObj.sapEventId = $(this).find('option:selected').attr('data-sap-event-id')
+                rescheduleObj.eventAbbr = $(this).find('option:selected').attr('data-event-abbr')
+                rescheduleObj.acadYear = $(this).find('option:selected').attr('data-acad-year')
+                rescheduleObj.eventType = $(this).find('option:selected').attr('data-event-type')
+                rescheduleObj.uniqueIdForSap = $(this).find('option:selected').attr('data-unique-id-for-sap')
+                //rescheduleObj.newEventId = $('#select-new-ec-faculty').val()
+                //rescheduleObj.newEventName = $(this).find('option:selected').attr('data-event-name')
+
+
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-extra-class-faculties/',
+                  dataType: "JSON",
+                  data: {
+                    programId: $('#select-new-ec-program').val(),
+                    acadSession: $('#select-new-ec-session').val(),
+                    division: $('#select-new-ec-div').val(),
+                    moduleId: $(this).val(),
+                    dateStr: rescheduleObj.toDate,
+                    slotName: rescheduleObj.toSlot,
+                    roomNo: rescheduleObj.toRoom
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let facultyListStr = `<option selected disabled value>--Select Faculty--</option>`
+
+                    for (let faculty of data.facultyList) {
+                      facultyListStr +=
+                        `<option value="${faculty.facultyId}" data-lid="${faculty.id}" data-faculty-name="${faculty.facultyName}">${faculty.facultyName}/${faculty.facultyId}</option>`
+                    }
+
+                    $('#select-new-ec-faculty').html(facultyListStr).attr('disabled', false)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+
+              })
+
+              $('#select-new-ec-faculty').on('change', function () {
+                rescheduleObj.toFacultyId = $(this).val()
+                rescheduleObj.toFacultyName = $(this).find('option:selected').attr('data-faculty-name')
+                // rescheduleObj.newEventId = $('#select-new-ec-faculty').val()
+
+                // let eventIdArr = rescheduleObj.newEventId.split('-')
+                // rescheduleObj.newEventId =
+                //   `${eventIdArr[0]}-${eventIdArr[1]}-${eventIdArr[2]}- ${$(this).find('option:selected').attr('data-lid')}`
+
+                // rescheduleObj.newEventId = rescheduleObj.newEventId.trim()
+                //select-new-ec-lecture
+                let fullEventName = `${$('#select-new-ec-lecture option:selected').attr('data-event-name').trim()} - TH - ${$('#select-new-ec-div').val().trim()} - ${$('#select-new-ec-session').val().trim()} - ${$('#select-new-ec-program option:selected').attr('data-program-name').trim()} - (${rescheduleObj.toFacultyName})`
+                console.log('fullEventName>>>>> ', fullEventName)
+                rescheduleObj.newEventName = fullEventName.trim()
+
+                //${$('#select-new-ec-lecture').val().trim()} - TH - ${$('#select-new-ec-div').val().trim()} - ${$(this).find('option:selected').attr('data-lid')}
+                let newEventId = `${$('#select-new-ec-lecture').val().trim()} - TH - ${$('#select-new-ec-div').val().trim()} - ${$(this).find('option:selected').attr('data-lid')}`
+
+                rescheduleObj.newEventId = newEventId;
+
+                console.log('fullEventName>>>>> ', newEventId)
+
+                console.log(rescheduleObj.newEventId)
+                console.log(rescheduleObj.newEventName)
+                console.log(rescheduleObj)
+
+              })
+
+
+              $('#scheduleExtraClass').on('click', function () {
+                console.log('Extra Class Res Obj: ', rescheduleObj)
+
+
+                if (rescheduleObj.extraClassType == 'EC' && isValidEC()) {
+                  let confirmed = confirm('Do you want to proceed with the extra class allocation?')
+                  if (confirmed) {
+                    $('.loaderBody').removeClass('d-none')
+                    socket.emit('scheduleExtraClass', {
+                      socketUser: socketUser,
+                      slugName: "<%- slug %>",
+                      resObj: rescheduleObj
+                    })
+                  }
+
+                } else if (rescheduleObj.extraClassType == 'EN' && isValidEN()) {
+
+                  rescheduleObj.reschFlag = $('#select-new-resch-type').val()
+
+
+                  let confirmed = confirm('Do you want to proceed with the new class allocation?')
+                  if (confirmed) {
+                    $('.loaderBody').removeClass('d-none')
+                    socket.emit('scheduleExtraClassNew', {
+                      socketUser: socketUser,
+                      slugName: "<%- slug %>",
+                      resObj: rescheduleObj
+                    })
+                  }
+
+                } else {
+                  alert('Please fill all the mandatory fields.')
+                }
+
+              })
+
+
+              $("#extraClassModal").on('hidden.bs.modal', function (e) {
+                $(`#extraClassModal input[name='extra-class']`).prop("checked", false);
+                $("#selectDroppedSlot").html(`<option value selected disabled>--Select Lecture--</option>`).attr(
+                  "disabled", true);
+                $("#selectDroppedFaculty").html(`<option value selected disabled>--Select Faculty--</option>`).attr(
+                  "disabled", true);
+
+                $('#select-new-ec-program').val('')
+                $('#select-new-ec-session').val('').attr('disabled', true)
+                $('#select-new-ec-div').val('').attr('disabled', true)
+                $('#select-new-ec-lecture').val('').attr('disabled', true)
+                $('#select-new-ec-faculty').val('').attr('disabled', true)
+                $('#ec-wrapper').addClass('d-none')
+                $('#en-wrapper').addClass('d-none')
+
+
+              })
+
+
+
+
+
+              //AFTER SOCKET EVENTS
+
+              socket.on("facultyAvlList", async function (data) {
+
+                console.log('data.socketUser>>> ', data.socketUser)
+
+                if (data.socketUser == socketUser) {
+
+                  let facultySchedule = await data.facultySchedule
+                  console.log('facultySchedule: ', facultySchedule);
+
+                  for (sch of facultySchedule) {
+
+                    $(`#bulk-lecture-list-card table tbody tr[data-date='${sch.EventDate}'][data-start-time='${sch.StartTime}'] .remark`)
+                      .html(`<i class="fas fa-exclamation-triangle text-danger"></i> Faculty not available`)
+                  }
+
+                  $('.loaderBody').addClass('d-none')
+
+                }
+              })
+
+
+
+              socket.on("droppedEventedSlot", async function (data) {
+
+                console.log('<<<<<HELLO>>>>>>')
+
+                console.log("SAPDATA1===>>> ", data)
+
+                if (data.status == 'success' && data.slugName == "<%- slug %>") {
+                  console.log("FLAG===>>> ", data.resFlag)
+
+                  if (data.resFlag == 'C' || data.resFlag == 'Z') {
+
+                    $(`#simulatedDataModal[data-modalDate = '${data.inputDate}'] tr[data-room='${data.roomNo}'] td[data-slot='${data.slotName}']`)
+                      .html('')
+
+                    console.log('data.socketUser>>>>> ', data.socketUser)
+
+                    if (data.socketUser == socketUser) {
+                      alert(data.msg)
+                      $("#editSimulatedModalData").modal("hide");
+                      $('.loaderBody').addClass('d-none')
+                    }
+
+                  } else if (data.resFlag == 'R' || data.resFlag == 'M') {
+
+                    console.log('SAPDATA==>> ', data)
+
+                    if (data.socketUser == socketUser) {
+                      alert(data.msg)
+                      $("#editSimulatedModalData").modal("hide");
+                    }
+
+
+                  } else if (data.resFlag == 'E' || data.resFlag == 'Y') {
+
+                    console.log('SAPDATA==>> ', data)
+                    console.log('SAPDATA==>> ', data.slotDetail)
+                    console.log('data.socketUser>>>>> ', data.socketUser)
+                    console.log('socketUser>>>>> ', socketUser)
+
+                    $(`#simulatedDataModal[data-modalDate = '${data.inputDate}'] tr[data-room='${data.oldRoomNo}'] td[data-slot='${data.fromSlot}']`)
+                      .html('')
+
+
+                    let newSlot = $(
+                      `#simulatedDataModal[data-modalDate = '${data.inputDate}'] tr[data-room='${data.newRoomNo}'] td[data-slot='${data.toSlot}']`
+                    )
+
+                    newSlot.html(data.slotDetail.eventName)
+                    newSlot.attr('data-slot', data.toSlot)
+                    newSlot.attr('data-uuid', data.slotDetail.uuid)
+                    newSlot.attr('data-facultyid', data.slotDetail.facultyId)
+                    newSlot.attr('data-acad-session', data.slotDetail.bookedAcadSession)
+                    newSlot.attr('data-div', data.slotDetail.bookedDiv)
+                    newSlot.attr('data-programid', data.slotDetail.bookedProgramId)
+                    newSlot.attr('data-start-time', data.slotDetail.starttime)
+                    newSlot.attr('data-end-time', data.slotDetail.endtime)
+                    newSlot.attr('data-uniqueidforsap', data.slotDetail.uniqueIdForSAP)
+                    newSlot.attr('data-sapflag', data.slotDetail.sapFlag)
+                    newSlot.attr('data-sapeventid', data.slotDetail.sapEventId)
+                    newSlot.attr('data-eventtype', data.slotDetail.eventType)
+                    newSlot.attr('data-eventname', data.slotDetail.eventName)
+                    newSlot.attr('data-acad-year', data.slotDetail.bookedAcadYear)
+                    newSlot.attr('data-moduleid', data.slotDetail.eventId.split('-')[0].trim())
+
+                    if (data.socketUser == socketUser) {
+                      alert(data.msg)
+                      $("#extraClassModal").modal("hide");
+                      $("#editSimulatedModalData").modal("hide");
+                    }
+                    //$('.loaderBody').addClass('d-none')
+
+                  }
+
+                } else if (data.status !== 'success' && data.slugName == "<%- slug %>") {
+
+                  console.log('data.socketUser>>>>> ', data.socketUser)
+                  console.log('socketUser>>>>> ', socketUser)
+
+
+
+
+                  if (data.socketUser == socketUser) {
+                    console.log(data)
+                    alert('Rescheduling failed! ' + data.msg)
+                    $('.loaderBody').addClass('d-none')
+                  }
+                }
+              })
+
+              socket.on("bulkModified", async function (data) {
+
+                if (data.socketUser == socketUser) {
+                  console.log(data);
+
+                  if (data.isUpdated) {
+
+                    for (let status of data.updatedLectureList) {
+
+                      $(`#bulk-lecture-list tbody .status[data-date='${status.date_str}'][data-room='${status.room_no}'][data-slot='${status.slot_name}']`)
+                        .text(status.status)
+                      $(`#bulk-lecture-list tbody .remark[data-date='${status.date_str}'][data-room='${status.room_no}'][data-slot='${status.slot_name}']`)
+                        .text(status.status_remark)
+
+                    }
+
+                  } else {
+                    alert('There are no lectures to be updated.')
+                  }
+                  $('.loaderBody').addClass('d-none')
+                }
+              })
+
+
+              socket.on("bulkCancelled", async function (data) {
+
+                if (data.socketUser == socketUser) {
+                  console.log(data);
+
+                  if (data.isUpdated) {
+
+                    for (let status of data.updatedLectureList) {
+
+                      $(`#cancel-lecture-list tbody .status[data-date='${status.date_str}'][data-room='${status.room_uid}'][data-slot='${status.slot_name}']`)
+                        .text(status.status)
+                      $(`#cancel-lecture-list tbody .remark[data-date='${status.date_str}'][data-room='${status.room_uid}'][data-slot='${status.slot_name}']`)
+                        .text(status.status_remark)
+
+                    }
+
+
+
+                  } else {
+                    alert('There are no lectures to be updated.')
+                  }
+
+
+                  $('.loaderBody').addClass('d-none')
+
+                }
+              })
+
+              //Calendar Utils Functions
+              function getMonth() {
+                let date = calendar.state.currentDate
+                let monthInt = date.getMonth();
+                return monthInt
+              }
+
+              //get faculty for modulen and render
+              function getFacultiesForModule() {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-faculties/',
+                  dataType: "JSON",
+                  data: {
+                    moduleId: rescheduleObj.moduleId,
+                    programId: rescheduleObj.programId
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let facultyListStr = `<option selected disabled value>--Select Faculty--</option>`
+
+                    for (let faculty of data.facultyList) {
+                      facultyListStr +=
+                        `<option value="${faculty.facultyId}">${faculty.facultyName}/${faculty.facultyId}</option>`
+                    }
+
+                    $('#reschedule-faculty-dropdown').html(facultyListStr)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              }
+
+              function getFacultiesRoomsForModify() {
+                $.ajax({
+                  type: 'POST',
+                  url: '/simulation/reschedule/get-faculties-rooms-modify/',
+                  dataType: "JSON",
+                  data: {
+                    moduleId: rescheduleObj.moduleId,
+                    programId: rescheduleObj.programId,
+                    dateStr: rescheduleObj.fromDate,
+                    slotName: rescheduleObj.fromSlot,
+                    roomNo: rescheduleObj.fromRoom
+                  },
+                  success: data => {
+                    console.log('Success: ', data)
+                    let facultyListStr = `<option selected disabled value>--Select Faculty--</option>`
+                    let roomStr = `<option selected disabled value>--Select Room--</option>`
+
+                    for (let faculty of data.facultyList) {
+                      facultyListStr +=
+                        `<option value="${faculty.facultyId}">${faculty.facultyName}/${faculty.facultyId}</option>`
+                    }
+
+                    for (let room of data.roomList) {
+                      roomStr += `<option value="${room.room_uid}">${room.room_no}</option>`
+                    }
+
+                    $('#reschedule-slot-dropdown').html(
+                      `<option value="${rescheduleObj.fromSlot}">${rescheduleObj.fromStartTime} - ${rescheduleObj.fromEndTime}</option>`
+                    )
+                    $('#reschedule-room-dropdown').html(roomStr).attr('disabled', false)
+                    $('#reschedule-faculty-dropdown').html(facultyListStr)
+
+                  },
+                  error: err => {
+                    console.log('Error: ', err)
+                  }
+                })
+              }
+
+              //Cancel Flag validation
+              let isValidCancel = function () {
+                if ($('#dropReason').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              let isValidCancelCae = function () {
+                if ($('#dropReason').val() && $('#cancel-wrapper .extra-lecture').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              let isValidBulkCancel = function () {
+                if ($('#dropReason').val() && $('.is-bulk-cancel:checked').length) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              //Reschedule Flag validation
+              let isValidReschedule = function () {
+                if ($('#dropReason').val() && $('#reschedule-date-dropdown').val() && $('#reschedule-faculty-dropdown')
+                  .val() && $('#reschedule-slot-dropdown').val() && $('#reschedule-room-dropdown').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              let isValidModify = function () {
+                if (rescheduleObj.reschFlag == 'M' && $('#dropReason').val() && rescheduleObj.fromDate && $(
+                  '#reschedule-faculty-dropdown').val() && $('#reschedule-room-dropdown').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              let isValidBulkModify = function () {
+                if (rescheduleObj.reschFlag == 'M' && rescheduleObj.bulkModify && $('#dropReason').val() && rescheduleObj
+                  .dateRangeFrom && rescheduleObj.dateRangeTo && $('#replace-faculty-dropdown').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              let isChangeTimetable = function () {
+                if (rescheduleObj.reschFlag == 'Y' && $('#dropReason').val() && rescheduleObj
+                  .dateRangeFrom && rescheduleObj.dateRangeTo && $('#replace-faculty-dropdown').val()) {
+                  return true;
+                } else {
+                  return false
+                }
+              }
+
+              //extra class cancelled validation
+              isValidEC = function () {
+                if (rescheduleObj.reschFlag == 'E' && rescheduleObj.extraClassType == 'EC' && $('#selectDroppedSlot')
+                  .val() && $('#ec-drop-reason').val()) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }
+
+              //extra class new validation
+              isValidEN = function () {
+                if (rescheduleObj.reschFlag == 'E' && rescheduleObj.extraClassType == 'EN' && $('#select-new-ec-program')
+                  .val() && $('#select-new-ec-session').val() && $('#select-new-ec-div').val() && $(
+                    '#select-new-ec-lecture').val() && $('#select-new-ec-faculty').val() && $('#ec-drop-reason').val() && $('#select-new-resch-type').val()) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }
+
+
+
+
+
+              //select2 init
+
+              $('.modal-selct2').select2({
+                dropdownParent: $('#editSimulatedModalData')
+              })
+
+              $('.ec-modal-select2').select2({
+                dropdownParent: $('#extraClassModal')
+              })
+
+              $('.bulkChangeTimeModal-selct2').select2({
+                dropdownParent: $('#bulkChangeTimeModal')
+              })
+
+              function convertDate(cDate, splitChar) {
+
+                if (splitChar == '/') {
+                  //31/08/2021
+                  let arr = cDate.split('/');
+                  return `${arr[2]}-${arr[1]}-${arr[0]}`
+                }
+                else if (splitChar == '-') {
+                  //2021-11-06
+                  let arr = cDate.split('-');
+                  return `${arr[2]}/${arr[1]}/${arr[0]}`
+                }
+              }
+
+              function callDatatable() {
+                if ($('.call-datatable').length > 0) {
+                  //CALL DATATABLE
+
+                  $('.call-datatable').DataTable({
+                    autoFill: false,
+                    aLengthMenu: [
+                      [25, 50, 100, 200, -1],
+                      [25, 50, 100, 200, "All"]
+                    ],
+                    scrollX: '100%',
+                    deferRender: true,
+                    scrollY: true,
+                    scrollX: true,
+                    paging: true,
+                    initComplete: function () {
+                      this.api().columns().every(function () {
+                        var column = this;
+                        var select = $(
+                          '<select><option value="">-Select-</option></select>'
+                        )
+                          .appendTo($(column.footer()).empty())
+                          .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                              $(this).val()
+                            );
+
+                            column
+                              .search(val ? '^' + val + '$' : '',
+                                true, false)
+                              .draw();
+                          });
+
+                        column.data().unique().sort().each(function (d, j) {
+                          select.append('<option value="' + d +
+                            '">' + d + '</option>')
+                        });
+                      });
+                    }
+                  })
+                  //CALL DATATABLE END
+                }
+              }
+              callDatatable();
+
+              $('#cancel-all').on('change', function () {
+                let isChecked = $(this).is(':checked')
+
+                if (isChecked) {
+                  $('.is-bulk-cancel').prop('checked', true)
+                } else {
+                  $('.is-bulk-cancel').prop('checked', false)
+                }
+              })
+
+            })
+          </script>
+          <%- include("../partials/footerEnd") %>

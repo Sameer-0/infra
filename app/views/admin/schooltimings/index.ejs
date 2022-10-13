@@ -1,0 +1,1198 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notification icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+
+    <div class="row my-3 gx-3 gy-3 row1-data">
+        <div class="col-xl-2 col-lg-4 col-md-6 ">
+            <a href="/admin/schooltiming/types">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/room-type.PNG" alt="">
+                        <p class="fw-normal pt-1">SCHOOL TIMING TYPE</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>SCHOOL TIMING LIST</h5>
+            </div>
+            <div>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-schooltiming-modal"><i
+                        class="fas fa-plus"></i></button>
+                <!-- <button class="btn ms-auto delete-campuses add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-campuses add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <!-- <div class="table-searchbar-container">
+                <button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar">
+                </div>  -->
+                <table class="table table-bordered custom_row" id="schoolTimingTable">
+                    <%if(schoolTiming.schoolsetting == null || schoolTiming.schoolsetting == undefined){%>
+                  No Data found
+                    <%}else{%>
+                        <%if(schoolTiming.settingname =="Same For All Day"){%>
+                            <thead> 
+                                <th>#</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                <% let count = 1%>
+                                <% for(let schooltime of JSON.parse(schoolTiming.schoolsetting)) {%>
+                                    <tr>
+                                        <td><%- count++ %></td>
+                                        <td><%-schooltime.start_time%></td>
+                                        <td><%-schooltime.end_time%></td>
+                                        <td><%-schooltime.school_time_type%></td>
+                                        <td><a class="edit-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>" data-school-time-type-id="<%-schooltime.school_time_type_id%>"><span class="fa fa-edit"></span></a>
+                                            <a class="delete-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>"><span class="fa fa-trash"></span></a>
+                                        </td>
+                                    </tr>
+                                <%}%>
+    
+                            </tbody>
+                        <%} else if (schoolTiming.settingname =="Day Wise"){%>
+                            <thead>
+                                <th>#</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Type</th>
+                                <th>Day</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                <% let count = 1%>
+                                <% for(let schooltime of JSON.parse(schoolTiming.schoolsetting)) {%>
+                                    <tr>
+                                        <td><%- count++ %></td>
+                                        <td><%-schooltime.start_time%></td>
+                                        <td><%-schooltime.end_time%></td>
+                                        <td><%-schooltime.school_time_type%></td>
+                                        <td><%-schooltime.day_name%></td>
+                                        <td><a class="edit-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>" data-day-lid="<%-schooltime.day_lid%>" data-school-time-type-id="<%-schooltime.school_time_type_id%>"><span class="fa fa-edit"></span></a>
+                                            <a class="delete-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>"><span class="fa fa-trash"></span></a>
+                                        </td>
+                                    </tr>
+                                <%}%>
+                            </tbody>
+                        <%} else if (schoolTiming.settingname =="Day and Program Wise"){%>
+                            <thead>
+                                <th>#</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Type</th>
+                                <th>Day</th>
+                                <th>Program Name</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                <% let count = 1 %>
+                                <% for(let schooltime of JSON.parse(schoolTiming.schoolsetting)) {%>
+                                    <tr>
+                                        <td><%- count++ %></td>
+                                        <td><%- schooltime.start_time %></td>
+                                        <td><%- schooltime.end_time %></td>
+                                        <td><%-schooltime.school_time_type%></td>
+                                        <td><%- schooltime.day_name %></td>
+                                        <td><%- schooltime.program_name %></td>
+                                        <td><a class="edit-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid %>" data-program-lid="<%-schooltime.program_lid%>" data-day-lid="<%-schooltime.day_lid%>" data-school-time-type-id="<%-schooltime.school_time_type_id%>"><span class="fa fa-edit"></span></a>
+                                            <a class="delete-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>"><span class="fa fa-trash"></span></a>
+                                        </td>
+                                    </tr>
+                                <%}%>
+                            </tbody>
+                        <%}  else if (schoolTiming.settingname =="Day, Program and Session Wise"){%>
+                            <thead>
+                                <th>#</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Type</th>
+                                <th>Day</th>
+                                <th>Program Name</th>
+                                <th>Academic Session</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                <% let count = 1 %>
+                                <% for(let schooltime of JSON.parse(schoolTiming.schoolsetting)) {%>
+                                    <tr>
+                                        <td><%- count++ %></td>
+                                        <td><%-schooltime.start_time%></td>
+                                        <td><%-schooltime.end_time%></td>
+                                        <td><%-schooltime.school_time_type%></td>
+                                        <td><%-schooltime.day_name%></td>
+                                        <td><%-schooltime.program_name%></td>
+                                        <td><%-schooltime.acad_session%></td>
+                                        <td><a class="edit-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>" data-program-lid="<%-schooltime.program_lid%>" data-day-lid="<%-schooltime.day_lid%>" data-session-lid="<%-schooltime.session_lid%>" data-school-time-type-id="<%-schooltime.school_time_type_id%>"><span class="fa fa-edit"></span></a>
+                                            <a class="delete-schooltime" data-id="<%-schooltime.id%>" data-slot-start-lid="<%-schooltime.slot_start_lid%>" data-slot-end-lid="<%-schooltime.slot_end_lid%>"><span class="fa fa-trash"></span></a>
+                                        </td>
+                                    </tr>
+                                <%}%>
+                            </tbody>
+                        <%}%>
+                    <%}%>
+                </table>
+</div>
+</div>
+</div>
+
+<!-- edit modal -->
+<div class="modal fade" id="editschoolTimeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">School Time Type</label>
+                <select name="schoolTimingType" id="schoolTimingType" class="select2 modalSelect2" >
+                    <% for(stype of schoolTimingTypeList){%>
+                        <option value="<%- stype.id%>"><%- stype.name%></option>
+                    <%}%>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Start Time</label>
+                <input id="old_start_time_id" type="hidden" >
+                <input id="old_end_time_id" type="hidden">
+                <input id="schoolTimingTypeOld" type="hidden">
+                <input id="daylid" type="hidden">
+                <input id="programlid" type="hidden">
+                <input id="sessionlid" type="hidden">
+                <select class="select2 modalSelect2" name="start_time_id" id="start_time_id">
+                    <% for(stime of slotTime){%>
+                        <option value="<%- stime.id%>"><%- stime.start_time %></option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">End Time</label>
+                <select class="select2 modalSelect2" name="end_time_id" id="end_time_id">
+                    <% for(etime of slotTime){%>
+                        <option value="<%- etime.id%>"><%- etime.end_time %></option>
+                    <%}%>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary update-school-time">UPDATE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- MODAL FOR SCHOOL TIMING -->
+<div class="modal fade" id="add-schooltiming-modal" tabindex="-1" role="dialog" aria-labelledby="add-schooltiming-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header  modal-inputform-header">
+                <h5 class="modal-title text-dark me-2" id="add-org-modal-title">Add School Timing</h5>
+                <button type="button" class="btn add-btn fs-6 text-dark me-auto" id="add-more-schoolTiming"><i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" class="btn fs-4 text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i>
+                </button>
+                
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="row px-3">
+
+                    <% let stsCount = 0; for(let setting of schoolTimingSettingsList) { stsCount++;
+      
+                    if(stsStatus > 0) { %>
+                    <div class="col-lg-3 col-md-6 col-12">
+                        <div class="form-check">
+                            <input class="form-check-input schoolTimingOptions me-1" type="radio" id="sts-<%- stsCount %>" name="school-timing-setting" data-setting-id="<%- setting.id%>" data-name="<%- setting.name %>" <%- setting.status != 1 ? 'disabled' : '' %> <%- setting.status == 1 ? 'checked' : '' %>>
+                            <label class="form-check-label" for="sts-<%- stsCount %>">
+                                <%- setting.name %>
+                            </label>
+                        </div>
+                    </div> 
+                    <% } else { %>
+
+                        <div class="col-lg-3 col-md-6 col-12">
+                            <div class="form-check">
+                                <input class="form-check-input schoolTimingOptions me-1" type="radio" id="sts-<%- stsCount %>" name="school-timing-setting" data-setting-id="<%- setting.id%>" value="<%- setting.id %>" data-name="<%- setting.name %>">
+                                <label class="form-check-label" for="sts-<%- stsCount %>">
+                                    <%- setting.name %>
+                                </label>
+                            </div>
+                        </div>
+
+                <%  } 
+                } %>
+
+                </div>
+                <div class="modal-body schoolTimingOptionsContainer">
+               
+                    <div class="table-responsive sameForAllDay" data-dis="true">
+                        <table class="table table-bordered" id="add-more-sameForAllDay-table">
+                            <thead>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>School Timing Type</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>                            
+                                <tr>
+                                    <td>
+                                        <select class="select2 modalSelect2" name="startTime">
+                                            <% for(time of slotTime){%>
+                                                <option value="<%- time.id%>"><%- time.start_time %></option>
+                                            <%}%>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="select2 modalSelect2" name="endTime">
+                                            <% for(time of slotTime){%>
+                                                <option value="<%- time.id%>"><%- time.end_time %></option>
+                                            <%}%>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="schoolTimingType" id="" class="select2 modalSelect2" >
+                                            <% for(type of schoolTimingTypeList){%>
+                                                <option value="<%- type.id%>"><%- type.name%></option>
+                                            <%}%>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <i class="far fa-edit d-none"></i>
+                                        <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTiming"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+    
+                   
+                </div>
+            
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn createSchoolTiming modal-inputform-btn">CREATE</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+
+
+<script>
+    $(document).ready(function () {
+
+        let checkSetting = `<%- stsStatus %>`
+        if(checkSetting > 0){
+            $('#add-schooltiming-modal').on('show.bs.modal', function() {
+                $('.schoolTimingOptions').trigger('click');
+            })
+        }
+      
+        $('.schoolTimingOptions').on('click', function() {    
+            let settingName;
+            if(checkSetting > 0){
+                let list = JSON.parse(`<%- schoolTimingSettingsListJson %>`);
+        
+                for(let l of list){
+                    if(l.status == 1){
+                        settingName = l.name;
+                    }
+                }
+            } else{
+                settingName = $(this).attr('data-name');
+            }
+
+            if(settingName == 'Day Wise'){
+                let DayWise = `<div class="table-responsive DayWise" data-dis="true">
+                    <table class="table table-bordered" id="add-more-DayWise-table">
+                        <thead>
+                            <th>Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>School Timing Type</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>                           
+                            <tr>
+                                <td>
+                                    <select class="select2 modalSelect2" name="day">
+                                        <% for(day of dayList){%>
+                                            <option value="<%- day.id%>"><%- day.day_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="startTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.start_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="endTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.end_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="schoolTimingType" id="" class="select2 modalSelect2" >
+                                        <% for(type of schoolTimingTypeList){%>
+                                            <option value="<%- type.id%>"><%- type.name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingDayWise"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`
+                $('.schoolTimingOptionsContainer').html(DayWise);
+                $('.select2').select2({
+                dropdownParent: $('#add-schooltiming-modal')});
+            }
+           
+            else if(settingName == 'Day and Program Wise'){
+                console.log('heoolu')
+                let programAndDayWise = `<div class="table-responsive programAndDayWise" data-dis="true">
+                    <table class="table table-bordered" id="add-more-programAndDayWise-table">
+                        <thead>
+                            <th>Program Name</th>
+                            <th>Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>School Timing Type</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>                           
+                            <tr>
+                                <td>
+                                    <select class="select2 modalSelect2" name="programName" id="program-name">
+                                        <% for(program of programList){%>
+                                            <option value="<%- program.id%>"><%- program.program_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="day">
+                                        <% for(day of dayList){%>
+                                            <option value="<%- day.id%>"><%- day.day_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="startTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.start_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="endTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.end_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="schoolTimingType" id="" class="select2 modalSelect2" >
+                                        <% for(type of schoolTimingTypeList){%>
+                                            <option value="<%- type.id%>"><%- type.name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingProgramWise"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`
+                $('.schoolTimingOptionsContainer').html(programAndDayWise);
+                $('.select2').select2({
+                dropdownParent: $('#add-schooltiming-modal')});
+
+            }
+           
+            else if(settingName == 'Day, Program and Session Wise'){
+                let programAndDayWise = `<div class="table-responsive programDaySessionWise" data-dis="true">
+                    <table class="table table-bordered" id="add-more-programDaySessionWise-table">
+                        <thead>
+                            <th>Program Name</th>
+                            <th>Acad Session</th>
+                            <th>Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>School Timing Type</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>                           
+                            <tr>
+                                <td>
+                                    <select class="select2 modalSelect2 programNameForSession" name="programName" id="program-name">
+                                        <option value="" selected disabled>Select Program<option>
+                                        <% for(program of programList){%>
+                                            <option value="<%- program.id%>"><%- program.program_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2 sessionForProgram" name="acadSession" id="session-name">
+                                        
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="day">
+                                        <% for(day of dayList){%>
+                                            <option value="<%- day.id%>"><%- day.day_name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td> 
+                                    <select class="select2 modalSelect2" name="startTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.start_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="endTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.end_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="schoolTimingType" id="" class="select2 modalSelect2" >
+                                        <% for(type of schoolTimingTypeList){%>
+                                            <option value="<%- type.id%>"><%- type.name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingProgramSessionWise"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`
+                $('.schoolTimingOptionsContainer').html(programAndDayWise);
+                $('.select2').select2({
+                dropdownParent: $('#add-schooltiming-modal')});
+            }
+            
+            else {
+                let dayOnly = `<div class="table-responsive sameForAllDay" data-dis="true">
+                    <table class="table table-bordered" id="add-more-sameForAllDay-table">
+                        <thead>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>School Timing Type</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>                           
+                            <tr>
+                                <td>
+                                    <select class="select2 modalSelect2" name="startTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.start_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="select2 modalSelect2" name="endTime">
+                                        <% for(time of slotTime){%>
+                                            <option value="<%- time.id%>"><%- time.end_time %></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="schoolTimingType" id="" class="select2 modalSelect2" >
+                                        <% for(type of schoolTimingTypeList){%>
+                                            <option value="<%- type.id%>"><%- type.name%></option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <i class="far fa-edit d-none"></i>
+                                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTiming"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`
+                $('.schoolTimingOptionsContainer').html(dayOnly);
+                $('.select2').select2({
+                dropdownParent: $('#add-schooltiming-modal')});
+            }
+        })
+
+        $('.select2').select2({
+        dropdownParent: $('#add-schooltiming-modal')});
+
+        //Add more rows for School timing
+        $('#add-more-schoolTiming').on('click', function(){
+         
+            if($('.sameForAllDay[data-dis]').attr('data-dis') == 'true'){
+            
+                let lastTr = $('#add-more-sameForAllDay-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+                let startTime = lastTr.find(`select[name="startTime"]`).val();
+                let endTime = lastTr.find(`select[name="endTime"]`).val();
+                let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+                let clonedTr = lastTr.clone();
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                $('#add-more-sameForAllDay-table tbody').append(clonedTr)
+             }
+            else if($('.DayWise[data-dis]').attr('data-dis') == 'true'){ 
+
+                let lastTr = $('#add-more-DayWise-table tbody tr:last-child');
+                lastTr.find('.modalSelect2').select2('destroy');
+                let day = lastTr.find(`select[name="day"]`).val();
+                let startTime = lastTr.find(`select[name="startTime"]`).val();
+                let endTime = lastTr.find(`select[name="endTime"]`).val();
+                let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+                let clonedTr = lastTr.clone();
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                $('#add-more-DayWise-table tbody').append(clonedTr)
+            }
+            else if($('.programAndDayWise[data-dis]').attr('data-dis') == 'true'){
+
+                let lastTr = $('#add-more-programAndDayWise-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+                let programName = lastTr.find(`select[name="programName"]`).val();
+                let day = lastTr.find(`select[name="day"]`).val();
+                let startTime = lastTr.find(`select[name="startTime"]`).val();
+                let endTime = lastTr.find(`select[name="endTime"]`).val();
+                let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+                let clonedTr = lastTr.clone();
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                $('#add-more-programAndDayWise-table tbody').append(clonedTr)
+            }
+            else if($('.programDaySessionWise[data-dis]').attr('data-dis') == 'true'){
+
+                let lastTr = $('#add-more-programDaySessionWise-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+                let programName = lastTr.find(`select[name="programName"]`).val();
+                let acadSession = lastTr.find(`select[name="acadSession"]`).val();
+                let day = lastTr.find(`select[name="day"]`).val();
+                let startTime = lastTr.find(`select[name="startTime"]`).val();
+                let endTime = lastTr.find(`select[name="endTime"]`).val();
+                let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+                let clonedTr = lastTr.clone();
+
+                lastTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                clonedTr.find('.modalSelect2').select2({
+                    dropdownParent: $('#add-schooltiming-modal')
+                });
+
+                $('#add-more-programDaySessionWise-table tbody').append(clonedTr)
+            }
+        })
+
+        $('#add-schooltiming-modal').on('click', '.remove-schoolTiming',
+       
+            function () {
+                console.log('delete::');
+                let trLength = $('#add-more-sameForAllDay-table tbody tr').length;
+
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this.')
+                }
+            })
+
+        $('.schoolTimingOptionsContainer').on('click', '.remove-schoolTimingDayWise',
+            function () {
+                let trLength = $('#add-more-DayWise-table tbody tr').length;
+                console.log(trLength)
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this.')
+                }
+            })
+    
+        $('.schoolTimingOptionsContainer').on('click', '.remove-schoolTimingProgramWise',
+            function () {
+                let trLength = $('#add-more-programAndDayWise-table tbody tr').length;
+
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this.')
+                }
+            })
+
+        $('.schoolTimingOptionsContainer').on('click', '.remove-schoolTimingProgramSessionWise',
+            function () {
+                let trLength = $('#add-more-programDaySessionWise-table tbody tr').length;
+
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this.')
+                }
+            })
+
+        //Getting session List Ajax
+        $("#add-schooltiming-modal").on('change','#program-name', function () {
+            console.log('yello')
+            let programLid = $(this).val();
+
+        
+            let ApiObj = {
+                url: '/admin/programs/sessions/unlocked-program-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let sessionList = ``;
+
+                if (result.length > 0) {
+                    sessionList +=
+                        `<option disabled selected value="">--Select Session--</option>`;
+                    result.forEach(element => {
+                        sessionList += `<option value="${element.id}">
+                            ${element.acad_session}
+                            </option>`
+                    });
+                } else {
+                    sessionList += `<option value="">
+                                         No Session Found!
+                                    </option>`
+                }
+                sessionList += `</select>`;
+                $(document).find($("#session-name")).html(sessionList).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+                })
+
+        // CREATING JSON     
+        $(".createSchoolTiming").on('click', function () {
+
+        let settingId =  $(`input[name='school-timing-setting']:checked`).attr('data-setting-id');
+        console.log("settingID", settingId)
+        let schoolTimingJson = [];
+
+        if($(`.schoolTimingOptions[id="sts-1"]`).is(':checked')){
+            let schoolTimingElems = $('#add-more-sameForAllDay-table tbody tr');
+            let schoolTimingCount = schoolTimingElems.length;
+
+            schoolTimingElems.each(function (index, elem) {
+                let startTimeId = $(elem).find(`select[name='startTime']`).val()
+                let endTimeId = $(elem).find(`select[name='endTime']`).val();
+                let schoolTimingTypeId = $(elem).find(`select[name='schoolTimingType']`).val();
+                
+                if (index < schoolTimingCount - 1) {
+                    let obj = {
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                } else {
+                    let obj = {
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                }
+        })
+        } 
+        else if($(`.schoolTimingOptions[id="sts-2"]`).is(':checked')){
+            let schoolTimingElems = $('#add-more-DayWise-table tbody tr');
+            let schoolTimingCount = schoolTimingElems.length;
+            schoolTimingElems.each(function (index, elem) {
+                let dayId = $(elem).find(`select[name='day']`).val()
+                let startTimeId = $(elem).find(`select[name='startTime']`).val()
+                let endTimeId = $(elem).find(`select[name='endTime']`).val();
+                let schoolTimingTypeId = $(elem).find(`select[name='schoolTimingType']`).val();
+                if (index < schoolTimingCount - 1) {
+                    let obj = {
+                        dayId: dayId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                } else {
+                    let obj = {
+                        dayId: dayId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                }
+        })
+        console.log('schoolTimingJson For settingId :::::::::::>>', settingId, schoolTimingJson)
+        }
+        else if($(`.schoolTimingOptions[id="sts-3"]`).is(':checked')){
+            let schoolTimingElems = $('#add-more-programAndDayWise-table tbody tr');
+            let schoolTimingCount = schoolTimingElems.length;
+            schoolTimingElems.each(function (index, elem) {
+                let dayId = $(elem).find(`select[name='day']`).val()
+                let programId = $(elem).find(`select[name='programName']`).val()
+                let startTimeId = $(elem).find(`select[name='startTime']`).val()
+                let endTimeId = $(elem).find(`select[name='endTime']`).val();
+                let schoolTimingTypeId = $(elem).find(`select[name='schoolTimingType']`).val();
+                
+                if (index < schoolTimingCount - 1) {
+                    let obj = {
+                        dayId: dayId,
+                        programId: programId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                } else {
+                    let obj = {
+                        dayId: dayId,
+                        programId: programId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                }
+        })
+        console.log('schoolTimingJson For settingId :::::::::::>>', settingId, schoolTimingJson)
+        }
+        else if($(`.schoolTimingOptions[id="sts-4"]`).is(':checked')){
+            let schoolTimingElems = $('#add-more-programDaySessionWise-table tbody tr');
+            let schoolTimingCount = schoolTimingElems.length;
+            schoolTimingElems.each(function (index, elem) {
+                let dayId = $(elem).find(`select[name='day']`).val()
+                let programId = $(elem).find(`select[name='programName']`).val()
+                let sessionId = $(elem).find(`select[name='acadSession']`).val()
+                let startTimeId = $(elem).find(`select[name='startTime']`).val()
+                let endTimeId = $(elem).find(`select[name='endTime']`).val();
+                let schoolTimingTypeId = $(elem).find(`select[name='schoolTimingType']`).val();
+                
+                if (index < schoolTimingCount - 1) {
+                    let obj = {
+                        dayId: dayId,
+                        programId: programId,
+                        sessionId: sessionId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                } else {
+                    let obj = {
+                        dayId: dayId,
+                        programId: programId,
+                        sessionId: sessionId,
+                        startTimeId: startTimeId,
+                        endTimeId: endTimeId,
+                        schoolTimingTypeId: schoolTimingTypeId
+                    }
+                    schoolTimingJson.push(obj)
+                }
+            })
+          
+        }
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/schooltiming/create',
+                data: {
+                    inputJSON: JSON.stringify(schoolTimingJson),
+                    settingId: settingId
+                },
+                dataType: 'JSON'
+            }
+            console.log('school data::>>', JSON.stringify(schoolTimingJson), settingId)
+            ajaxApi(ApiObj).then(result => { 
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            }) 
+    })
+
+        if($('schoolTimingOptions').attr('id') == 'sameForAllDay'){}
+        
+            //Api for onchange program event
+            // $('.schoolTimingOptionsContainer').on('change', '.programNameForSession', function() { 
+            //     let program_lid = $(this).val();
+            //         console.log('program_lid', program_lid)
+            //     let apiObj = {
+            //         type:"POST",
+            //         url:"/admin/courseDayRoomPreference/acadSessionList",
+            //         data: {
+            //             program_lid: program_lid
+            //         },
+            //         dataType:"JSON"
+            //     }
+
+            //     ajaxApi(apiObj).then(result => {
+            //         let acadList = `<select class="form-select sessionForProgram" name="acadSession" id="">`
+            //             if(result.data.acadSessionList.length > 0){
+            //                 for(let data of result.data.acadSessionList){
+            //                 acadList += `<option value="${data.acad_session_lid}"> ${data.acad_session} </option>` 
+            //                 }
+            //             }
+            //             else{
+            //                 acadList += `<option value=""> NO SESSION FOUND <option>`
+            //             }
+            //             acadList += `</select>`
+            //             $(this).parent().next().html(acadList);
+
+            //         console.log('list:::>>>', $(this).parent().next());
+            //     }).catch(error =>{
+            //         showError(error.responseJSON)
+            //     });
+            // })
+
+            $(".AddRoomPreference").on('click',function(){
+                let school_timings_name = $("#school_timings_name").val()
+                let program_lid = $("#program_name").val()// Get Value of Dropdown
+                let program_text =  $("#program_name option:selected").text(); // Get Text of Dropdown
+                let acad_session_lid = $("#acad_session").val();
+                let acad_session_text =  $("#acad_session option:selected").text();
+                let day_name_lid = $("#day_name").val();
+                let day_text =  $( "#day_name option:selected").text();
+                let slot_start_lid = $("#slot_start_lid").val();
+                let slot_start_text =  $( "#slot_start_lid option:selected").text();
+                let slot_end_lid = $("#slot_end_lid").val();
+                let slot_end_text =  $( "#slot_end_lid option:selected").text();
+                $("#add-more-schoolTiming-table tbody").append(`
+                <tr>
+                                        <td>
+                                        #
+                                        </td>
+                                        <td data-school-timings-name="${school_timings_name}">
+                                            ${school_timings_name}
+                                        </td>
+                                        <td data-program-lid="${program_lid}">
+                                            ${program_text}
+                                        </td>
+                                        <td data-acad-session-lid="${acad_session_lid}">
+                                            ${acad_session_text}
+                                        </td>
+                                        <td data-day-name-lid="${day_name_lid}">
+                                            ${day_text}
+                                        </td>
+                                        <td data-slot-start-lid="${slot_start_lid}">
+                                            ${slot_start_text}
+                                        </td>
+                                        <td data-start-end-lid="${slot_end_lid}">
+                                            ${slot_end_text}
+                                        </td>
+                                        <td>
+                                            <i class="far fa-edit d-none"></i>
+                                            <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingRow"></i>
+                                        </td>
+                                    </tr>
+                        `)
+            })
+
+
+            //Remove Element
+            $("#add-more-schoolTiming-table").on('click', '.remove-schoolTimingRow', function () {
+                $($(this)).fadeOut(300, function () {
+                $($(this).parent().parent()).remove()
+                })
+            })
+
+            //On change function
+            $('#program_name').on('change', function() { 
+            let program_lid = $("#program_name").val();
+                
+            let apiObj = {
+                type:"POST",
+                url:"/admin/courseDayRoomPreference/acadSessionList",
+                data: {
+                    program_lid: program_lid
+                },
+                dataType:"JSON"
+            }
+
+            ajaxApi(apiObj).then(result => {
+                let acadList = ``
+                    if(result.data.acadSessionList.length > 0){
+                        for(let data of result.data.acadSessionList){
+                        acadList += `<option value="${data.acad_session_lid}"> ${data.acad_session} </option>` 
+                        }
+                    }
+                    else{
+                        acadList += `<option value=""> NO SESSION FOUND <option>`
+                    }
+                    $("#acad_session").html(acadList);
+                dayList =  `` 
+                    if(result.data.dayList.length > 0){
+                        for(let data of result.data.dayList){
+                            dayList += `<option value="${data.day_lid}"> ${data.day_name} </option>` 
+                        }
+                    }
+                    else{
+                        dayList += `<option value=""> NO DAY FOUND <option>`
+                    }
+                    $("#day_name").html(dayList);
+                console.log('list:::>>>', $(this).next());
+            }).catch(error => console.log('error',error));
+        })
+
+
+        // SEARCH PROGRAM TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "GET",
+                url: "/admin/divisions/search",
+                data: {
+                    keyword: keyword
+                },
+                success: function (data) {
+                    console.log(data)
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+        $('#searchkeyword').on('input', delay(function (e) {
+        let keyword = $("#searchkeyword").val()
+        let ApiObj = {
+            url: "/admin/schooltiming/search",
+            type: "POST",
+            data: {
+                keyword: keyword
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+           AjaxTable(result.data)
+           
+        }).catch(error => {
+
+            showError(error)
+        })
+    }, 500));
+
+
+
+    $('.select2').select2({
+                dropdownParent: $('#editschoolTimeModal')});
+
+        $("#schoolTimingTable").on('click','.edit-schooltime',function(){
+            let start_time_id = $(this).attr('data-slot-start-lid')
+            let end_time_id = $(this).attr('data-slot-end-lid')
+            let day_lid = $(this).attr('data-day-lid')
+            let program_lid = $(this).attr('data-program-lid')
+            let session_lid = $(this).attr('data-session-lid')
+            let school_time_type = $(this).attr('data-school-time-type-id');
+            console.log('school_timing_type',school_time_type)
+            $("#editschoolTimeModal #old_start_time_id").val(start_time_id).trigger('change')
+            $("#editschoolTimeModal #old_end_time_id").val(end_time_id).trigger('change')
+            $("#editschoolTimeModal #daylid").val(day_lid).trigger('change')
+            $("#editschoolTimeModal #programlid").val(program_lid).trigger('change')
+            $("#editschoolTimeModal #sessionlid").val(session_lid).trigger('change')
+
+            $("#editschoolTimeModal #start_time_id").val(start_time_id).trigger('change')
+            $("#editschoolTimeModal #end_time_id").val(end_time_id).trigger('change')
+            $("#editschoolTimeModal #schoolTimingTypeOld").val(school_time_type).trigger('change')
+            $("#editschoolTimeModal #schoolTimingType").val(school_time_type).trigger('change')
+            $("#editschoolTimeModal").modal('show')
+
+        })
+
+        $(".update-school-time").on('click',function(){
+           let start_time_id = $("#editschoolTimeModal #start_time_id").val()
+           let end_time_id =  $("#editschoolTimeModal #end_time_id").val()
+           let old_start_time_id = $("#editschoolTimeModal #old_start_time_id").val()
+           let old_end_time_id =  $("#editschoolTimeModal #old_end_time_id").val()
+           let day_lid =  $("#editschoolTimeModal #daylid").val()
+           let program_lid =  $("#editschoolTimeModal #programlid").val()
+           let session_lid =  $("#editschoolTimeModal #sessionlid").val()
+           let type_lid =  $("#editschoolTimeModal #schoolTimingType").val()
+           let old_type_lid =  $("#editschoolTimeModal #schoolTimingTypeOld").val()
+           let array = []
+
+           let obj = {
+            start_time_id: start_time_id,
+            end_time_id: end_time_id,
+            old_start_time_id: old_start_time_id,
+            old_end_time_id:old_end_time_id,
+            day_lid: day_lid,
+            program_lid: program_lid,
+            session_lid: session_lid,
+            type_lid: type_lid,
+            old_type_lid: old_type_lid
+           }
+
+           array.push(obj)
+           console.log('Update JSON::::::::>>',array)
+           let ApiObj = {
+                type: 'POST',
+                url: '/admin/schooltiming/update',
+                data: {
+                    inputJSON: JSON.stringify(array),
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => { 
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            }) 
+
+        })
+
+
+        //DELETE SCHOOL TIME
+
+        $("#schoolTimingTable").on('click','.delete-schooltime',function(){
+           let start_time_lid = $(this).attr("data-slot-start-lid")
+           let end_time_lid = $(this).attr("data-slot-end-lid")
+           let schoolTimingLid = $(this).attr("data-id");
+           console.log('SCHOOL TIME ID ::::::::>>', $(this))
+           let ApiObj = {
+                type: 'POST',
+                url: '/admin/schooltiming/delete',
+                data: {
+                    schoolTimingLid : schoolTimingLid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => { 
+                console.log('result:::::::::::>>',result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            }) 
+
+        })
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

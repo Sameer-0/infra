@@ -1,0 +1,208 @@
+<%- include('./management/partials/head') %>
+<link rel="stylesheet" href="/css/simpleAlert.css">
+<style>
+  :root {
+    --login-bg-color: radial-gradient(circle, rgb(143 0 0) 0%, rgb(0 0 0) 100%);
+    --welcome-color: #740e00;
+    --bottom-line-color: #ff1f00;
+  }
+
+  a{
+  text-decoration: none;
+  font-size: 2rem;
+  color: #333;
+  }
+
+  a:hover{
+    color: var(--welcome-color);
+  }
+
+  .background {
+    background: var(--login-bg-color);
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    height: 100vh;
+    width: 100%;
+  }
+
+  /* Custom CSS */
+  .cust-btn-group {
+    display: flex;
+    align-items: center;
+    padding: 7px 15px;
+    background: #fff;
+    border: 1px solid #c2c2c2;
+    border-radius: 25px;
+    font-size: 18px;
+  }
+
+  .cust-input-prepend {
+    margin-right: 10px;
+    width: 20px;
+  }
+
+  .cust-btn-group input {
+    border: none;
+    width: 100%;
+  }
+
+  .cust-btn-group input:focus {
+    outline: none;
+  }
+
+  .bottom-line {
+    width: 100px;
+    position: relative;
+    height: 1px;
+    margin-bottom: 25px;
+    background: var(--bottom-line-color);
+    display: block;
+  }
+
+  .bottom-line::after {
+    content: '';
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    top: 2px;
+    left: 0;
+    background: #6b6d6d;
+  }
+
+
+  /* // Custom CSS */
+
+
+  img {
+    width: 100%;
+  }
+
+  .login-wrapper {
+    overflow: hidden;
+    padding: 15px;
+    position: fixed;
+    width: 1200px;
+    left: calc(50% - 600px);
+    top: calc(50% - 280px);
+    box-shadow: 0px 0px 8px 1px;
+    background: rgb(255 255 255 / 80%);
+    border-radius: 30px;
+  }
+
+  section.login-wrapper::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: -1;
+    width: 50%;
+    height: 100%;
+    background: rgb(255 255 255 / 80%);
+  }
+
+  .inner-login-wrapper {
+    height: 100%;
+    width: 100%;
+  }
+
+  .logo img {
+    width: 170px;
+  }
+
+  #login-left {
+    padding: 150px 100px;
+  }
+
+  #login-left .cust-btn-group i {
+    color: #757575;
+  }
+
+  #login-left h3 span {
+    color: var(--welcome-color);
+  }
+
+
+  .login-btn {
+    display: block;
+    margin: auto;
+    background: #000;
+    padding: 7px 50px;
+    border-radius: 25px;
+  }
+
+  @media (max-width: 1200px) {
+    .login-wrapper {
+      width: 950px;
+      top: calc(50% - 268px);
+      left: calc(50% - 475px);
+    }
+
+    #login-left {
+      padding: 133px 50px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .login-wrapper {
+      width: 700px;
+      top: calc(50% - 230px);
+      left: calc(50% - 350px);
+    }
+
+    #login-left {
+      padding: 49px 15px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .login-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      border-radius: 0;
+      left: 0;
+      top: 0;
+    }
+
+    .inner-login-wrapper {
+      height: 100%;
+      width: 100%;
+    }
+
+
+  }
+</style>
+</head>
+
+<body>
+  <canvas class="background"></canvas>
+
+  <section class="login-wrapper">
+    <div class="inner-login-wrapper">
+      <div class="row">
+        <div class="col-md-6 d-flex justify-content-center align-items-center" id="login-right">
+            <a href="/admin/dashboard">Admin</a>
+        </div>
+        <div class="col-md-6 d-flex justify-content-center align-items-center" id="login-left">
+          <a href="/management/dashboard">Management</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <%- include('./management/partials/footer') %>
+
+  <script src="/js/particlejs.min.js"></script>
+  <script src="/js/SimpleAlert.js"></script>
+
+  <!-- Page Level JavaScript Libaries End -->
+  <script>
+ 
+  </script>
+</body>
+
+</html>

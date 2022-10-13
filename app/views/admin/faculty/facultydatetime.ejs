@@ -1,0 +1,710 @@
+<%- include("../partials/head") %>
+
+
+
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    <%- include("../partials/faculty-menu") %>
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Faculty Date Time</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger" href="/admin/faculties/date-time/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-facultydatetime-modal"><i
+                        class="fas fa-plus"></i></button>
+                <!-- <button class="btn ms-auto delete-buildings add-btn "><i class="fas fa-trash"></i></button> -->
+                <!-- <button class="btn ms-auto bulk-delete-buildings add-btn "><img src="/icons/delete.png" alt=""
+                        width="24px" height="32px"></button> -->
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+
+            <table class="table custom_row" id="facultyDateTimeTable">
+                <thead>
+                    <th>Sr.No.</th>
+                    <th>Faculty Name</th>
+                    <th>Faculty Type</th>
+                    <th>Faculty Id</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th> 
+                    <!-- <th>All <input type="checkbox" class="selectAll-building"></th> -->
+                </thead>
+                <tbody>
+                   <%  let count =1; %>
+                    <% for (let faculty of FacultyDateTimeList) { %>
+       
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td>
+                            <%- faculty.faculty_name %>
+                        </td>
+                        <td>
+                            <%- faculty.faculty_type %>
+                        </td>
+                        <td>
+                            <%- faculty.faculty_id %>
+                        </td>
+                        <td>
+                            <%- faculty.start_date %>
+                        </td>
+                        <td>
+                            <%- faculty.end_date %>
+                        </td>
+                        <td>
+                            <%- faculty.start_time %>
+                        </td>
+                        <td>
+                            <%- faculty.end_time %>
+                        </td>
+                        <td>
+                            <a class="edit-faculty" data-faculty-id="<%- faculty.id %>"><i class="fa fa-edit text-danger"></i></a>
+                            <a class="delete-faculty" data-faculty-id="<%- faculty.id %>"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                        <!-- <td>
+                            <input type="checkbox" data-faculty-id=""
+                                class="delete-building">
+                        </td> -->
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- IMPORT FACULTY MODAL -->
+<div class="modal fade" id="add-facultydatetime-modal" tabindex="-1" role="dialog" aria-labelledby="add-holiday-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header  modal-inputform-header">
+                <h5 class="modal-title text-dark" id="add-org-modal-title">ADD FACULTY DATE TIME</h5>
+                <button type="button" class="btn fs-4 text-dark" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+
+            </div>
+            <!-- <form action="/management/campus/add" method="POST"> -->
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+
+
+             <div class="row">
+                 <div class="col-md-3 select-items">
+                <div class="mb-3">
+                    <label class="form-label">Select Faculty</label>
+                    <select class="form-select select2 faculty-drop-down" id="faculty-drop-down">
+                        <option value="">Select faculty</option>
+                        <% for (let faculty of facultyList) { %>
+                            <option  data-faculty-name="<%- faculty.faculty_name %>"
+                                data-faculty-id="<%- faculty.faculty_id%>" data-faculty-lid="<%- faculty.id %>"  value="<%- faculty.faculty_dbo_lid %>">
+                                <%- faculty.faculty_name %> (<%- faculty.faculty_id%>)
+                                %></option>
+                            <% } %>
+                    </select>
+
+                </div>
+                <div class="mb-3">
+                 <label class="form-label">Select Start Time</label>
+                    <select class="form-select" name="start_time_id" id="start_time_id"></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select End Time</label>
+                    <select class="form-select" name="end_time_id" id="end_time_id"></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Start Date</label>
+                    <select class="form-select select2" name="start_date_id" id="start_date_id">
+                        <% for(let start_date of AcademicCalenderList) {%>
+                        <option value="<%-start_date.id%>"><%-start_date.date_str%></option>
+                        <%}%>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select End Date</label>
+                    <select class="form-select select2" name="end_date_id" id="end_date_id">
+                        <% for(let end_date of AcademicCalenderList) {%>
+                        <option value="<%-end_date.id%>"><%-end_date.date_str%></option>
+                        <%}%>
+                    </select>
+                </div>
+       
+
+                <div class="mb-3 d-grid gap-2">
+                    <button class="btn btn-info text-light add-faculty-date-time" disabled>ADD FACULTY DATE TIME</button>
+                </div>
+
+                <div class="alert alert-success rounded-0" role="alert">
+                    Note: Select Faculty First.
+                  </div>
+
+                 </div>
+                 <div class="col-md-9 selected-items">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-bordered" id="add-more-faculty-date-time-table">
+                            <thead>
+                                <th>Sr No.</th>
+                                <th>Faculty Name</th>
+                                <th>Faculty Id</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                 </div>
+             </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn createfacultydatetime modal-inputform-btn">CREATE</button>
+                <button type="button" class="btn updatefacultydatetime modal-inputform-btn d-none">UPDATE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- edit modal -->
+<div class="modal fade" id="editFacultyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <input type="hidden" id="facultydatetime_lid" name="facultydatetime_lid">
+                <label for="exampleFormControlInput1" class="form-label">Start Time</label>
+               <select class="form-select" id="start_time_id"></select>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">End Time</label>
+               <select class="form-select" id="end_time_id"></select>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Start Date</label>
+                <select class="form-select select2 modalselect2" name="start_date_id" id="start_date_id">
+                    <% for(let start_date of AcademicCalenderList) {%>
+                    <option value="<%-start_date.id%>"><%-start_date.date_str%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">End Date</label>
+                <select class="form-select select2 modalselect2" name="end_date_id" id="end_date_id">
+                    <% for(let end_date of AcademicCalenderList) {%>
+                    <option value="<%-end_date.id%>"><%-end_date.date_str%></option>
+                    <%}%>
+                </select>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary update-faculty-date-time">UPDATE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<%- include("../partials/footer") %>
+
+<script src="/js/dashboardscript.js"></script>
+<script src="/js/leftsidebartoggle.js"></script>
+<script>
+$(document).ready(function(){
+
+    $('.select2').select2({dropdownParent: $('#add-facultydatetime-modal')});
+   
+        $(".faculty-drop-down").on('change',function(){
+            let facultyid = $(this).val()
+            let ApiObj = {
+            type: 'POST',
+            url: '/admin/faculties/date-time/getslottime',
+            data: {
+                facultyid: facultyid
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            let startTime = ``;
+                let endTime = ``;
+                if (result.result.length > 0) {
+                    startTime += `<option disabled selected value="" >Select Start Time</option>`;
+                    endTime += `<option disabled selected value="">Select End Time</option>`;
+
+                    result.result.forEach(element => {
+                        startTime +=
+                            `<option value="${element.id}">${element.start_time}</option>`;
+                        endTime +=
+                            `<option value="${element.id}">${element.end_time}</option>`;
+                    });
+                    $('.add-faculty-date-time').removeAttr('disabled')
+                } else {
+                    startTime += `<option value="">No Slot Found!</option>`;
+                    endTime += `<option value="">No Slot Found!</option>`;
+                    $('.add-faculty-date-time').attr('disabled','disabled')
+                }
+                $("#add-facultydatetime-modal  #start_time_id").html(startTime);
+                $("#add-facultydatetime-modal  #end_time_id").html(endTime);
+          
+        }).catch(error => {
+            showError(error.responseJSON)
+        })
+        })
+
+let tableCount = 1;
+        //APPEND FACULTY DATETIME 
+        $('.add-faculty-date-time').on('click', function(){
+             let faculty_lid = $("#faculty-drop-down option:selected").attr("data-faculty-lid");//$(this).find(`data-faculty-lid`).attr(`data-faculty-lid`)
+            let faculty_name = $("#faculty-drop-down option:selected").attr(`data-faculty-name`)
+            let faculty_id = $("#faculty-drop-down option:selected").attr(`data-faculty-id`)
+            let start_time_id = $("#start_time_id").val();
+            let start_time_text = $("#start_time_id option:selected").text();
+            let end_time_id = $("#end_time_id").val();
+            let end_time_text = $("#end_time_id option:selected").text();
+            let start_date_id = $("#start_date_id").val();
+            let end_date_id = $("#end_date_id").val();
+            let start_date_text = $("#start_date_id  option:selected").text();
+            let end_date_text = $("#end_date_id  option:selected").text();
+            $('#add-more-faculty-date-time-table tbody').append(`<tr>
+                <td>${tableCount++}</td>
+                <td>${faculty_name}</td>
+                <td data-faculty-lid="${faculty_lid}">${faculty_id}</td>
+                <td data-start-time-id="${start_time_id}">${start_time_text}</td>
+                <td data-end-time-id="${end_time_id}">${end_time_text}</td>
+                <td data-start-date-id="${start_date_id}">${start_date_text}</td>
+                <td data-end-date-id="${end_date_id}">${end_date_text}</td>
+                <td>
+                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-date-time-column"></i></td>
+                </tr>`)
+        })
+
+
+
+        //Remove Element
+        $("#add-more-faculty-date-time-table").on('click', '.remove-date-time-column', function () {
+            $($(this)).fadeOut(300, function () {
+               $($(this).parent().parent()).remove()
+            })
+        })
+
+    $(".createfacultydatetime").on('click', function () {
+        let facultyDateTimeElems = $('#add-more-faculty-date-time-table tbody tr');
+        let facultyDateTimeCount = facultyDateTimeElems.length;
+        let facultyDateTimeJson = [];
+        facultyDateTimeElems.each(function (index, elem) {
+            let faculty_lid = $(elem).find(`td[data-faculty-lid]`).attr(`data-faculty-lid`)
+            let start_date_id = $(elem).find(`td[data-start-date-id]`).attr(`data-start-date-id`);
+            let end_date_id = $(elem).find(`td[data-end-date-id]`).attr(`data-end-date-id`);
+            let start_time_id = $(elem).find(`td[data-start-time-id]`).attr(`data-start-time-id`);
+            let end_time_id = $(elem).find(`td[data-end-time-id]`).attr(`data-end-time-id`);
+            if (index < facultyDateTimeCount - 1) {
+                let obj = {
+                    faculty_lid: faculty_lid,
+                    start_date_id: start_date_id,
+                    end_date_id: end_date_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id
+                }
+                facultyDateTimeJson.push(obj)
+            } else {
+                let obj = {
+                    faculty_lid: faculty_lid,
+                    start_date_id: start_date_id,
+                    end_date_id: end_date_id,
+                    start_time_id: start_time_id,
+                    end_time_id: end_time_id
+                }
+                facultyDateTimeJson.push(obj)
+            }
+        })
+        console.log('facultyDateTimeJson',facultyDateTimeJson)
+        let ApiObj = {
+            type: 'POST',
+            url: '/admin/faculties/date-time/create',
+            data: {
+                inputJSON: JSON.stringify(facultyDateTimeJson)
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            showSuccess(result)
+        }).catch(error => {
+            showError(error.responseJSON)
+        })
+    })
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+            $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+            url: "/admin/faculties/date-time/search",
+            data: {
+                keyword: keyword,
+                pageNo: 1
+            },
+            success: function (data) {
+                console.log(data)
+                showAjaxTable(data.data) // Facilty List
+            }
+        })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/faculties/date-time/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data) // Facilty List
+                    }
+                })
+            })
+
+        //PAGINATION
+    let pageCount = `<%- pageCount %>`
+    let pageNos = Math.ceil(Number(pageCount) / 10)
+    console.log("Page Numbers", pageNos)
+    $('#pagination').bootpag({
+        total: pageNos,
+        page: 1,
+        maxVisible: 10,
+        leaps: true,
+        firstLastUse: true,
+        first: '←',
+        last: '→',
+        wrapClass: 'pagination',
+        activeClass: 'active', 
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first'
+    }).on("page", function (event, num) {
+        console.log('pagination here!!')
+        $.ajax({
+            type: "POST",
+            url: "/admin/faculties/date-time/pagination",
+            data: {
+                pageNo: num
+            },
+            success: function (data) {
+                showAjaxTable(data.data) 
+            }
+        })
+    });
+
+
+            //Delete Faculty API
+            $("#facultyDateTimeTable").on('click','.delete-faculty',function(){
+            let id = $(this).attr("data-faculty-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/date-time/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+             //edit Faculty API
+            $("#facultyDateTimeTable").on('click','.edit-faculty',function(){        
+            let id = $(this).attr("data-faculty-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/date-time/findone',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                $('.select2').select2({dropdownParent: $('#editFacultyModal')});
+                console.log('sucess:::::::::', result)
+                facultySlotForEdit(result.data.faculty_dbo_lid, result.data.start_time_id, result.data.end_time_id)
+                $("#editFacultyModal #facultydatetime_lid").val(result.data.id)
+                $("#editFacultyModal #end_date_id").val(result.data.end_date_id).trigger('change')
+                $("#editFacultyModal #start_date_id").val(result.data.start_date_id).trigger('change')
+             $("#editFacultyModal").modal('show')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        $(".update-faculty-date-time").on('click', function () {
+            let id = $("#facultydatetime_lid").val()
+            let start_date_id = $("#editFacultyModal #start_date_id").val()
+            let end_date_id = $("#editFacultyModal #end_date_id").val()
+            let start_time_id = $("#editFacultyModal  #start_time_id").val()
+            let end_time_id = $("#editFacultyModal  #end_time_id").val()
+
+            let facultyJson = []
+
+            let obj = {
+                id : id,
+                start_date_id: start_date_id,
+                end_date_id: end_date_id,
+                start_time_id: start_time_id,
+                end_time_id: end_time_id
+            }
+            facultyJson.push(obj)
+
+            console.log('obj>>>>>>', facultyJson)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/date-time/update',
+                data: {
+                    inputJSON: JSON.stringify(facultyJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+                //search selected faculty
+        $('#searchSelectedItem').on('input', function () {
+            let selectedFaculties = $('#selectedList table tbody tr')
+            var text = $('#searchSelectedItem').val().toLowerCase();
+            console.log('text:::::::::', selectedFaculties)
+            for (let faculty of selectedFaculties) {
+                console.log('faculty:::::::::', faculty)
+                if (faculty.textContent.toLowerCase().indexOf(text) > -1) {
+
+                    $(faculty).removeClass("d-none");
+                } else {
+                    $(faculty).addClass("d-none");
+                }
+            };
+        })
+
+
+        function showAjaxTable(facultiesList) {
+            let AjaxTable = `<table class="table custom_row" id="facultyDateTimeTable">
+                <thead>
+                    <th>Sr.No.</th>
+                    <th>Faculty Name</th>
+                    <th>Faculty Type</th>
+                    <th>Faculty Id</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </thead>`;
+
+            if (facultiesList.length > 0) {
+                let count  = 1;
+                for (faculty of facultiesList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>${count++}</td>
+                        <td>${faculty.faculty_name}</td>
+                        <td>${faculty.faculty_type}</td>
+                        <td>${faculty.faculty_id}</td>
+                        <td>${faculty.start_date}</td>
+                        <td>${faculty.end_date}</td>
+                        <td>${faculty.start_time}</td>
+                        <td>${faculty.end_time}</td>
+                        <td>
+                            <a class="edit-faculty" data-faculty-id="${faculty.id}"><i class="fa fa-edit text-danger"></i></a>
+                            <a class="delete-faculty" data-faculty-id="${faculty.id}"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    `<tr>
+                        <td colspan="8">No Data Found</td>
+                    </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#facultyDateTimeTable").html(AjaxTable);
+        }
+
+
+
+        function facultySlotForEdit(facultyid, start_time_id, end_time_id){
+            let ApiObj = {
+            type: 'POST',
+            url: '/admin/faculties/date-time/getslottime',
+            data: {
+                facultyid: facultyid
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            let startTime = ``;
+                let endTime = ``;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        startTime +=
+                            `<option value="${element.id}">${element.start_time}</option>`;
+                        endTime +=
+                            `<option value="${element.id}">${element.end_time}</option>`;
+                    });
+                    $('.add-faculty-date-time').removeAttr('disabled')
+                } else {
+                    startTime += `<option value="">No Slot Found!</option>`;
+                    endTime += `<option value="">No Slot Found!</option>`;
+                    $('.add-faculty-date-time').attr('disabled','disabled')
+                }
+                $("#editFacultyModal  #start_time_id").html(startTime);
+                $("#editFacultyModal  #end_time_id").html(endTime);
+                $("#editFacultyModal  #start_time_id").val(start_time_id).trigger('change')
+                $("#editFacultyModal  #end_time_id").val(end_time_id).trigger('change')
+          
+        }).catch(error => {
+            showError(error.responseJSON)
+        })
+        }
+
+
+        //CHANGE ENTRIES
+      $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/faculties/date-time/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    showAjaxTable(data.data) 
+                }
+            })
+        })
+
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                }
+            }
+        }
+        simpleAlert.alert(obj);
+        }
+        
+
+        function showSuccess(errors) {
+        console.log(errors);
+        let simpleAlert = new SimpleAlert();
+        let obj = {
+            title : errors.description,
+            message: "",
+            type: 'alert-success',
+            buttons: {
+                positive:{
+                    text: "Okay",
+                    action: function(){
+                        document.querySelector('.simple-alert').remove();
+                    }
+                },
+                negative: {
+                    text: "Cancel",
+                    action: function () {
+                    alert('Negative')
+                    }
+                }
+            }
+        }
+        simpleAlert.alert(obj);
+    }
+
+})
+</script>
+<%- include("../partials/footerEnd") %>

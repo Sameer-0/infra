@@ -1,0 +1,2156 @@
+<%- include ('../partials/head') %>
+
+
+<!-- PAGE LEVEL CSSS START -->
+<% if (currentFormStep) { %>
+<style>
+    .stage:nth-child(-n + <%- currentFormStep-1 %>) {
+        background: #3cc58c;
+        color: #fff;
+
+    }
+
+    .stage:nth-child(-n + <%- currentFormStep-1 %>)::before {
+        border-left: 25px solid #3cc58c;
+    }
+
+    .stage:nth-child(<%- currentFormStep %>) {
+        background: #ffc800;
+        color: #000;
+
+    }
+
+    .stage:nth-child(<%- currentFormStep %>)::before {
+        border-left: 25px solid #ffc800;
+    }
+ 
+    .main, .top-navbar{
+            left: 0 !important;
+        }
+
+    @media (min-width:1200px) {
+        .navbar-logo{
+        display: block !important;
+    }
+
+        .navbar-logo a img {
+        width: 180px;
+    
+    }
+    }
+    
+
+    .left-sidebar-toggle{
+        display: none;
+    }
+
+    .top-navbar {
+        padding: 1vh;
+    }
+</style>
+<% } %>
+<!-- PAGE LEVEL CSSS END -->
+<% if (!currentFormStep) { %> 
+    <%- include ('../partials/leftSidebar') %>
+<% } %>
+
+<%- include ('../partials/header') %>
+
+
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+
+    <!-- <% if (currentFormStep) { %> 
+    <%- include('./stepform.ejs') %>
+    <% } else { %> -->
+    <%- include('./dashboard.ejs') %>
+    <!-- <% } %> -->
+  
+</div>
+</main>
+
+<%- include('../partials/footer') %>
+ 
+
+<!-- PAGE LEVEL JS START -->
+
+<!-- <script src="/js/adminDashboardscript.js"></script> -->
+
+<script>
+    $(document).ready(function () {
+
+    //     $('.holiday-select2').select2();
+
+    //     $('.room-select2').select2({
+    //         dropdownParent: $('#open-transaction-modal')
+    //     });
+        
+    //     $('.faculty-works-select2').select2({
+    //         dropdownParent: $('#add-facultywork-modal')
+    //     });
+
+    //     $('.faculty-pref-select2').select2({
+    //         dropdownParent: $('#add-facultypreference-modal')
+    //     });
+
+    //     $('.faculty-dt-select2').select2({
+    //         dropdownParent: $('#add-facultydatetime-modal')
+    //     });
+
+    //     $('.faculty-batch-select2').select2();
+ 
+    //     let username = `<%- locals.userId %>`;
+    //     let campu = `<%- campusList%>`;
+    //     let date = `<%- acadCalender%>`;
+    //     let acadDate = JSON.parse(date);
+    //     let slotTime = `<%- slotTiming %>`
+    //     let slotObj = JSON.parse(slotTime);
+    //     let programType = JSON.parse(`<%- programTypeList%>`);
+    //     let facultyTypeList = JSON.parse(`<%- facultyType %>`);
+    //     let transactionType = JSON.parse(`<%- transactionTypes %>`);
+        
+    //     let optionStartTime;
+    //     let optionEndTime;
+    //     let startDate;
+    //     let endDate;
+    //     let programTypeList;
+    //     let facultyType; 
+    //     let transactionTypeList;
+
+    //     for (let obj of slotObj) {
+    //         optionStartTime += `<option value="${obj.id}">${obj.start_time}</option>`;
+    //     }
+
+    //     for (let obj of slotObj) {
+    //         optionEndTime += `<option value="${obj.id}">${obj.end_time}</option>`;
+    //     }
+
+    //     for (let obj of acadDate) {
+    //         startDate += `<option value="${obj.id}">${obj.date}</option>`;
+    //     }
+
+    //     for (let obj of acadDate) {
+    //         endDate += `<option value="${obj.id}">${obj.date}</option>`;
+    //     }
+
+    //     for (let obj of programType) {
+    //         programTypeList += `<option value="${obj.id}">${obj.name}</option>`
+    //     }
+
+    //     for (let obj of facultyTypeList) {
+    //         facultyType += `<option value="${obj.id}">${obj.name}</option>`;
+    //     }
+
+    //     for (let obj of transactionType) {
+    //         transactionTypeList += `<option value="${obj.id}">${obj.name}</option>`;
+    //     }
+
+    //     //DATA SELECT FOR ROOM
+    //     $(".selectRoomList").on('click', '.list-group-item', function () {
+         
+    //         let building_lid =  $("#building_lid").val()
+    //         let campus_lid =  $("#campus_lid").val()
+          
+    //         //remove current element when added to right sidebar
+    //         // if ($(this).attr('data-clickable') == 'true') {
+    //         $(".selectedListRoom table tbody").append(
+    //             `<tr data-clickable="true" data-building-lid="${building_lid}" data-campus-lid="${campus_lid}">
+    //                 <td data-room-id="${$(this).attr('data-room-id')}">${$(this).text()}</td>
+    //                 <td>
+    //                     <select class="room-select2" name="startTime">${optionStartTime}</select>
+    //                 </td>
+    //                 <td>
+    //                     <select class="room-select2" name="endTime">${optionEndTime}</select>
+    //                 </td>
+    //                 <td>
+    //                     <select class="room-select2" name="startDate">${startDate}</select>
+    //                 </td>
+    //                 <td>
+    //                     <select class="room-select2" name="endDate">${endDate}</select>
+    //                 </td>
+    //                 <td>
+    //                     <select class="room-select2" name="transaction_type_lid">${transactionTypeList}</select>
+    //                 </td>
+    //                 <td>
+    //                     <i class="fas fa-trash-alt text-danger cursor-pointer clicktoremove"></i>
+    //                 </td>
+    //             </tr>
+    //             ` 
+                    
+                
+    //         )
+    //         // }
+    //         $('#add-more-room-table tbody tr:last-child .room-select2').select2({
+    //             dropdownParent: $('#open-transaction-modal')
+    //         });
+    //         $(this).attr('data-clickable', 'false');
+    //     })
+
+    //     //Remove Element
+    //     $(".selectedListRoom").on('click', '.clicktoremove', function () {
+    //         $(this).parent().attr('data-clickable', 'false')
+    //         $($(this)).fadeOut(300, function () {
+    //             $($(this).parent().parent()).remove()
+    //         })
+    //     })
+
+    //     //search 
+    //     $('.searchItemRoom').on('input', function () {
+    //         let selectItems = $('.selectRoomList li')
+    //         var text = $('.searchItemRoom').val().toLowerCase();
+    //         for (let item of selectItems) {
+    //             if (item.textContent.toLowerCase().indexOf(text) > -1) {
+    //                 $(item).removeClass("d-none");
+    //             } else {
+    //                 $(item).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //search selected room
+    //     $('#searchSelectedItem').on('input', function () {
+    //         let selectedItems = $('.selectedList table tbody tr')
+    //         var text = $('#searchSelectedItem').val().toLowerCase();
+    //         console.log('text:::::::::', selectedItems)
+    //         for (let item of selectedItems) {
+    //             console.log('faculty:::::::::', item)
+    //             if (item.textContent.toLowerCase().indexOf(text) > -1) {
+    //                 $(item).removeClass("d-none");
+    //             } else {
+    //                 $(item).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //DATA SELECT FOR PROGRAM//
+    //     $(".selectListProgram").on('click', '.list-group-item', function () {
+
+    //         // remove current element when added to right sidebar
+    //         // if ($(this).attr('data-clickable') == 'true') {
+    //         console.log('appending:::::>>')
+    //         $(".selectedListProgram table tbody").append(
+    //             `<tr data-clickable="true">
+    //                 <td data-value="${$(this).attr('data-program-code')}">${$(this).text()}</td>
+    //                 <td>
+    //                     <select class="program-select2" name="programType">${programTypeList}</select>
+    //                 </td>
+    //                 <td>
+    //                     <i class="fas fa-trash-alt text-danger cursor-pointer clicktoremove"></i>
+    //                 </td>
+    //             </tr>`
+    //         )
+
+    //         $('#add-more-program-table tbody tr:last-child .program-select2').select2({
+    //             dropdownParent: $('#open-program-modal')});
+
+    //         $(this).attr('data-clickable', 'false');
+    //         // }
+
+            
+    //         $($(this)).fadeOut(0, function () {
+    //             $($(this)).remove()
+    //         })
+
+    //     })
+
+    //     //Remove Element
+    //     $(".selectedListProgram").on('click', '.clicktoremove', function () {
+
+    //         if ($(this).parent().parent().attr('data-clickable') == 'true') {
+
+    //             $(".selectListProgram").append(`<li class="list-group-item my-1 border-top" data-faculty-name="${$(this).parent().attr("data-faculty-name")}" data-faculty-id="${$(this).parent().attr("data-faculty-id")}" data-clickable="true"> ${$(this).parent().parent().find("td[data-value]").text()} 
+    //         </li>`)
+    //         }
+
+    //         $(this).parent().attr('data-clickable', 'false')
+
+    //         $($(this)).fadeOut(300, function () {
+    //             $($(this).parent().parent()).remove()
+    //         })
+    //     })
+
+    //     //search 
+    //     $('.searchItemProgram').on('input', function () {
+    //         selectItems = $('.selectListProgram li')
+
+    //         var text = $('.searchItemProgram').val().toLowerCase();
+
+    //         for (let item of selectItems) {
+    //             if (item.textContent.toLowerCase().indexOf(text) > -1) {
+    //                 $(item).removeClass("d-none");
+    //             } else {
+    //                 $(item).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //search selected room
+    //     $('.searchSelectedItemProgram').on('input', function () {
+    //         let selectedItems = $('.selectedListProgram table tbody tr')
+    //         var text = $('.searchSelectedItemProgram').val().toLowerCase(); 
+    //         console.log('text:::::::::', selectedItems)
+    //         for (let item of selectedItems) {
+    //             console.log('faculty:::::::::', item)
+    //             if (item.textContent.toLowerCase().indexOf(text) > -1) {
+    //                 $(item).removeClass("d-none");
+    //             } else {
+    //                 $(item).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //DATA SELECT FOR FACULTY//
+    //     $(".selectListFaculty").on('click', '.list-group-item', function () {
+    //         //remove current element when added to right sidebar
+    //         console.log('faculty::s')
+    //         if ($(this).attr('data-clickable') == 'true') {
+    //             $(".selectedListFaculty table tbody").append(`
+                    
+    //                 <tr data-clickable="true">
+    //                     <td data-faculty-id="${$(this).attr("data-faculty-id")}" data-faculty-lid="${$(this).attr("data-faculty-lid")}" data-faculty-name="${$(this).attr("data-faculty-name")}">${$(this).text()} 
+    //                     </td>
+                        
+    //                     <td>
+    //                         <select class="import-faculty-select2" name="faculty_type_lid">${facultyType}</select>
+    //                     </td>
+    //                     <td>
+    //                         <i class="fas fa-trash-alt text-danger cursor-pointer clicktoremoveFaculty"></i>
+    //                     </td>
+    //                 </tr>
+    //                 `)
+    //                 $('#add-more-faculty-table tbody tr:last-child .import-faculty-select2').select2({
+    //     dropdownParent: $('#open-faculty-modal')});
+    //         }
+
+    //         $(this).attr('data-clickable', 'false');
+
+    //         $($(this)).fadeOut(300, function () {
+    //             $($(this)).remove()
+    //         })
+
+    //     })
+
+    //     //Remove Element
+    //     $(".selectedListFaculty").on('click', '.clicktoremoveFaculty', function () {
+    //         // if ($(this).parent().attr('data-clickable') == 'true') {
+    //         $(".selectListFaculty").append(`<li class="list-group-item my-1 border-top" data-faculty-name="${$(this).parent().parent().find('td[data-faculty-id]').attr("data-faculty-name")}" data-faculty-id="${$(this).parent().parent().find('td[data-faculty-id]').attr("data-faculty-id")}" data-clickable="true"> ${$(this).parent().parent().find('td[data-faculty-id]').attr("data-faculty-name")} (${$(this).parent().parent().find('td[data-faculty-id]').attr("data-faculty-id")})
+	// 		        </li>`)
+    //         // }
+    //         $(this).parent().attr('data-clickable', 'false')
+
+    //         $($(this)).fadeOut(300, function () {
+    //             $($(this).parent().parent()).remove()
+    //         })
+    //     })
+
+    //     //search 
+    //     $('.searchItemFaculty').on('input', function () {
+           
+    //         let faculties = $('.selectListFaculty li')
+    //         console.log('searchong', faculties)
+    //         var text = $('.searchItemFaculty').val().toLowerCase();
+
+    //         for (let faculty of faculties) {
+    //             if (faculty.textContent.toLowerCase().indexOf(text) > -1) {
+    //                 $(faculty).removeClass("d-none");
+    //             } else {
+    //                 $(faculty).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //search selected faculty
+    //     $('.searchSelectedFaculty').on('input', function () {
+    //         let selectedFaculties = $('.selectedListFaculty table tbody tr')
+    //         var text = $('.searchSelectedFaculty').val().toLowerCase();
+    //         console.log('text:::::::::', selectedFaculties)
+    //         for (let faculty of selectedFaculties) {
+    //             console.log('faculty:::::::::', faculty)
+    //             if (faculty.textContent.toLowerCase().indexOf(text) > -1) {
+
+    //                 $(faculty).removeClass("d-none");
+    //             } else {
+    //                 $(faculty).addClass("d-none");
+    //             }
+    //         };
+    //     })
+
+    //     //Options for school timing
+        
+
+    //     if(checkSetting > 0){
+    //            setTimeout(() => {
+    //             $('.schoolTimingOptions').trigger('click');
+    //            }, 50);
+    //     }
+      
+    //     $('.schoolTimingOptions').on('click', function() {    
+    //         let settingName;
+
+    //         if(checkSetting > 0){
+    //             let list = JSON.parse(`<%- schoolTimingSettingsListJson %>`);
+        
+    //             for(let l of list){
+    //                 if(l.status == 1){
+    //                     settingName = l.name;
+    //                 }
+    //             }
+    //         } else{
+    //             settingName = $(this).attr('data-name');
+    //         }
+    //         console.log('setting name', settingName)
+
+    //         if(settingName == 'Day Wise'){
+    //             let DayWise = `<div class="table-responsive DayWise" data-dis="true">
+    //                 <table class="table table-bordered" id="add-more-DayWise-table">
+    //                     <thead>
+    //                         <th>Day</th>
+    //                         <th>Start Time</th>
+    //                         <th>End Time</th>
+    //                         <th>School Timing Type</th>
+    //                         <th>Action</th>
+    //                     </thead>
+    //                     <tbody>                           
+    //                         <tr>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="day">
+    //                                     <% for(day of dayList){%>
+    //                                         <option value="<%- day.id%>"><%- day.day_name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="startTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.start_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="endTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.end_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select name="schoolTimingType" id="" class="school-timing-select2" >
+    //                                     <% for(type of schoolTimingTypeList){%>
+    //                                         <option value="<%- type.id%>"><%- type.name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <i class="far fa-edit d-none"></i>
+    //                                 <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingDayWise"></i>
+    //                             </td>
+    //                         </tr>
+    //                     </tbody>
+    //                 </table>
+    //             </div>`
+    //             $('.schoolTimingOptionsContainer').html(DayWise);
+    //             $('#add-more-DayWise-table tbody tr:last-child .school-timing-select2').select2();
+    //         }
+           
+    //         else if(settingName == 'Day and Program Wise'){
+    //             console.log('heoolu')
+    //             let programAndDayWise = `<div class="table-responsive programAndDayWise" data-dis="true">
+    //                 <table class="table table-bordered" id="add-more-programAndDayWise-table">
+    //                     <thead>
+    //                         <th>Program Name</th>
+    //                         <th>Day</th>
+    //                         <th>Start Time</th>
+    //                         <th>End Time</th>
+    //                         <th>School Timing Type</th>
+    //                         <th>Action</th>
+    //                     </thead>
+    //                     <tbody>                           
+    //                         <tr>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="programName">
+    //                                     <% for(program of programList){%>
+    //                                         <option value="<%- program.id%>"><%- program.program_name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="day">
+    //                                     <% for(day of dayList){%>
+    //                                         <option value="<%- day.id%>"><%- day.day_name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="startTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.start_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="endTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.end_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select name="" id="" class="school-timing-select2" >
+    //                                     <% for(type of schoolTimingTypeList){%>
+    //                                         <option value="<%- type.id%>"><%- type.name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <i class="far fa-edit d-none"></i>
+    //                                 <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingProgramWise"></i>
+    //                             </td>
+    //                         </tr>
+    //                     </tbody>
+    //                 </table>
+    //             </div>`
+    //             $('.schoolTimingOptionsContainer').html(programAndDayWise);
+    //             $('#add-more-programAndDayWise-table tbody tr:last-child .school-timing-select2').select2();
+
+    //         }
+           
+    //         else if(settingName == 'Day, Program and Session Wise'){
+    //             let programAndDayWise = `<div class="table-responsive programDaySessionWise" data-dis="true">
+    //                 <table class="table table-bordered" id="add-more-programDaySessionWise-table">
+    //                     <thead>
+    //                         <th>Program Name</th>
+    //                         <th>Acad Session</th>
+    //                         <th>Day</th>
+    //                         <th>Start Time</th>
+    //                         <th>End Time</th>
+    //                         <th>School Timing Type</th>
+    //                         <th>Action</th>
+    //                     </thead>
+    //                     <tbody>                           
+    //                         <tr>
+    //                             <td>
+    //                                 <select class="school-timing-select2 programNameForSession" name="programName" id="">
+    //                                     <% for(program of programList){%>
+    //                                         <option value="<%- program.id%>"><%- program.program_name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2 sessionForProgram" name="acadSession" id="">
+    //                                     <% for(acadSession of AcadSessionList){%>
+    //                                         <option value="<%- acadSession.id%>"><%- acadSession.acad_session %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="day">
+    //                                     <% for(day of dayList){%>
+    //                                         <option value="<%- day.id%>"><%- day.day_name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="startTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.start_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="endTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.end_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select name="schoolTimingType" id="" class="school-timing-select2" >
+    //                                     <% for(type of schoolTimingTypeList){%>
+    //                                         <option value="<%- type.id%>"><%- type.name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <i class="far fa-edit d-none"></i>
+    //                                 <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTimingProgramSessionWise"></i>
+    //                             </td>
+    //                         </tr>
+    //                     </tbody>
+    //                 </table>
+    //             </div>`
+    //             $('.schoolTimingOptionsContainer').html(programAndDayWise);
+    //             $('#add-more-programDaySessionWise-table tbody tr:last-child .school-timing-select2').select2();
+    //         }
+            
+    //         else {
+    //             let dayOnly = `<div class="table-responsive sameForAllDay" data-dis="true">
+    //                 <table class="table table-bordered" id="add-more-sameForAllDay-table">
+    //                     <thead>
+    //                         <th>Start Time</th>
+    //                         <th>End Time</th>
+    //                         <th>School Timing Type</th>
+    //                         <th>Action</th>
+    //                     </thead>
+    //                     <tbody>                           
+    //                         <tr>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="startTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.start_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select class="school-timing-select2" name="endTime">
+    //                                     <% for(time of slotTime){%>
+    //                                         <option value="<%- time.id%>"><%- time.end_time %></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <select name="schoolTimingType" id="" class="school-timing-select2" >
+    //                                     <% for(type of schoolTimingTypeList){%>
+    //                                         <option value="<%- type.id%>"><%- type.name%></option>
+    //                                     <%}%>
+    //                                 </select>
+    //                             </td>
+    //                             <td>
+    //                                 <i class="far fa-edit d-none"></i>
+    //                                 <i class="fas fa-trash-alt text-danger cursor-pointer remove-schoolTiming"></i>
+    //                             </td>
+    //                         </tr>
+    //                     </tbody>
+    //                 </table>
+    //             </div>`
+    //             $('.schoolTimingOptionsContainer').html(dayOnly);
+    //             $('#add-more-sameForAllDay-table tbody tr:last-child .school-timing-select2').select2();
+    //         }
+    //     })
+    //     $('.school-timing-select2').select2();
+ 
+    //     //Add more rows for Holidays
+    //     $('#add-more-holidays').on('click', function () {
+    //         console.log("holidays Added::::")
+    //         let lastTr = $('#add-more-holidays-table tbody tr:last-child')
+    //         lastTr.find('.holiday-select2').select2('destroy');
+    //         let calendarId = lastTr.find(`input[name='calendarId']`).val();
+    //         // let calendarName = lastTr.find(`input[name='calendarName']`).val();
+    //         let holidayType = lastTr.find(`select[name='holidayType']`).val();
+    //         let calendarYear = lastTr.find(`input[name='calendarYear']`).val();
+    //         let holidayDate = lastTr.find(`input[name='holidayDate']`).val();
+    //         let holidayReason = lastTr.find(`input[name='holidayReason']`).val();
+
+    //         let clonedTr = lastTr.clone(); 
+    //         clonedTr.find(`input[name='calendarId']`).val('')
+    //         // clonedTr.find(`input[name='calendarName']`).val('')
+    //         clonedTr.find(`select[name='holidayType']`).val('')
+    //         clonedTr.find(`input[name='calendarYear']`).val('')
+    //         clonedTr.find(`input[name='holidayDate']`).val('')
+    //         clonedTr.find(`input[name='holidayReason']`).val('')
+            
+    //         $('#add-more-holidays-table tbody').append(clonedTr)
+           
+    //         $('#add-more-holidays-table tbody tr:last-child .holiday-select2').select2();
+    //         lastTr.find('.holiday-select2').select2();
+    //     })
+
+    //     $('#add-more-holidays-table').on('click', '.remove-holidays', function () {
+    //         let trLength = $('#add-more-holidays-table tbody tr').length;
+    //         if (trLength > 1) {
+    //             $(this).closest('tr').remove()
+    //         } else {
+    //             alert('Cannot delete this room.')
+    //         }
+    //     })
+        
+    //     //Add more faculty date time row
+    //     //APPEND FACULTY DATETIME 
+    //     $('.add-faculty-date-time').on('click', function(){
+    //          let faculty_lid = $("#faculty-drop-down option:selected").attr("data-faculty-lid");//$(this).find(`data-faculty-lid`).attr(`data-faculty-lid`)
+    //         let faculty_name = $("#faculty-drop-down option:selected").attr(`data-faculty-name`)
+    //         let faculty_id = $("#faculty-drop-down option:selected").attr(`data-faculty-id`)
+    //         let start_time_id = $("#start_time_id").val();
+    //         let start_time_text = $("#start_time_id option:selected").text();
+    //         let end_time_id = $("#end_time_id").val();
+    //         let end_time_text = $("#end_time_id option:selected").text();
+    //         let start_date_id = $("#start_date_id").val();
+    //         let end_date_id = $("#end_date_id").val();
+    //         let start_date_text = $("#start_date_id  option:selected").text();
+    //         let end_date_text = $("#end_date_id  option:selected").text();
+    //         $('#add-more-faculty-date-time-table tbody').append(`<tr>
+    //             <td>#</td>
+    //             <td>${faculty_name}</td>
+    //             <td data-faculty-lid="${faculty_lid}">${faculty_id}</td>
+    //             <td data-start-time-id="${start_time_id}">${start_time_text}</td>
+    //             <td data-end-time-id="${end_time_id}">${end_time_text}</td>
+    //             <td data-start-date-id="${start_date_id}">${start_date_text}</td>
+    //             <td data-end-date-id="${end_date_id}">${end_date_text}</td>
+    //             <td>
+    //                 <i class="fas fa-trash-alt text-danger cursor-pointer remove-date-time-column"></i></td>
+    //             </tr>`)
+    //     })
+
+    //     //Remove Element
+    //     $("#add-more-faculty-date-time-table").on('click', '.remove-date-time-column', function () {
+    //         $($(this)).fadeOut(300, function () {
+    //            $($(this).parent().parent()).remove()
+    //         })
+    //     })
+        
+    //     //Add more rows for FacultyWorks
+    //     $('#add-more-facultyworkfields').on('click', function () {
+    //         console.log("Adding faculty work fields::::")
+    //         let lastTr = $('#add-more-facultywork-table tbody tr:last-child')
+
+    //         lastTr.find('.faculty-works-select2').select2('destroy');
+    //         let faculty_lid = lastTr.find(
+    //             `select[name='faculty_lid']`).val();
+    //         let program_session_lid = lastTr.find(
+    //             `select[name='program_session_lid']`).val();
+    //         let module_lid = lastTr.find(
+    //             `select[name='module_lid']`).val();
+    //         let lecture_per_week = lastTr.find(
+    //             `select[name='lecture_per_week']`).val();
+    //         let practical_per_week = lastTr.find(
+    //             `select[name='practical_per_week']`).val();
+    //         let tutorial_per_week = lastTr.find(
+    //             `select[name='tutorial_per_week']`).val();
+    //         let workshop_per_week = lastTr.find(
+    //             `select[name='workshop_per_week']`).val();
+    //         let is_batch_preference_set = lastTr.find(
+    //                 `select[name='is_batch_preference_set']`)
+    //             .val();
+    //         let clonedTr = lastTr.clone();
+    //         console.log(lastTr.find(`select[name='module_lid']`)
+    //             .val())
+    //         console.log('faculty_lid::::::::::', module_lid)
+
+    //         clonedTr.find(`select[name='faculty_lid']`).val(
+    //             faculty_lid).trigger('change')
+    //         clonedTr.find(`select[name='program_session_lid']`)
+    //             .val(program_session_lid).trigger('change')
+    //         clonedTr.find(`select[name='module_lid']`).val(
+    //             module_lid).trigger('change')
+    //         clonedTr.find(`select[name='lecture_per_week']`)
+    //             .val('')
+    //         clonedTr.find(`select[name='practical_per_week']`)
+    //             .val('')
+    //         clonedTr.find(`select[name='tutorial_per_week']`)
+    //             .val('')
+    //         clonedTr.find(`select[name='workshop_per_week']`)
+    //             .val('')
+    //         clonedTr.find(
+    //                 `select[name='is_batch_preference_set']`)
+    //             .val(is_batch_preference_set).trigger('change')
+    //         $('#add-more-facultywork-table tbody').append(
+    //             clonedTr)
+                
+    //             lastTr.find('.faculty-works-select2').select2({dropdownParent:$('#add-facultywork-modal')});
+    //             $('#add-more-facultywork-table tbody tr:last-child .faculty-works-select2').select2({dropdownParent:$('#add-facultywork-modal')});
+
+                
+    //     })
+
+    //     $('#add-more-facultywork-table').on('click',
+    //         '.remove-facultyworkfield',
+    //         function () {
+    //             let trLength = $(
+    //                     '#add-more-facultywork-table tbody tr')
+    //                 .length;
+    //             if (trLength > 1) {
+    //                 $(this).closest('tr').remove()
+    //             } else {
+    //                 alert('Cannot delete this room.')
+    //             }
+    //         })
+
+    //     //Add more rows for Faculty Preference
+    //     $('#add-more-facultyworktimepreferences').on('click', function () {
+    //         console.log('yelo:::')
+    //         let lastTr = $('#facultyworktimepreferencesTable tbody tr:last-child')
+
+    //         lastTr.find('.faculty-pref-select2').select2('destroy');
+    //         let faculty_work_lid = lastTr.find(`select[name="faculty_work_lid"]`).val(); 
+    //         let p_day_lid = lastTr.find(`select[name="p_day_lid"]`).val();
+    //         let start_time_id = lastTr.find(`select[name="start_time_id"]`).val();
+    //         let end_time_id = lastTr.find(`select[name="end_time_id"]`).val();
+
+    //         let clonedTr = lastTr.clone();
+
+    //         clonedTr.find(`select[name="faculty_work_lid"]`).val(faculty_work_lid).trigger('change');
+    //         clonedTr.find(`select[name="p_day_lid"]`).val(p_day_lid).trigger('change');
+    //         clonedTr.find(`select[name="end_time_id"]`).val(end_time_id).trigger('change');
+    //         clonedTr.find(`select[name="start_time_id"]`).val(start_time_id).trigger('change');
+    //         clonedTr.find(`select[name="end_time_id"]`).val(end_time_id).trigger('change');
+    //         $('#facultyworktimepreferencesTable tbody').append(clonedTr);
+    //         lastTr.find('.faculty-pref-select2').select2({dropdownParent:$('#add-facultypreference-modal')})
+    //         $('#facultyworktimepreferencesTable tbody tr:last-child .faculty-pref-select2').select2({dropdownParent:$('#add-facultypreference-modal')})
+    //     })
+
+    //     $('#facultyworktimepreferencesTable').on('click', '.remove-facultyworktimepreference',
+    //         function () {
+    //             let trLength = $('#facultyworktimepreferencesTable tbody tr').length;
+
+    //             if (trLength > 1) {
+    //                 $(this).closest('tr').remove()
+    //             } else {
+    //                 alert('Cannot delete this room.')
+    //             }
+    //         })
+
+    //     //Add more rows for Faculty Batch
+    //     $('#add-more-facultybatch-fields').on('click', function () {
+
+    //         let lastTr = $('#add-more-facultybatch-table tbody tr:last-child')
+
+    //         lastTr.find('.faculty-batch-select2').select2('destroy');
+
+    //         let faculty_lid = lastTr.find(`select[name="faculty_lid"]`).val();
+    //         let batch_id = lastTr.find(`select[name="faculty_batch"]`).val();
+    //         let clonedTr = lastTr.clone();
+    //         clonedTr.find(`select[name="faculty_lid"]`).val(faculty_lid).trigger('change')
+    //         clonedTr.find(`select[name="faculty_batch"]`).val(batch_id).trigger('change')
+
+    //         $('#add-more-facultybatch-table tbody').append(clonedTr)
+          
+    //         $('#add-more-facultybatch-table tbody tr:last-child .faculty-batch-select2').select2();
+    //         lastTr.find('.faculty-batch-select2').select2();
+    //     })
+
+    //     $('#add-more-facultybatch-table').on('click', '.remove-facultybatchfield',
+    //         function () {
+    //             let trLength = $('#add-more-facultybatch-table tbody tr').length;
+
+    //             if (trLength > 1) {
+    //                 $(this).closest('tr').remove()
+    //             } else {
+    //                 alert('Cannot delete this.')
+    //             }
+    //         })
+
+    //     //Add more rows for School timing
+    //      $('#add-more-schoolTiming').on('click', function(){
+         
+    //      if($('.sameForAllDay[data-dis]').attr('data-dis') == 'true'){
+    //          console.log('hello')
+    //          let lastTr = $('#add-more-sameForAllDay-table tbody tr:last-child')
+    //          lastTr.find('.school-timing-select2').select2('destroy');
+    //          let startTime = lastTr.find(`select[name="startTime"]`).val();
+    //          let endTime = lastTr.find(`select[name="endTime"]`).val();
+    //          let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+    //          let clonedTr = lastTr.clone();
+
+    //          lastTr.find('.school-timing-select2').select2();
+
+    //          clonedTr.find('.school-timing-select2').select2();
+
+    //          $('#add-more-sameForAllDay-table tbody').append(clonedTr)
+    //       }
+    //      else if($('.DayWise[data-dis]').attr('data-dis') == 'true'){
+    //          let lastTr = $('#add-more-DayWise-table tbody tr:last-child')
+    //          lastTr.find('.school-timing-select2').select2('destroy');
+    //          let day = lastTr.find(`select[name="day"]`).val();
+    //          let startTime = lastTr.find(`select[name="startTime"]`).val();
+    //          let endTime = lastTr.find(`select[name="endTime"]`).val();
+    //          let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+    //          let clonedTr = lastTr.clone();
+
+    //          lastTr.find('.school-timing-select2').select2();
+
+    //          clonedTr.find('.school-timing-select2').select2();
+
+    //          $('#add-more-DayWise-table tbody').append(clonedTr)
+    //      }
+    //      else if($('.programAndDayWise[data-dis]').attr('data-dis') == 'true'){
+    //          let lastTr = $('#add-more-programAndDayWise-table tbody tr:last-child')
+    //          lastTr.find('.school-timing-select2').select2('destroy');
+    //          let programName = lastTr.find(`select[name="programName"]`).val();
+    //          let day = lastTr.find(`select[name="day"]`).val();
+    //          let startTime = lastTr.find(`select[name="startTime"]`).val();
+    //          let endTime = lastTr.find(`select[name="endTime"]`).val();
+    //          let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+    //          let clonedTr = lastTr.clone();
+
+    //          lastTr.find('.school-timing-select2').select2();
+
+    //          clonedTr.find('.school-timing-select2').select2();
+
+    //          $('#add-more-programAndDayWise-table tbody').append(clonedTr)
+    //      }
+    //      else if($('.programDaySessionWise[data-dis]').attr('data-dis') == 'true'){
+    //          let lastTr = $('#add-more-programDaySessionWise-table tbody tr:last-child')
+    //          lastTr.find('.school-timing-select2').select2('destroy');
+    //          let programName = lastTr.find(`select[name="programName"]`).val();
+    //          let acadSession = lastTr.find(`select[name="acadSession"]`).val();
+    //          let day = lastTr.find(`select[name="day"]`).val();
+    //          let startTime = lastTr.find(`select[name="startTime"]`).val();
+    //          let endTime = lastTr.find(`select[name="endTime"]`).val();
+    //          let schoolTimingType = lastTr.find(`select[name="schoolTimingType"]`).val();
+    //          let clonedTr = lastTr.clone();
+
+    //          lastTr.find('.school-timing-select2').select2();
+
+    //          clonedTr.find('.school-timing-select2').select2();
+
+    //          $('#add-more-programDaySessionWise-table tbody').append(clonedTr)
+    //      }
+    //  })
+
+    //     $(document).on('click', '.remove-schoolTiming',
+    
+    //      function () {
+    //          console.log('delete::');
+    //          let trLength = $('#add-more-sameForAllDay-table tbody tr').length;
+
+    //          if (trLength > 1) {
+    //              $(this).closest('tr').remove()
+    //          } else {
+    //              alert('Cannot delete this.')
+    //          }
+    //      })
+
+    //     $(document).on('click', '.remove-schoolTimingDayWise',
+    //      function () {
+    //          let trLength = $('#add-more-DayWise-table tbody tr').length;
+    //          console.log(trLength)
+    //          if (trLength > 1) {
+    //              $(this).closest('tr').remove()
+    //          } else {
+    //              alert('Cannot delete this.')
+    //          }
+    //      })
+ 
+    //     $(document).on('click', '.remove-schoolTimingProgramWise',
+    //      function () {
+    //          let trLength = $('#add-more-programAndDayWise-table tbody tr').length;
+
+    //          if (trLength > 1) {
+    //              $(this).closest('tr').remove()
+    //          } else {
+    //              alert('Cannot delete this.')
+    //          }
+    //      })
+
+    //     $(document).on('click', '.remove-schoolTimingProgramSessionWise',
+    //         function () {
+    //             let trLength = $('#add-more-programDaySessionWise-table tbody tr').length;
+
+    //             if (trLength > 1) {
+    //                 $(this).closest('tr').remove()
+    //             } else {
+    //                 alert('Cannot delete this.')
+    //             }
+    //         })
+    
+    //     // Display room import
+    //     $('#importRoom').on('click', function() {
+    //         let orgId = $('#open-room-modal #handled_by').val()
+    //         let campusId =  $('#campus_lid').val()
+           
+       
+    //     let roomElems = $('#add-more-room-table tbody tr');
+    //             let roomCount = roomElems.length;
+    //             let roomJson = [];
+    //             roomElems.each(function (index, elem) {
+
+    //                 let roomLid = $(elem).find(`td[data-room-id]`).attr('data-room-id')
+    //                 let startTime = $(elem).find(`select[name='startTime']`).val()
+    //                 let endTime = $(elem).find(`select[name='endTime']`).val()
+    //                 let startDate = $(elem).find(`select[name='startDate']`).val()
+    //                 let endDate = $(elem).find(`select[name='endDate']`).val()
+    //                 let transaction_type_lid = $(elem).find(`select[name='transaction_type_lid']`).val()
+    //                 console.log('roomLid::::::::::>>',roomLid)
+
+
+    //                 if (index < roomCount - 1) {
+    //                     let obj = {
+    //                         room_lid: roomLid,
+    //                         start_time_id: startTime,
+    //                         end_time_id: endTime,
+    //                         start_date_id: startDate,
+    //                         end_date_id: endDate,
+    //                         org_lid: orgId,
+    //                         campus_lid: campusId,
+    //                         transaction_type_lid: transaction_type_lid,
+    //                         user_id:username
+    //                     }
+    //                     roomJson.push(obj)
+    //                 } else {
+    //                     let obj = {
+    //                         room_lid: roomLid,
+    //                         start_time_id: startTime,
+    //                         end_time_id: endTime,
+    //                         start_date_id: startDate,
+    //                         end_date_id: endDate,
+    //                         org_lid: orgId,
+    //                         campus_lid: campusId,
+    //                         transaction_type_lid: transaction_type_lid,
+    //                         user_id:username
+    //                     }
+    //                     roomJson.push(obj)
+    //                 }
+    //             })
+    //             console.log('roomjson:::',roomJson);
+    //             let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/rooms',
+    //             data: {
+    //                 inputJSON: JSON.stringify(roomJson),
+    //                 settingName: 'Room'
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log('response::::::::::',result)
+    //             showSuccess(result)
+    //             // scroll()
+    //             formStepNext()
+    //         }).catch(error => {
+    //             console.log('ERROR::::::::::',error.responseJSON)
+    //             showError(error.responseJSON)
+    //         })
+
+    //         })
+
+    //     //  Program import
+    //     $('#importPrograms').on('click', function() {
+    //     let programElems = $('#add-more-program-table tbody tr');
+    //             let programCount = programElems.length;
+    //             let programJson = [];
+    //             programElems.each(function (index, elem) {
+
+    //                 let programId = $(elem).find('td[data-value]').attr('data-value');
+                   
+    //                 let programType = $(elem).find(`select[name='programType']`).val()
+                
+    //                 if (index < programCount - 1) {
+    //                     let obj = {
+    //                         program_id: programId,
+    //                         program_type: programType,  
+    //                     }
+    //                     programJson.push(obj)
+    //                 } else {
+    //                     let obj = {
+    //                         program_id: programId,
+    //                         program_type: programType,
+    //                     }
+    //                     programJson.push(obj)
+    //                 }
+    //             })
+    //             console.log('roomjason:::',programJson);
+    //             let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/programs/create',
+    //             data: {
+    //                 inputJSON: JSON.stringify(programJson),
+    //                 settingName: 'Program'
+    //             },
+    //             dataType: 'JSON' 
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log('response::::::::::',result)
+    //             showSuccess(result)
+    //             // scroll()
+                
+    //         }).catch(error => {
+    //             console.log('ERROR::::::::::',error.responseJSON)
+    //             showError(error.responseJSON)
+    //         })
+
+    //         })
+
+    //     //importFaculty
+    //     $(".importFaculty").on('click', function () {
+    //         console.log('chelk')
+    //         let facultiesList = $('#selectedList table tbody tr');
+    //         let facultyCount = facultiesList.length; 
+    //         let facultyJson = [];
+    //         facultiesList.each(function (index, elem) {
+    //             let faculty_id = $(elem).find('td[data-faculty-id]').attr("data-faculty-id")
+    //             let faculty_lid = $(elem).find(`td[data-faculty-lid]`).attr('data-faculty-lid')
+    //             let faculty_name = $(elem).find('td[data-faculty-name]').attr("data-faculty-name")
+    //             let faculty_type_lid =  $(elem).find(`select[name="faculty_type_lid"]`).val();
+
+    //             console.log('faculty_type_lid', faculty_type_lid)
+
+    //             if (index < facultyCount - 1) {
+    //                 let obj = {
+    //                     id: faculty_lid,
+    //                     faculty_id: faculty_id,
+    //                     faculty_type_lid: faculty_type_lid
+    //                 }
+    //                 facultyJson.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     id: faculty_lid,
+    //                     faculty_id: faculty_id,
+    //                     faculty_type_lid: faculty_type_lid
+    //                 }
+    //                 facultyJson.push(obj)
+    //             }
+    //         })
+
+    //         console.log('facultyJson::::::::::::>>', facultyJson)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/faculties/create',
+    //             data: {
+    //                 inputJSON: JSON.stringify(facultyJson),
+    //                 settingName: "Faculty"
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log('sucess:::::::::', result)
+    //             showSuccess(result)
+                
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //IMPORT ROOM
+    //     $("#bookRoom").on('click', function () {
+    //         console.log('yello hello')
+
+    //         let roomElems = $('#add-more-room-table tbody tr');
+    //         let roomCount = roomElems.length;
+    //         let roomJson = [];
+    //         let org_lid = $(`#handled_by`).val();
+    //         let campus_lid = $("#campus_lid").val();
+    //         let building_lid = $("#building_lid").attr(`data-building-lid`);
+    //         if(!org_lid){
+    //             org_lid = `<%- locals.organizationId %>`
+    //         }
+    //         roomElems.each(function (index, elem) {
+    //             let room_lid = $(elem).find(`td[data-room-id]`).attr('data-room-id');
+    //             let transaction_type_id = $(elem).find(`select[name='transaction_type_lid']`).val();
+    //             let start_time_id = $(elem).find(`select[name='startTime']`).val();
+    //             let end_time_id = $(elem).find(`select[name='endTime']`).val();
+    //             let start_date_id = $(elem).find(`select[name='startDate']`).val();
+    //             let end_date_id = $(elem).find(`select[name='endDate']`).val();
+                
+    //             if (index < roomCount - 1) {
+    //                 let obj = {
+    //                     room_lid: room_lid,
+    //                     transaction_type_lid: transaction_type_id,
+    //                     start_time_id: start_time_id,
+    //                     end_time_id: end_time_id,
+    //                     start_date_id: start_date_id,
+    //                     end_date_id: end_date_id,
+    //                     org_lid: org_lid,
+    //                     campus_lid: campus_lid,
+    //                     user_id: username
+    //                 }
+    //                 roomJson.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     room_lid: room_lid,
+    //                     transaction_type_lid: transaction_type_id,
+    //                     start_time_id: start_time_id,
+    //                     end_time_id: end_time_id,
+    //                     start_date_id: start_date_id,
+    //                     end_date_id: end_date_id,
+    //                     org_lid: org_lid,
+    //                     campus_lid: campus_lid,
+    //                     user_id: username
+    //                 }
+    //                 roomJson.push(obj)
+    //             }
+    //         })
+
+    //         console.log('roomJson::::::::::::', roomJson)
+
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/rooms/book',
+    //             data: {
+    //                 inputJSON: JSON.stringify(roomJson),
+    //                 settingName: 'Room'
+    //             },
+    //             dataType: 'JSON'
+    //         }
+    //         ajaxApi(ApiObj).then(result => {
+    //             showSuccess(result)
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+      
+    //     //create faculty date time
+    //     $(".createfacultydatetime").on('click', function () {
+    //         let facultyDateTimeElems = $('#add-more-faculty-date-time-table tbody tr');
+    //         let facultyDateTimeCount = facultyDateTimeElems.length;
+    //         let facultyDateTimeJson = [];
+    //         facultyDateTimeElems.each(function (index, elem) {
+    //             let faculty_lid = $(elem).find(`td[data-faculty-lid]`).attr(`data-faculty-lid`)
+    //             let start_date_id = $(elem).find(`td[data-start-date-id]`).attr(`data-start-date-id`);
+    //             let end_date_id = $(elem).find(`td[data-end-date-id]`).attr(`data-end-date-id`);
+    //             let start_time_id = $(elem).find(`td[data-start-time-id]`).attr(`data-start-time-id`);
+    //             let end_time_id = $(elem).find(`td[data-end-time-id]`).attr(`data-end-time-id`);
+    //             if (index < facultyDateTimeCount - 1) {
+    //                 let obj = {
+    //                     faculty_lid: faculty_lid,
+    //                     start_date_id: start_date_id,
+    //                     end_date_id: end_date_id,
+    //                     start_time_id: start_time_id,
+    //                     end_time_id: end_time_id
+    //                 }
+    //                 facultyDateTimeJson.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     faculty_lid: faculty_lid,
+    //                     start_date_id: start_date_id,
+    //                     end_date_id: end_date_id,
+    //                     start_time_id: start_time_id,
+    //                     end_time_id: end_time_id
+    //                 }
+    //                 facultyDateTimeJson.push(obj)
+    //             }
+    //         })
+    //         console.log('facultyDateTimeJson',facultyDateTimeJson)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/faculties/date-time/create',
+    //             data: {
+    //                 inputJSON: JSON.stringify(facultyDateTimeJson),
+    //                 settingName: 'Facultydatetime'
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             showSuccess(result)
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //Create facultyworkload
+    //     $(".createFacultyWorkLoad").on('click', function(){
+    //         console.log('create function calling..')
+    //         let facultyElems = $('#add-more-facultywork-table tbody tr');
+    //         let facultyCount = facultyElems.length;
+    //         let facultyJson = [];
+    //         facultyElems.each(function (index, elem) {
+    //             let faculty_lid = $(elem).find(`select[name='faculty_lid']`).val()
+    //             let program_session_lid = $(elem).find(`select[name='program_session_lid']`).val();
+    //             let module_lid = $(elem).find(`select[name='module_lid']`).val();
+    //             let lecture_per_week = $(elem).find(`input[name='lecture_per_week']`).val();
+    //             let practical_per_week = $(elem).find(`input[name='practical_per_week']`).val();
+    //             let tutorial_per_week = $(elem).find(`input[name='tutorial_per_week']`).val();
+    //             let workshop_per_week = $(elem).find(`input[name='workshop_per_week']`).val();
+    //             let is_batch_preference_set = $(elem).find(`select[name='is_batch_preference_set']`).val();
+
+    //             if (index < facultyCount - 1) {
+    //                 let obj = {
+    //                     faculty_lid: faculty_lid,
+    //                     program_session_lid: program_session_lid,
+    //                     module_lid: module_lid,
+    //                     lecture_per_week: lecture_per_week,
+    //                     practical_per_week: practical_per_week,
+    //                     tutorial_per_week: tutorial_per_week,
+    //                     workshop_per_week: workshop_per_week,
+    //                     is_batch_preference_set: is_batch_preference_set
+    //                 }
+    //                 facultyJson.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     faculty_lid: faculty_lid,
+    //                     program_session_lid: program_session_lid,
+    //                     module_lid: module_lid,
+    //                     lecture_per_week: lecture_per_week,
+    //                     practical_per_week: practical_per_week,
+    //                     tutorial_per_week: tutorial_per_week,
+    //                     workshop_per_week: workshop_per_week,
+    //                     is_batch_preference_set: is_batch_preference_set
+    //                 }
+    //                 facultyJson.push(obj)
+    //             }
+    //         })
+
+    //         console.log('Json::::::::::::',facultyJson)
+
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/faculties/works/create',
+    //             data: {
+    //                 inputJSON: JSON.stringify(facultyJson),
+    //                 settingName: 'Facultyworkload'
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+                
+    //             showSuccess(result)
+
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //create faculty preference
+    //     $(".createFacultyWorkTimePref").on('click', function () {
+    //     let facultyWorkElems = $('#facultyworktimepreferencesTable tbody tr');
+    //     let facultyWorkPrefCount = facultyWorkElems.length;
+    //     let facultyWorkJSON = [];
+    //     facultyWorkElems.each(function (index, elem) {
+    //         let faculty_work_lid = $(elem).find(`select[name="faculty_work_lid"]`).val()
+    //         let p_day_lid = $(elem).find(`select[name="p_day_lid"]`).val();
+    //         let start_time_id = $(elem).find(`select[name="start_time_id"]`).val();
+    //         let end_time_id = $(elem).find(`select[name="end_time_id"]`).val();
+
+    //         if (index < facultyWorkPrefCount - 1) {
+    //             let obj = {
+    //                 faculty_work_lid: faculty_work_lid,
+    //                 p_day_lid: p_day_lid,
+    //                 start_time_id: start_time_id,
+    //                 end_time_id: end_time_id
+    //             }
+    //             facultyWorkJSON.push(obj)
+    //         } else {
+    //             let obj = {
+    //                 faculty_work_lid: faculty_work_lid,
+    //                 p_day_lid: p_day_lid,
+    //                 start_time_id: start_time_id,
+    //                 end_time_id: end_time_id
+    //             }
+    //             facultyWorkJSON.push(obj)
+    //         }
+    //     })
+
+    //     console.log(facultyWorkJSON)
+
+    //     let ApiObj = {
+    //         type: 'POST',
+    //         url: '/admin/workpreferences/create',
+    //         data: { 
+    //             inputJSON: JSON.stringify(facultyWorkJSON),
+    //             settingName: 'Facultypreference'
+    //         },
+    //         dataType: 'JSON'
+    //     }
+
+    //     ajaxApi(ApiObj).then(result => {
+    //         showSuccess(result)
+    //         console.log('eroor:::::::::', result)
+    //         // location.reload()
+    //     }).catch(error => {
+    //         showError(error.responseJSON)
+    //     })
+    // })
+
+        
+    //     //Step form Start
+    //     let currentFormStep = parseInt(`<%- currentFormStep%>`);
+
+    //     $('.step-form .step-form-body .active-form').removeClass('active-form').addClass('d-none');
+
+    //     $(`.step-form .step-form-body .step[data-step=${currentFormStep}]`).removeClass('d-none').addClass('active-form');
+          
+    //     if(currentFormStep){
+    //         scroll();
+    //     }
+
+    //     function formStepNext() {
+    //         currentFormStep++;
+
+    //         $(`.step-form .stages .stage:nth-child(-n + ${currentFormStep-1})`).removeClass('pending').addClass('submitted');
+    //         $(`.step-form .stages .stage:nth-child(${currentFormStep})`).removeClass('pending').addClass('active');
+
+    //         $('.step-form .step-form-body .active-form').removeClass('active-form').addClass('d-none');
+    //         $(`.step-form .step-form-body .step[data-step=${currentFormStep}]`).removeClass('d-none').addClass('active-form');
+    //         console.log(currentFormStep);
+    //     }
+
+    //     function scroll(){
+    //         //SCROLL ON NEXT
+    //         if(currentFormStep == 13){
+    //             let ele = document.querySelector(`.arrow-pointer[data-step="${currentFormStep}"]`)
+    //             ele.scrollIntoView({
+    //             behavior: "smooth",
+    //             inline: 'start'
+    //         })
+    //         }else{
+    //         let ele = document.querySelector(`.arrow-pointer[data-step="${currentFormStep}"]`);
+           
+    //         ele.scrollIntoView({
+    //             behavior: "smooth",
+    //             inline: 'start'
+    //         })
+    //         // $('#errorHtml').html('');
+    //     }
+    // }
+
+    //     //Api for onchange program event
+    //     $('.schoolTimingOptionsContainer').on('change', '.programNameForSession', function() { 
+    //         let program_lid = $(this).val();
+    //             console.log('program_lid', program_lid)
+    //         let apiObj = {
+    //             type:"POST",
+    //             url:"/admin/courseDayRoomPreference/acadSessionList",
+    //             data: {
+    //                 program_lid: program_lid
+    //             },
+    //             dataType:"JSON"
+    //         }
+
+    //         ajaxApi(apiObj).then(result => {
+    //             let acadList = `<select class="form-select sessionForProgram" name="acadSession" id="">`
+    //                 if(result.data.acadSessionList.length > 0){
+    //                     for(let data of result.data.acadSessionList){
+    //                     acadList += `<option value="${data.acad_session_lid}"> ${data.acad_session} </option>` 
+    //                     }
+    //                 }
+    //                 else{
+    //                     acadList += `<option value=""> NO SESSION FOUND <option>`
+    //                 }
+    //                 acadList += `</select>` 
+    //                 $(this).parent().next().html(acadList);
+
+    //             console.log('list:::>>>', $(this).parent().next());
+    //         }).catch(error => console.log('error',error));
+
+    //     })
+
+    //     // NEXT STEP EVENT
+    //     $('#next-step').on('click', function () {
+ 
+    //         // CREATING JSON AND AJAX CALL
+    //         if (currentFormStep == 1) {
+                
+    //             let holidayElems = $('#add-more-holidays-table tbody tr');
+    //             let holidayCount = holidayElems.length;
+    //             let holidayJson = [];
+    //             holidayElems.each(function (index, elem) {
+
+    //                 let calendarId = $(elem).find(`input[name='calendarId']`).val()
+    //                 let calendarYear = $(elem).find(`input[name='calendarYear']`).val()
+    //                 let holidayDate = $(elem).find(`input[name='holidayDate']`).val()
+    //                 let holidayReason = $(elem).find(`input[name='holidayReason']`).val()
+    //                 let holidayType = $(elem).find(`select[name='holidayType']`).val()
+
+    //                 if (index < holidayCount - 1) {
+    //                     let obj = {
+    //                         calendar_id: calendarId,
+    //                         calendar_year: calendarYear,
+    //                         h_date: holidayDate,
+    //                         reason: holidayReason,
+    //                         holiday_type_lid: holidayType
+    //                     }
+    //                     holidayJson.push(obj)
+    //                 } else {
+    //                     let obj = {
+    //                         calendar_id: calendarId,
+    //                         calendar_year: calendarYear,
+    //                         h_date: holidayDate,
+    //                         reason: holidayReason,
+    //                         holiday_type_lid: holidayType
+    //                     }
+    //                     holidayJson.push(obj)  
+    //                 }
+    //             })
+ 
+
+    //             console.log('holidayJson::::::::::::::::::::>>>', holidayJson)
+
+    //             let ApiObj = {
+    //                 type: 'POST',
+    //                 url: '/admin/holidays/create', 
+    //                 data: {
+    //                     inputJSON: JSON.stringify(holidayJson),
+    //                     settingName: 'Holiday'
+    //                 },
+    //                 dataType: 'JSON'
+    //             }
+
+
+    //             ajaxApi(ApiObj).then(result => {
+    //                 console.log('Result:::::::::::', result)
+    //                 showSuccess(result)
+    //                 // scroll()
+                  
+
+    //             }).catch(error => {
+    //                 console.log('error.responseJSON::::::::::::>>>', error.responseJSON)
+    //                 showError(error.responseJSON)
+    //             })
+
+
+    //         } else if(currentFormStep == 4){
+                
+    //             let courseElems = $('#courseWorkloadTable tbody tr');
+    //             let courseCount = courseElems.length;
+    //             let courseJSON = [];
+    //             courseElems.each(function (index, elem) {
+    //             let workloadlid = $(elem).find(`input[name='workloadlid']`).val()
+    //             let intake = $(elem).find(`input[name='intake']`).val()
+    //             let student_per_division = $(elem).find(`input[name='student_per_division']`).val();
+    //             let lecture_count_per_batch = $(elem).find(`input[name='lecture_count_per_batch']`).val();
+    //             let practical_count_per_batch = $(elem).find(`input[name='practical_count_per_batch']`).val();
+    //             let tutorial_count_per_batch = $(elem).find(`input[name='tutorial_count_per_batch']`).val();
+    //             let workshop_count_per_batch = $(elem).find(`input[name='workshop_count_per_batch']`).val();
+    //             let session_events_per_semester = $(elem).find(`input[name='session_events_per_semester']`).val();
+    //             let module_type_lid = $(elem).find(`select[name='module_type_lid']`).val();
+    //             let continuous = $(elem).find(`input[name='continuous']`).val();
+    //             let module_name = $(elem).find(`td[data-module-name]`).attr(`data-module-name`);
+    //             let program_id = $(elem).find(`td[data-program-id]`).attr(`data-program-id`);
+    //             let module_id = $(elem).find(`td[data-module-id]`).attr(`data-module-id`);
+    //             let acad_session_lid =  $(elem).find(`td[data-acad-session-lid]`).attr(`data-acad-session-lid`);
+
+    //             console.log('module_name:::::::::::::::>>>>>',module_name, program_id, module_id, acad_session_lid)
+
+    //             if (index < courseCount - 1) {
+    //                 let obj = {
+    //                     id: workloadlid,
+    //                     intake: intake,
+    //                     student_per_division: student_per_division,
+    //                     lecture_count_per_batch: lecture_count_per_batch,
+    //                     practical_count_per_batch: practical_count_per_batch,
+    //                     tutorial_count_per_batch: tutorial_count_per_batch,
+    //                     workshop_count_per_batch: workshop_count_per_batch,
+    //                     session_events_per_semester: session_events_per_semester,
+    //                     continuous: continuous,
+    //                     module_type_lid:module_type_lid,
+    //                     user_id: username,
+    //                     module_name: module_name,
+    //                     program_id: program_id,
+    //                     module_id: module_id,
+    //                     acad_session_lid: acad_session_lid
+    //                 }
+    //                 courseJSON.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     id: workloadlid,
+    //                     intake: intake,
+    //                     student_per_division: student_per_division,
+    //                     lecture_count_per_batch: lecture_count_per_batch,
+    //                     practical_count_per_batch: practical_count_per_batch,
+    //                     tutorial_count_per_batch: tutorial_count_per_batch,
+    //                     workshop_count_per_batch: workshop_count_per_batch,
+    //                     session_events_per_semester: session_events_per_semester,
+    //                     continuous: continuous,
+    //                     module_type_lid:module_type_lid,
+    //                     user_id: username,
+    //                     module_name: module_name,
+    //                     program_id: program_id,
+    //                     module_id: module_id,
+    //                     acad_session_lid: acad_session_lid
+    //                 }
+    //                 courseJSON.push(obj)
+    //             }
+    //         })
+
+    //         console.log('Json::::::::::::',courseJSON)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/courseworkload/workload/update',
+    //             data: {
+    //                 inputJSON: JSON.stringify(courseJSON),
+    //                 settingName: 'Courseworkload'
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log(result)
+    //             showSuccess(result)
+    //             // scroll()
+    //             formStepNext()
+
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+            
+    //         }else if(currentFormStep == 5){
+                
+    //             console.log('session dates')
+    //             $.ajax({
+    //                 url: 'sessions/dates/create', 
+    //                 method: 'POST',
+    //                 type: 'JSON',
+    //                 data: {
+    //                     // acadSession: $('#program_session_lid').val(),
+    //                     // sessionType: $('#sessionType').val(),
+    //                     // startDate: $('#startDate').val(),
+    //                     // endDate: $('#endDate').val()
+    //                     settingName:"Sessiondates"
+    //                 },
+    //                 success: (data) => {
+    //                     // scroll()
+    //                     showSuccess(data)  
+    //                     // formStepNext()
+    //                 },
+    //                 error: err => {
+    //                     console.log('err::::::::',err)
+    //                     showExpressError(err.responseJSON) 
+    //                 }
+    //             })
+                
+        
+
+    //         }else if(currentFormStep == 6){
+    //             let divElems = $('#add-more-division-table tbody tr');
+    //             let divCount = divElems.length;
+    //             let divJSON = [];
+    //             divElems.each(function (index, elem) {
+    //                 let id = $(elem).find(`input[name='divId']`).val()
+    //                 let count_for_theory_batch = $(elem).find(
+    //                     `input[name='count_for_theory_batch']`).val()
+    //                 let count_for_practical_batch = $(elem).find(
+    //                     `input[name='count_for_practical_batch']`).val();
+    //                 let count_for_tutorial_batch = $(elem).find(
+    //                     `input[name='count_for_tutorial_batch']`).val();
+    //                 let count_for_workshop_batch = $(elem).find(
+    //                     `input[name='count_for_workshop_batch']`).val();
+
+
+    //                 if (index < divCount - 1) {
+    //                     let obj = {
+    //                         id: id,
+    //                         count_for_theory_batch: count_for_theory_batch,
+    //                         count_for_practical_batch: count_for_practical_batch,
+    //                         count_for_tutorial_batch: count_for_tutorial_batch,
+    //                         count_for_workshop_batch: count_for_workshop_batch
+    //                     }
+    //                     divJSON.push(obj)
+    //                 } else {
+    //                     let obj = {
+    //                         id: id,
+    //                         count_for_theory_batch: count_for_theory_batch,
+    //                         count_for_practical_batch: count_for_practical_batch,
+    //                         count_for_tutorial_batch: count_for_tutorial_batch,
+    //                         count_for_workshop_batch: count_for_workshop_batch
+    //                     }
+    //                     divJSON.push(obj) 
+    //                 }
+    //             })
+
+    //             console.log('Json::::::::::::', divJSON)
+    //             let ApiObj = {
+    //                 type: 'POST',
+    //                 url: '/admin/divisions/update',
+    //                 data: {
+    //                     inputJSON: JSON.stringify(divJSON),
+    //                     settingName:"Division"
+    //                 }, 
+    //                 dataType: 'JSON'
+    //             }
+
+    //             ajaxApi(ApiObj).then(result => {
+    //                 console.log(result)
+    //                 showSuccess(result)
+    //                 // scroll()
+    //                 formStepNext()
+    //             }).catch(error => {
+    //                 showError(error.responseJSON)
+    //             })
+    //         }else if(currentFormStep == 7){
+    //             let divbatchElems = $('#add-more-divisionBatches-table tbody tr');
+    //             let batchCount = divbatchElems.length;
+    //             let batchJSON = [];
+    //             divbatchElems.each(function (index, elem) {
+    //                 let id = $(elem).find(`input[name='batch_id']`).val()
+    //                 let faculty_count = $(elem).find(`input[name='faculty_count']`).val()
+    //                 if (index < batchCount - 1) {
+    //                     let obj = {
+    //                         id: id,
+    //                         faculty_count: faculty_count,
+    //                     }
+    //                     batchJSON.push(obj)
+    //                 } else {
+    //                     let obj = {
+    //                         id: id,
+    //                         faculty_count: faculty_count,
+    //                     }
+    //                     batchJSON.push(obj)
+    //                 }
+    //             })
+
+    //             //Ajax Call
+    //             console.log('JSON::::::::', batchJSON) 
+    //             let ApiObj = {
+    //                 type: 'POST',
+    //                 url: '/admin/divisions/batches/update',
+    //                 data: {
+    //                     inputJSON: JSON.stringify(batchJSON),
+    //                     settingName: 'Divisionbatches'
+    //                 },
+    //                 dataType: 'JSON'
+    //             }
+
+    //             ajaxApi(ApiObj).then(result => {
+    //                 console.log(result)
+    //                 showSuccess(result)
+    //                 // scroll()
+    //                 // formStepNext()
+
+    //             }).catch(error => {
+    //                 showError(error.responseJSON)
+    //             })
+    //         }else if(currentFormStep == 8){
+                
+    //             console.log('school timing')
+    //             $.ajax({
+    //                 url: '/admin/schooltiming', 
+    //                 method: 'POST',
+    //                 type: 'JSON',
+    //                 data: {
+    //                     // acadSession: $('#program_session_lid').val(),
+    //                     // sessionType: $('#sessionType').val(),
+    //                     // startDate: $('#startDate').val(),
+    //                     // endDate: $('#endDate').val()
+    //                     settingName:"schooltiming"
+    //                 },
+    //                 success: (data) => {
+    //                     showSuccess(data)
+    //                     // scroll()
+    //                     formStepNext()
+    //                     // location.reload();
+    //                 },
+    //                 error: err => {
+    //                     console.log('err::::::::',err)
+    //                     showError(err.responseJSON)  
+    //                 }
+    //             })
+                
+        
+
+    //         }else if(currentFormStep == 13){
+    //                 let facultyBatchElems = $('#add-more-facultybatch-table tbody tr');
+    //                 let facultyBatchCount = facultyBatchElems.length;
+    //                 let facultyBatchJson = [];
+    //                 facultyBatchElems.each(function (index, elem) {
+    //                     let faculty_lid = $(elem).find(`select[name="faculty_lid"]`).val()
+    //                     let faculty_batch = $(elem).find(`select[name="faculty_batch"]`).val();
+
+    //                     if (index < facultyBatchCount - 1) {
+    //                         let obj = {
+    //                             faculty_lid: faculty_lid,
+    //                             batch_lid:faculty_batch
+    //                         }
+    //                         facultyBatchJson.push(obj)
+    //                     } else {
+    //                         let obj = { 
+    //                             faculty_lid: faculty_lid,
+    //                             batch_lid:faculty_batch
+    //                         }
+    //                         facultyBatchJson.push(obj)
+    //                     }
+    //                 })
+    //                 console.log('batches:::::', facultyBatchJson)
+
+    //                 let ApiObj = {
+    //                         type: 'POST',
+    //                         url: '/admin/faculties/batch/create',
+    //                         data: {
+    //                             inputJSON: JSON.stringify(facultyBatchJson), 
+    //                             settingName: 'Facultybatch'
+    //                         },
+    //                         dataType: 'JSON'
+    //                     }
+
+    //                     ajaxApi(ApiObj).then(result => {
+    //                         console.log(result)
+    //                         showSuccess(result)
+    //                     //    location.reload();
+                         
+                         
+
+    //                     }).catch(error => {
+    //                         showError(error.responseJSON)
+    //                     })
+    //                         }
+            
+                    
+    //         })
+
+    //     //Getting campus Bulding List
+    //     $("#campus_lid").on('change', function () {
+    //         let campus_lid = $(this).val()
+    //         let ApiObj = {
+    //             url: '/management/rooms/buildinglist',
+    //             type: 'POST',
+    //             data: {
+    //                 campus_lid: campus_lid
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             let buildingList =
+    //                 `<select class="form-select" name="campus_lid" id="campus_lid">`;
+
+    //             if (result.data.length > 0) {
+    //                 buildingList +=
+    //                     `<option disabled selected value="">--Select Building--</option>`;
+    //                 result.data.forEach(element => {
+    //                     buildingList += `<option value="${element.id}">
+    //                             ${element.building_name}
+    //                         </option>`
+    //                 });
+    //             } else {
+    //                 buildingList += `<option value="">
+    //                                     No Building Found!
+    //                                 </option>`
+    //             }
+    //             buildingList += `</select>`;
+    //             $("#building_lid").html(buildingList).trigger('change')
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //GET ROOM BY BUILDING ID
+    //     $("#building_lid").on('change', function(){
+    //       let   building_lid  = $(this).val()
+    //       let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/rooms/booking/getroomsbybuildingid',// building router
+    //             data: {
+    //                 building_lid: building_lid
+    //             },
+    //             dataType: 'JSON'
+    //         }
+    //         ajaxApi(ApiObj).then(result => {
+    //             let roomList = ``;
+    //             let labelhtml = ``;
+    //             if (result.roomList.length > 0) {
+    //                 result.roomList.forEach(element => {
+    //                     roomList +=`<li class="list-group-item my-1 border-top" data-clickable="true" data-room-id="${element.id}">${element.room_number}</li>`;
+    //                 });
+
+    //                 $("#open-transaction-modal  .room-list-container").html(`Available Rooms`);
+    //             } else {
+    //                 roomList += `<li>No Rooms Found!</li>`;
+    //             }
+               
+    //             $("#open-transaction-modal  .selectRoomList").html(roomList);
+               
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //Fetch course workload form SAP
+    //     $(".fetchFromSAP").on('click', function () {
+    //         let acadYear = $("#acadYear").val()
+    //         let programLid = $("#programLid").val()
+    //         let acadSessionLid = $("#acadSessionLid").val()
+    //         console.log('Cllicke', acadYear, programLid, acadSessionLid)
+    //         let ApiObj = {
+    //             url: '/admin/courseworkload',
+    //             type: 'POST',
+    //             data: {
+    //                 acadYear: acadYear,
+    //                 programLid: programLid,
+    //                 acadSessionLid: acadSessionLid
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log('Response ::::::::::::::::::::::', result.data)
+    //         }).catch(error => {
+    //             console.log('Error ::::::::::::::::::::::', error)
+    //         })
+    //     })
+
+    //     //SaveAll course workload
+    //     $(".SaveAllCourse").on('click', function () {
+    //         console.log('hello')
+    //         let courseElems = $('#courseWorkloadTable tbody tr');
+    //         let courseCount = courseElems.length;
+    //         let courseJSON = [];
+    //         courseElems.each(function (index, elem) { 
+    //             let workloadlid = $(elem).find(`input[name='workloadlid']`).val()
+    //             let intake = $(elem).find(`input[name='intake']`).val()
+    //             let student_per_division = $(elem).find(`input[name='student_per_division']`).val();
+    //             let lecture_count_per_batch = $(elem).find(`input[name='lecture_count_per_batch']`).val();
+    //             let practical_count_per_batch = $(elem).find(`input[name='practical_count_per_batch']`).val();
+    //             let tutorial_count_per_batch = $(elem).find(`input[name='tutorial_count_per_batch']`).val();
+    //             let workshop_count_per_batch = $(elem).find(`input[name='workshop_count_per_batch']`).val();
+    //             let session_events_per_semester = $(elem).find(`input[name='session_events_per_semester']`).val();
+    //             let module_type_lid = $(elem).find(`select[name='module_type_lid']`).val();
+    //             let continuous = $(elem).find(`input[name='continuous']`).val();
+    //             let module_name = $(elem).find(`td[data-module-name]`).attr(`data-module-name`);
+    //             let program_id = $(elem).find(`td[data-program-id]`).attr(`data-program-id`);
+    //             let module_id = $(elem).find(`td[data-module-id]`).attr(`data-module-id`);
+    //             let acad_session_lid =  $(elem).find(`td[data-acad-session-lid]`).attr(`data-acad-session-lid`);
+
+    //             console.log('module_name:::::::::::::::>>>>>',module_name, program_id, module_id, acad_session_lid)
+
+    //             if (index < courseCount - 1) {
+    //                 let obj = {
+    //                     id: workloadlid,
+    //                     intake: intake,
+    //                     student_per_division: student_per_division,
+    //                     lecture_count_per_batch: lecture_count_per_batch,
+    //                     practical_count_per_batch: practical_count_per_batch,
+    //                     tutorial_count_per_batch: tutorial_count_per_batch,
+    //                     workshop_count_per_batch: workshop_count_per_batch,
+    //                     session_events_per_semester: session_events_per_semester,
+    //                     continuous: continuous,
+    //                     module_type_lid:module_type_lid,
+    //                     user_id: username,
+    //                     module_name: module_name,
+    //                     program_id: program_id,
+    //                     module_id: module_id,
+    //                     acad_session_lid: acad_session_lid
+    //                 }
+    //                 courseJSON.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     id: workloadlid,
+    //                     intake: intake,
+    //                     student_per_division: student_per_division,
+    //                     lecture_count_per_batch: lecture_count_per_batch,
+    //                     practical_count_per_batch: practical_count_per_batch,
+    //                     tutorial_count_per_batch: tutorial_count_per_batch,
+    //                     workshop_count_per_batch: workshop_count_per_batch,
+    //                     session_events_per_semester: session_events_per_semester,
+    //                     continuous: continuous,
+    //                     module_type_lid:module_type_lid,
+    //                     user_id: username,
+    //                     module_name: module_name,
+    //                     program_id: program_id,
+    //                     module_id: module_id,
+    //                     acad_session_lid: acad_session_lid
+    //                 }
+    //                 courseJSON.push(obj)
+    //             }
+    //         })
+
+    //         console.log('Json::::::::::::',courseJSON)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/courseworkload/workload/update',
+    //             data: {
+    //                 inputJSON: JSON.stringify(courseJSON)
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log(result)
+    //             showSuccess(result) 
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //SaveAll Divisions
+    //     $(".saveDivision").on('click', function () {
+    //         console.log('saveDivision::::::::::>>>')
+    //         let divElems = $('#add-more-division-table tbody tr');
+    //         let divCount = divElems.length;
+    //         let divJSON = [];
+    //         divElems.each(function (index, elem) {
+    //             let id = $(elem).find(`input[name='divId']`).val()
+    //             let count_for_theory_batch = $(elem).find(
+    //                 `input[name='count_for_theory_batch']`).val()
+    //             let count_for_practical_batch = $(elem).find( 
+    //                 `input[name='count_for_practical_batch']`).val();
+    //             let count_for_tutorial_batch = $(elem).find(
+    //                 `input[name='count_for_tutorial_batch']`).val();
+    //             let count_for_workshop_batch = $(elem).find(
+    //                 `input[name='count_for_workshop_batch']`).val();
+
+
+    //             if (index < divCount - 1) {
+    //                 let obj = {
+    //                     id: id,
+    //                     count_for_theory_batch: count_for_theory_batch,
+    //                     count_for_practical_batch: count_for_practical_batch,
+    //                     count_for_tutorial_batch: count_for_tutorial_batch,
+    //                     count_for_workshop_batch: count_for_workshop_batch
+    //                 }
+    //                 divJSON.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     id: id,
+    //                     count_for_theory_batch: count_for_theory_batch,
+    //                     count_for_practical_batch: count_for_practical_batch,
+    //                     count_for_tutorial_batch: count_for_tutorial_batch,
+    //                     count_for_workshop_batch: count_for_workshop_batch
+    //                 }
+    //                 divJSON.push(obj) 
+    //             }
+    //         })
+
+    //         console.log('Json::::::::::::', divJSON)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/divisions/update',
+    //             data: {
+    //                 inputJSON: JSON.stringify(divJSON)
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log(result)
+    //             showSuccess(result)
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //SaveAll DivisionBatches
+    //     $(".saveDivisionBatch").on('click', function () {
+    //         let divbatchElems = $('#add-more-divisionBatches-table tbody tr');
+    //         let batchCount = divbatchElems.length;
+    //         let batchJSON = [];
+    //         divbatchElems.each(function (index, elem) {
+    //             let id = $(elem).find(`input[name='batch_id']`).val()
+    //             let faculty_count = $(elem).find(`input[name='faculty_count']`).val()
+    //             if (index < batchCount - 1) {
+    //                 let obj = {
+    //                     id: id,
+    //                     faculty_count: faculty_count,
+    //                 }
+    //                 batchJSON.push(obj)
+    //             } else {
+    //                 let obj = {
+    //                     id: id,
+    //                     faculty_count: faculty_count,
+    //                 }
+    //                 batchJSON.push(obj)
+    //             }
+    //         })
+
+    //         //Ajax Call
+    //         console.log('JSON::::::::', batchJSON)
+    //         let ApiObj = {
+    //             type: 'POST',
+    //             url: '/admin/divisions/batches/update',
+    //             data: {
+    //                 inputJSON: JSON.stringify(batchJSON)
+    //             },
+    //             dataType: 'JSON'
+    //         }
+
+    //         ajaxApi(ApiObj).then(result => {
+    //             console.log(result)
+    //             showSuccess(result)
+
+    //         }).catch(error => {
+    //             showError(error.responseJSON)
+    //         })
+    //     })
+
+    //     //slot time from faculty on change API
+    //     $(".faculty-drop-down").on('change',function(){
+    //         let facultyid = $(this).val()
+    //         let ApiObj = {
+    //         type: 'POST',
+    //         url: '/admin/faculties/date-time/getslottime',
+    //         data: {
+    //             facultyid: facultyid
+    //         },
+    //         dataType: 'JSON'
+    //     }
+
+    //     ajaxApi(ApiObj).then(result => {
+    //         let startTime = ``;
+    //             let endTime = ``;
+    //             if (result.result.length > 0) {
+    //                 //startTime += `<option disabled selected value="">--Select Time--</option>`;
+    //                 //endTime += `<option disabled selected value="">--Select Time--</option>`;
+
+    //                 result.result.forEach(element => {
+    //                     startTime +=
+    //                         `<option value="${element.id}">${element.start_time}</option>`;
+    //                     endTime +=
+    //                         `<option value="${element.id}">${element.end_time}</option>`;
+    //                 });
+    //                 $('.add-faculty-date-time').removeAttr('disabled')
+    //             } else {
+    //                 startTime += `<option value="">No Slot Found!</option>`;
+    //                 endTime += `<option value="">No Slot Found!</option>`;
+    //                 $('.add-faculty-date-time').attr('disabled','disabled')
+    //             }
+    //             $("#add-facultydatetime-modal  #start_time_id").html(startTime);
+    //             $("#add-facultydatetime-modal  #end_time_id").html(endTime);
+          
+    //     }).catch(error => {
+    //         showError(error.responseJSON)
+    //     })
+    //     })
+
+    //     function showError(errors) {
+            
+    //         console.log(errors);
+    //         let simpleAlert = new SimpleAlert();
+    //         let obj = {
+    //             title : errors.description,
+    //             message: errors.data,
+    //             type: 'alert-danger',
+    //             buttons: {
+    //                 positive:{
+    //                     text: "Okay",
+    //                     action: function(){
+    //                         document.querySelector('.simple-alert').remove();
+    //                     }
+    //                 },
+    //                 negative: {
+    //                     text: "Cancel",
+    //                     action: function () {
+    //                     alert('Negative')
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         simpleAlert.alert(obj);
+    //     }
+
+    //     function showSuccess(errors) {
+        
+    //         console.log(errors);
+    //         let simpleAlert = new SimpleAlert();
+    //         let obj = {
+    //             title : errors.description,
+    //             message: "",
+    //             type: 'alert-success',
+    //             buttons: {
+    //                 positive:{
+    //                     text: "Okay",
+    //                     action: function(){
+    //                         document.querySelector('.simple-alert').remove();
+    //                     }
+    //                 },
+    //                 negative: {
+    //                     text: "Cancel",
+    //                     action: function () {
+    //                     alert('Negative')
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         simpleAlert.alert(obj);
+    //     }
+
+    //     function showExpressError(errors){
+    //         let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    //                 <h3>Error</h3>`;
+    //             errorHtml += `<ul>`;
+    //             // errors.errors.map(er => {
+    //             //     errorHtml +=
+    //             //         `<li>${er.msg}</li>`
+    //             // })
+
+    //             errorHtml +=
+    //                 `</ul><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+    //                 $(".error-html").html(errorHtml)
+    //                 $("#errorHtml").html(errorHtml)
+    //     }
+
+    })
+</script>
+
+<!-- PAGE LEVEL JS END -->
+<%- include('../partials/footerEnd') %>

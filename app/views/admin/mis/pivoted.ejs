@@ -1,0 +1,281 @@
+<%- include("../partials/head") %>
+<style>
+    table {
+        width: 100%;
+  text-align: left;
+  position: relative;
+  border-collapse: collapse; 
+  background-color: #f6f6f6;
+}/* Spacing */
+td, th {
+  border: 1px solid #999;
+  padding: 20px;
+}
+th {
+  background: brown;
+  color: white;
+  border-radius: 0;
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  
+}
+
+.brown{
+  background: brown;
+  color: white;
+}
+.primary{
+  background-color: #000000
+}
+
+tfoot > tr  {
+  background: black;
+  color: white;
+}
+/* tbody > tr:hover {
+  background-color: #ffc107;
+} */
+</style>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="row my-3 gx-3 gy-3 row1-data">
+
+<div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/faculties/date-time">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/shared-folder.png" alt="">
+                        <p class="fw-normal pt-1">ALLOCATED EVENT</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a href="/admin/faculties/works">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/task.png" alt="">
+                        <p class="fw-normal pt-1">PENDING EVENT</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <a  href="/admin/mis/simulation-chart/pivoted">
+                <div class="card row1-data-card text-center">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <img src="/icon_imgs/bar-chart.png" alt="">
+                        <p class="fw-normal pt-1">TIME TABLE PIVOTED</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+                <h5>Division Wise Faculty</h5>
+
+        </div>
+
+        <div class="card-body">
+           
+        <table>
+  <!-- <caption>A summary of top sites with both paid and free course</caption> -->
+  <thead>
+    <tr>
+      <th scope="col">Start Time - End Time</th>
+      <th scope="col">Monday</th>
+      <th scope="col">Tuesday</th>
+      <th scope="col">Wednesday</th>
+      <th scope="col">Thursday</th>
+      <th scope="col">Friday</th>
+      <th scope="col">Saturday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%for(let fdt of timetableSheet){%>
+    <tr>
+      <td><%-fdt.start_time%> - <%-fdt.start_time%></td>
+      <td class="<%- fdt.Monday == 'NA' ? '' : 'brown'%>"><%-fdt.Monday%></td>
+      <td class="<%- fdt.Tuesday == 'NA' ? '' : 'brown'%>"><%-fdt.Tuesday%></td>
+      <td class="<%- fdt.Wednesday == 'NA' ? '' : 'brown'%>"><%-fdt.Wednesday%></td>
+      <td class="<%- fdt.Thursday == 'NA' ? '' : 'brown'%>"><%-fdt.Thursday%></td>
+      <td class="<%- fdt.Friday == 'NA' ? '' : 'brown'%>"><%-fdt.Friday%></td>
+      <td class="<%- fdt.Saturday == 'NA' ? '' : 'brown'%>"><%-fdt.Saturday%></td>
+    </tr>
+    <%}%>
+  </tbody>
+</table>
+        </div>
+    </div>
+</div>
+
+      <!-- <table>
+  <caption>A summary of top sites with both paid and free course</caption>
+  <thead>
+    <tr>
+      <th class="primary" scope="col">Websites</th>
+      <th scope="col">Certification</th>
+      <th scope="col">Tuition</th>
+      <th scope="col">Top Courses</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Freecode Camp</th>
+      <td>Yes</td>
+      <td>Free</td>
+      <td>Web Development and Design</td>
+    </tr>
+    <tr>
+      <th scope="row">Udemy</th>
+      <td>Yes</td>
+      <td>Paid</td>
+      <td>Python and Machine Learning</td>
+    </tr>
+    <tr>
+      <th scope="row">Coursera</th>
+      <td>Yes</td>
+      <td>Free and Paid</td>
+      <td>IoT and AI</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>Total Courses</th>
+      <td colspan="4"><i>What are you waiting for? Get Started now for free</i></td>
+    </tr>
+  </tfoot>
+</table> -->
+
+
+
+<%- include("../partials/notification") %>
+<%- include("../partials/footer") %>
+
+<script src="/js/leftsidebartoggle.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({
+        dropdownParent: $('#open-faculty-modal')});
+
+        $("#timetablepivoted").on('click',function(){
+            console.log('timetablepivoted::::::::::')
+            $("#pivotableSheet").modal('show')
+        })
+      
+   
+
+
+
+
+        function showSuccess(errors) {
+
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+        function showAjaxTable(facultiesList) {
+            let AjaxTable = `<table class="table custom_row" id="facultyTable">
+                <thead>
+                    <th>Sr.No.</th>
+                    <th>Faculty Id</th>
+                    <th>Faculty Name</th>
+                    <th>Faculty Type</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+            if (facultiesList.length > 0) {
+                let count = 1;
+                for (faculty of facultiesList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>${count++}</td>
+                        <td data-faculty-id="${faculty.faculty_id}">${faculty.faculty_id}</td>
+                        <td>${faculty.faculty_name}</td>
+                        <td>${faculty.faculty_type}</td>
+                        <td><a class="edit-faculty" data-faculty-id="${faculty.id}"><i class="fa fa-edit text-success"></i></a>
+                            <a class="delete-faculty" data-faculty-id="${faculty.id}"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#facultyTable").html(AjaxTable);
+
+        }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

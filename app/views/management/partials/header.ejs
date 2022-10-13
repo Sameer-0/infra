@@ -1,0 +1,32 @@
+<main class="main">
+    <!-- NAVBAR -->
+    <header>
+        <nav class="top-navbar d-flex justify-content-xl-end justify-content-between align-items-center">
+            <a href="/management/dashboard"><img src="/image/logo-nmims.png" alt="NMIMS LOGO" class="nmims-logo-smalldevices me-auto"></a>
+            <div class="navbar-logo d-none me-auto">
+                <a href="/management/dashboard"> <img src="/image/logo-nmims.png" class="nmims-logo"> </a>
+             </div>
+            <button class="me-auto left-sidebar-toggle" style="border: none; outline: none; background-color: white;"><i class="fa-solid fa-angles-left"></i></button>
+            <ul class="top-navbar__list">
+                
+                <li style="color: #fc6964; font-weight: bold;"><img src="/icons/management.png" class="ps-3 pe-2">Management</li>
+
+                <li><a href="" class="text-dark"><img src="/icons/notification.png" alt=""> Notification</a></li>
+                <li><a onclick="toggle_full_screen()" style="cursor: pointer;"><img src="/icons/expand.png" alt=""></a></li>
+
+                <div class="btn-group">
+                    <button class="btn btn-white dropdown-toggle" type="button" id="defaultDropdown" 
+                    data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+                    <img src="/icons/user.png" alt=""> Hi! <%- locals.firstName %>
+                    </button>
+                    <ul class="dropdown-menu userprofile-dropdown-menu" aria-labelledby="defaultDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog"></i> Settings</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle"></i> Manage account</a></li>
+                        <li><a class="dropdown-item" href="/user/logout"><i class="fas fa-sign-out-alt"></i> Signout</a></li>
+                    </ul>
+                </div>
+            </ul>
+            <div class="hamburger-smalldevices"><img src="/icons/HamburgerIcon.png" alt="" width="24px" height="20px">
+            </div>
+        </nav>
+    </header>

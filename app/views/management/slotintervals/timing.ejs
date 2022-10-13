@@ -1,0 +1,288 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>SLOT Timing</h5>
+
+            <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                data-bs-target="#add-slot-setting-modal">
+                <i class="fas fa-plus"></i></button>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row" id="slotTimingTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let list of slotTiming) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- list.slot_name %>
+                        </td>
+
+                        <td>
+                            <%- list.start_time %>
+                        </td>
+                        <td>
+                            <%- list.end_time %>
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-slot-timing"
+                                data-slot-timing-id="<%- list.id %>"></i>
+                            <i data-slot-timing-id="<%- list.id %>"
+                                class="fas fa-trash-alt text-danger delete-slot-timing"></i>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+
+<!-- ADD NEW CAMPUS MODAL -->
+<div class="modal fade" id="add-slot-setting-modal" tabindex="-1" role="dialog" aria-labelledby="add-slot-setting-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header bg-info modal-inputform-header">
+                <h5 class="modal-title text-white" id="add-slot-setting-modal-title">Add Slot Setting
+                </h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="form-row mt-4">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="slot_name" id="slot_name" class="form-control" placeholder="Enter Name" required>
+                    <input type="hidden" name="timingId" id="timingId" class="form-control" placeholder="Enter Name"
+                        required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <label class="form-label">Start Date</label>
+                    <input type="time"  name="start_time" id="start_time" class="form-control"
+                        placeholder="Enter Start Time" required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <label class="form-label">End Time</label>
+                    <input type="time"  name="end_time" id="end_time" class="form-control" placeholder="Enter End Time"
+                        required>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn modal-inputform-btn createSlotTiming ">Create</button>
+                <button type="button" class="btn modal-inputform-btn updateSlotTiming  d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    
+    $('.createSlotTiming').on('click', function () {
+        $.ajax({
+            url: '/management/slotinterval/timing/create',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                slotName: $("#slot_name").val(),
+                startTime: $("#start_time").val(),
+                endTime: $("#end_time").val(),
+            },
+            success: data => {
+                console.log('Success: ', data)
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+    $('#slotTimingTable').on('click', '.edit-slot-timing', function () {
+        $(".updateSlotTiming").removeClass('d-none')
+        $(".createSlotTiming").addClass('d-none')
+        $("#add-slot-setting-modal-title").html('Update Slot Timimg')
+
+        console.log($(this).attr('data-slot-timing-id'))
+        $.ajax({
+            url: '/management/slotinterval/timing/findone',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                Id: $(this).attr('data-slot-timing-id')
+            },
+            success: data => {
+                let obj = data.data;
+                console.log(obj)
+                $("#slot_name").val(obj.slot_name)
+                $("#start_time").val(obj.start_time)
+                $("#end_time").val(obj.end_time)
+                $("#timingId").val(obj.id)
+                $("#add-slot-setting-modal").modal('show')
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+    $('.updateSlotTiming').on('click', function () {
+        $.ajax({
+            url: '/management/slotinterval/timing/update',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                id: $("#timingId").val(),
+                slotName: $("#slot_name").val(),
+                startTime: $("#start_time").val(),
+                endTime: $("#end_time").val()
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+
+    $('#slotTimingTable').on('click', '.delete-slot-timing', function () {
+        $.ajax({
+            url: '/management/slotinterval/timing/delete',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                Id: $(this).attr('data-slot-timing-id')
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+
+    //search feature delay function is writter in script.js file which is located in public/js/script.js
+    $('#searchkeyword').on('input', delay(function (e) {
+        let keyword = $("#searchkeyword").val()
+        $.ajax({
+            type: "POST",
+            url: '/management/slotinterval/timing/search',
+            data: {
+                keyword: keyword
+            },
+            success: function (data) {
+                let timingList = data.data;
+
+                console.log(timingList)
+
+                let AjaxTable = `<table class="table custom_row" id="slotTimingTable">
+                    <thead>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+                if (timingList.length > 0) {
+                    let count = 1;
+                    for (list of timingList) {
+                        AjaxTable +=
+                            `<tr>
+                        <td>
+                            ${count++}
+                        </td>
+                        <td>
+                            ${list.slot_name}
+                        </td>
+
+                        <td>
+                            ${list.start_time}
+                        </td>
+                        <td>
+                            ${list.end_time}
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-slot-timing"
+                                data-slot-timing-id="${list.id}"></i>
+                            <i data-slot-timing-id="${list.id}"
+                                class="fas fa-trash-alt text-danger delete-slot-timing"></i>
+                        </td>
+                    </tr>`;
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="5">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#slotTimingTable").html(AjaxTable);
+            }
+        })
+    }, 500));
+
+
+</script>
+<%- include("../partials/footerEnd") %></table>

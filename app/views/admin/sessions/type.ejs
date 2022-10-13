@@ -1,0 +1,401 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    
+    <%- include("../partials/session-menu")%>
+      <!--DASHBOARD CONTENT START-->
+  
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>SESSION TYPE</h5>
+            </div>
+            <div>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-session-modal">
+                    <i class="fas fa-plus"></i></button>
+                <button class="btn ms-auto select-delete-session-type add-btn "><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container d-flex"><button type="button"><i class="fas fa-search"></i> </button>                        
+                <input type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row table-bordered" id="sessionTypeTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                    <th>All <input type="checkbox" class="selectAll-Session-Types"></th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let session of sessionList) { %> 
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- session.name %></td>
+                        <td><%- session.description %></td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-session"
+                                data-session-type-id="<%- session.id %>"></i>
+                        </td>
+                        <td>
+                            <input type="checkbox" data-session-type-id="<%- session.id %>" class="delete-session-type">
+                        </td>
+                    </tr>
+
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+<!--ADD Modal -->
+<div class="modal fade" id="add-session-modal" tabindex="-1" aria-labelledby="add-session-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-session-modal-title">ADD SESSION TYPE</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="mb-3">
+                    <label for="sessionName" class="form-label">Enter Session Name</label>
+                    <input type="text" class="form-control" id="sessionName" placeholder="Enter Name">
+                    <input type="hidden" id="Id">
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Enter Description Name</label>
+                    <input type="text" class="form-control" id="description" placeholder="Enter Description">
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <span class="errorMsg"></span>
+                    <button type="submit" class="btn  createSessionType modal-inputform-btn">Create Session</button>
+                    <button type="submit" class="btn  updateSessionType modal-inputform-btn d-none">Update Session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <%- include("../partials/footer") %>
+    
+    <script>
+        $(document).ready(function () {
+
+            $('.createSessionType').on('click', function () {
+                $.ajax({
+                    url: '/admin/sessions/types/create',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        name: $('#sessionName').val(),
+                        description: $('#description').val(),
+                    },
+                    success: (data) => {
+                        console.log('ejsdata', data)
+                        
+                        showExpressSuccess(data)
+                    },
+                    error: err => {
+                        console.log('err::::::::>><<<',err)
+                        showExpressError(err.responseJSON)
+                    }
+                })
+            })
+
+            //EDIT PROGRAM TYPE
+            $("#sessionTypeTable").on('click', '.edit-session', function () {
+                $(".createSessionType").addClass('d-none')
+                $(".updateSessionType").removeClass('d-none')
+                $("#add-session-modal-title").html('UPDATE SESSION TYPE')
+
+                $.ajax({
+                    url: '/admin/sessions/types/findone',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        id: $(this).attr('data-session-type-id')
+                    },
+                    success: data => {
+                        console.log(data)
+                        let Sessionobj = data.SessionData;
+                        console.log('Sessionobj',Sessionobj)
+                        $('#sessionName').val(Sessionobj.name)
+                        $('#description').val(Sessionobj.description)
+                        $('#Id').val(Sessionobj.id)
+                        $("#add-session-modal").modal('show')
+                        
+                    },
+                    error: err => {
+                        showExpressError(err.responseJSON)
+                    }
+                })
+            })
+
+            //Select All campus
+            $("#sessionTypeTable").on('click', '.selectAll-Session-Types', function () {
+                if (this.checked) {
+                    // Iterate each checkbox
+                    $('.delete-session-type:checkbox').each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    $('.delete-session-type:checkbox').each(function () {
+                        this.checked = false;
+                    });
+                }
+            })
+
+
+            // UPDATE PROGRAM TYPE
+            $(".updateSessionType").on('click', function () {
+                $.ajax({
+                    url: '/admin/sessions/types/update',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        id: $("#Id").val(),
+                        name: $('#sessionName').val(),
+                        description: $('#description').val()
+                    },
+                    success: (data) => {
+                        if (data.status == 200) {
+                            // location.reload()
+                            showExpressSuccess(data);
+                        } else {
+                            $(".errorMsg").html(data.message)
+                        }
+                    },
+                    error: err => {
+                        showExpressError(err.responseJSON)
+                    }
+                })
+            })
+
+
+            //Delete Single and mutiple Delete
+            $('.select-delete-session-type').on('click', function () {
+                let deleteids = []
+                $('.delete-session-type:checked').each(function () {
+                    let obj = {
+                        id: $(this).attr("data-session-type-id"),
+                    }
+                    deleteids.push(obj) 
+                })
+
+                if (deleteids.length > 0) {
+
+                    let ApiObj = {
+                        url: '/admin/sessions/types/delete',
+                        type: 'POST',
+                        data: {
+                            Ids: JSON.stringify(deleteids)
+                        },
+                        dataType: 'JSON'
+                    }
+                    ajaxApi(ApiObj).then(result => {
+             
+                        showExpressSuccess(result)
+                    }).catch(error => {
+                        showExpressError(error.responseJSON)
+                    })
+                } else {
+                    alert('Select Fields')
+                }
+            })
+
+
+            // SEARCH PROGRAM TYPE
+            $('#searchkeyword').on('input', delay(function (e) {
+                let keyword = $("#searchkeyword").val()
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/sessions/types/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: 1
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                    }
+                })
+            }, 500));
+
+               //Search With Pagination
+              $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/sessions/types/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                    }
+                })
+            })
+
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/admin/sessions/types/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    console.log('data',data)
+                    AjaxtTable(data.data) 
+                }
+            })
+        });
+
+
+
+            function AjaxtTable(programTypeList) {
+                let AjaxTable = `<table class="table custom_row table-bordered" id="sessionTypeTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                    <th>All <input type="checkbox" class="selectAll-Session-Types"></th>
+                </thead>`;
+                if (programTypeList.length > 0) {
+                    let count = 1;
+                    for (list of programTypeList) {
+                        AjaxTable +=
+                            `<tr>
+                        <td>${count++}</td>
+                        <td>${list.name}</td>
+                        <td>${list.description}</td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-session"
+                                data-session-type-id="${list.id}"></i>
+                        </td>
+                        <td>
+                            <input type="checkbox" data-session-type-id="${list.id}" class="delete-session-type">
+                        </td>
+                    </tr>`
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="3">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#sessionTypeTable").html(AjaxTable);
+            }
+
+
+        function showExpressSuccess(errors) {
+
+            console.log('success',errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.message,
+                message:"",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+        function showExpressError(errors) {
+                
+                console.log('success<><><',errors);
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : "Error",
+                    message: errors.errors,
+                    express:'true',
+                    type: 'alert-danger',
+                    buttons: {
+                        positive:{
+                            text: "Okay",
+                            action: function(){
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                            }
+                        }
+                    }
+                }
+                simpleAlert.alert(obj);
+            }
+
+        })
+    </script>
+    <%- include("../partials/footerEnd") %>

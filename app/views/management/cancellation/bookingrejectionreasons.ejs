@@ -1,0 +1,253 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>Room Booking Rejection Reasons List</h5>
+
+            <button class="btn add-btn ms-auto" data-bs-toggle="modal"
+                            data-bs-target="#add-room-cancellation-modal"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row" id="cancellationTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Type of cancellation</th>
+                    <th>Reason Text</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let list of RoomCancellationReasonsList) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- list.transaction_uuid %>
+                        </td>
+                        <td>
+                            <%- list.reason %>
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-Cancellation"
+                                data-cancellation-id="<%- list.id %>"></i>
+                            <i data-cancellation-id="<%- list.id %>"
+                                class="fas fa-trash-alt text-danger delete-Cancellation"></i>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+
+<!-- ADD NEW CAMPUS MODAL -->
+<div class="modal fade" id="add-room-cancellation-modal" tabindex="-1" role="dialog"
+    aria-labelledby="add-room-cancellation-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header bg-info modal-inputform-header">
+                <h5 class="modal-title text-white" id="add-room-cancellation-modal-title">Add Room Cancellation Reason
+                </h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="form-row mt-4">
+                    <label class="form-label">Reason</label>
+                    <textarea name="reason" rows="10" id="reason" type="text" class="form-control"
+                        placeholder="Enter reason" required></textarea>
+                    <input type="hidden" id="cancellationId">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger createCancellationReason ">Create</button>
+                <button type="button" class="btn btn-danger updateCancellationReason  d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    //management/campus/add
+    $('.createCancellationReason').on('click', function () {
+        $.ajax({
+            url: '/management/room/bookingrejectionreasons/create',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                reason: $("#reason").val(),
+            },
+            success: data => {
+                console.log('Success: ', data)
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+    $('#cancellationTable').on('click', '.edit-Cancellation', function () {
+        $(".updateCancellationReason").removeClass('d-none')
+        $(".createCancellationReason").addClass('d-none')
+        $("#add-room-cancellation-modal-title").html('Update New Cancellation Reason')
+
+        console.log($(this).attr('data-cancellation-id'))
+        $.ajax({
+            url: '/management/room/bookingrejectionreasons/findone',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                id: $(this).attr('data-cancellation-id')
+            },
+            success: data => {
+
+                let camp = data.data;
+                $("#cancellationId").val(camp.id)
+                 $("#reason").val(camp.reason)
+                $("#add-room-cancellation-modal").modal('show')
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+    $('.updateCancellationReason').on('click', function () {
+        $.ajax({
+            url: '/management/room/bookingrejectionreasons/update',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                Id: $("#cancellationId").val(),
+                reason: $("#reason").val(),
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+
+    $('#cancellationTable').on('click', '.delete-Cancellation', function () {
+        $.ajax({
+            url: '/management/room/bookingrejectionreasons/delete',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                id: $(this).attr('data-cancellation-id')
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+
+    //search feature delay function is writter in script.js file which is located in public/js/script.js
+    $('#searchkeyword').on('input', delay(function (e) {
+        let keyword = $("#searchkeyword").val()
+        $.ajax({
+            type: "POST",
+            url: "/management/room/bookingrejectionreasons/search",
+            data: {
+                keyword: keyword
+            },
+            success: function (data) {
+                let rejectionList = data.data;
+
+                let AjaxTable = `<table class="table custom_row" id="cancellationTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Type of cancellation</th>
+                    <th>Reason Text</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+                if (rejectionList.length > 0) {
+                    let count = 1;
+                    for (list of rejectionList) {
+                        AjaxTable +=
+                            `<tr>
+                        <td>
+                           ${count++}
+                        </td>
+                        <td>
+                            ${list.transaction_uuid}
+                        </td>
+                        <td>
+                            ${list.reason}
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-Cancellation"
+                                data-cancellation-id=" ${list.id}"></i>
+                            <i data-cancellation-id=" ${list.id}"
+                                class="fas fa-trash-alt text-danger delete-Cancellation"></i>
+                        </td>
+                    </tr>`;
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="4">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#cancellationTable").html(AjaxTable);
+            }
+        })
+    }, 500));
+</script>
+<%- include("../partials/footerEnd") %></table>

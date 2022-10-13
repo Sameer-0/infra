@@ -1,0 +1,283 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+<style>
+    hr {
+        margin: 0 !important;
+    }
+
+    .timetable-container {
+        width: var(--timetableWidth);
+        background: #e6e6e6;
+        /* border: 2px solid;    */
+    }
+
+    .day-name {
+        min-width: var(--roomNoWidth);
+        max-width: var(--roomNoWidth);
+        background: #006faa;
+        color: #fff;
+        border-bottom: 1px solid;
+        text-align: center;
+        padding: 10px 0px;
+    }
+
+    .room-slots {
+        width: var(--roomSlotWidth);
+        min-height: 10px;
+        position: relative;
+        background-size: var(--breakIntervalWidth);
+        background-image:
+            linear-gradient(to right, grey 1px, transparent 1px)
+    }
+
+    .timetable-slots {
+        width: var(--roomSlotWidth);
+        min-height: 10px;
+        position: relative;
+        left: 50px;
+    }
+
+    .timetable-slots span {
+        width: 156px;
+        font-size: 14px;
+    }
+
+    .room {
+        border: 1px solid black;
+        line-height: 0px;
+    }
+
+    .event {
+        position: absolute;
+        /* width: var(--eventWidth); */
+        background: #ffffff;
+        word-break: break-word;
+        height: 100%;
+        /* overflow: hidden; */
+        padding-right: calc(var(--breakIntervalWidth) + 2px);
+        padding-left: 2px;
+        padding-top: 5px;
+        font-size: 14px;
+    }
+
+
+
+
+    /* .event:nth-child(even) .start-time{
+       background-color: #dc3545 !important;
+ 
+   }
+
+   .event:nth-child(even) .end-time{
+       background: #dc3545 !important;
+   } */
+
+
+    .start-time {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        border-radius: 0 !important;
+        font-size: 0.75rem;
+    }
+
+    .end-time {
+        position: absolute;
+        right: var(--breakIntervalWidth);
+        bottom: 0;
+        border-radius: 0 !important;
+        font-size: 0.75rem;
+    }
+
+    .fa-arrows-left-right {
+        /* position: absolute; */
+        right: calc(var(--breakIntervalWidth) + 78px - 7px);
+        bottom: 0;
+    }
+
+    .break {
+        position: absolute;
+        height: 100%;
+        width: var(--breakIntervalWidth);
+        background-size: 3px;
+        background: #1ff704ab;
+    }
+
+    .fixed-break {
+        position: absolute;
+        height: 100%;
+        /* background-color: #006faa; */
+        width: var(--fixedBreakWidth);
+        background-size: 3px;
+        background: repeating-linear-gradient(251deg, #212121, #444141 12px);
+        color: #fff;
+        font-size: 13px;
+        padding: 1px 18px;
+        text-align: center;
+        line-height: 1.1;
+
+    }
+
+    .occupied-event {
+        position: absolute;
+        background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
+        height: 100%;
+        text-align: center;
+        padding: 125px 0px;
+        font-weight: bold;
+    }
+
+    .light-success {
+        background: #76e71acf;
+    }
+
+    .light-danger {
+        background: #e91b14;
+    }
+</style>
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+
+
+    </div>
+
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase ">
+            <h5>Search Room</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- <div class="col-md-3">
+                    <label>Select Year</label>
+                    <input type="text" readonly class="form-control" id="acadYear" value="2022">
+                </div> -->
+                <div class="col-md-3">
+                    <label>Select Start Date</label>
+
+                    <input type="date" class="select2" id="startDate" name="startDate">
+
+                </div>
+                <div class="col-md-3">
+                    <label>Select End Date</label>
+
+                    <input type="date" class="select2" id="endDate" name="endDate">
+
+                </div>
+                <div class="col-md-3">
+                    <label>Select Room No.</label>
+                    <select class="select2" id="RoomNo" name="RoomNo">
+                        <option value="">---SELECT---</option>
+                        <option value="701">701</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary searchRoom"><i class="fa fa-search"></i> Search</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card table-card mt-3">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Rooms Status</h5>
+            </div>
+            <div>
+                <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-holiday-modal">
+                    <i class="fas fa-plus"></i></button> -->
+                <!-- <button class="btn ms-auto select-delete-holidays add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-holiday add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+
+
+        <div class="timetable-slots mt-3">
+
+            <div class="timetable-container" style="overflow-x: auto;"></div>
+            <!-- 
+        <div class="card-body table-responsive">
+            <div id="errorHtml"></div> -->
+            <!-- <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div> -->
+            <!-- <table class="table custom_row table-bordered" id="roomstatusTable">
+                <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Room No.</th>
+                            <th>Room Abbr</th>
+                            <th>Day</th>
+                            <th>Event</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Program Name</th>
+                            <th>Acad Session</th>
+                            <th>Module Name</th>
+                            <th>Faculty id</th>
+                            <th>Faculty Name</th>
+                            <th>Division</th>
+                            <th>Batch</th>
+                        </tr>
+                </thead>
+                <tbody>
+                   
+                </tbody>
+            </table>
+
+
+        </div> -->
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+
+
+    <%- include("../partials/footer") %>
+
+    <script>
+        $(document).ready(function () {
+
+            $('.searchRoom').on('click', function () {
+                console.log("clickeddd")
+                let startDate = $('#startDate').val().replaceAll('-', '/');
+                let endDate = $('#endDate').val().replaceAll('-', '/');
+                let roomNo = $('#RoomNo').val();
+                console.log(roomNo, startDate, endDate);
+                console.log(10);
+                let ApiObj = {
+                    url: '/admin/rooms/getstatus',
+                    type: 'POST',
+                    data: {
+                        startDate: startDate,
+                        endDate: endDate,
+                        roomNo: roomNo
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+                    console.log(result)
+                    // ajaxTable(result)
+                }).catch(error => {
+                    console.log('Error ::::::::::::::::::::::', error)
+                    // showError(error.responseJSON)
+                })
+            })
+
+            let div = ` <div class="text-light" style="display: flex;background:#CC0700"></div>`
+            
+           const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+           console.log(timings[0].min_timing.slice(0, -3))
+           console.log(timings[0].max_timing.slice(0, -3))
+        })
+    </script>
+    <%- include("../partials/footerEnd") %>

@@ -1,0 +1,150 @@
+<%- include("../partials/head") %>
+        <%- include("../partials/leftSidebar") %>
+                <%- include("../partials/header") %>
+                        <!--Notificaion icon-->
+                        <!--HEADER END-->
+                        <div class="main-content">
+                                <!--DASHBOARD CONTENT START-->
+                                <div class="card table-card">
+                                        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+                                                <h5>Course Workload Data</h5>
+                                                <!-- 
+            <button class="btn btn-success ml-auto" data-toggle="modal" data-target="#add-roompref-modal"><i
+                    class="fas fa-plus"></i>Add New</button> -->
+                                        </div>
+                                        <div class="card-body table-responsive">
+
+
+                                                <table class="table  call-datatable" id="courseworkload">
+                                                        <thead>
+                                                                <th>ID</th>
+                                                                <th>Module</th>
+                                                                <th>Program ID</th>
+                                                                <th>Module_ID</th>
+                                                                <th>Electives</th>
+                                                                <th>Intake</th>
+                                                                <th>Student_Per_Division</th>
+                                                                <th>Active</th>
+                                                                <th>Lecture_Per_Division</th>
+                                                                <th>Practical_Per_Division</th>
+                                                                <th>Tutorial_Per_Division</th>
+                                                                <th>Workshop_Per_Division</th>
+                                                                <th>Continuous</th>
+                                                                <th>Session_Per_Semester</th>
+                                                                <th>Acad Session</th>
+                                                                <th>Lecture_Per_Batch</th>
+                                                                <th>Practical_Per_Batch</th>
+                                                                <th>Tutorial_Per_Batch</th>
+                                                                <th>Workshop_Per_Batch</th>
+
+                                                        </thead>
+
+
+                                                        <tbody>
+                                                                <% for (let course of courseList) { %>
+                                                                        <tr>
+                                                                                <td><input type="number"
+                                                                                                value="<%- course.id %>"
+                                                                                                name="id" required>
+                                                                                </td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.module_name %>"
+                                                                                                name="module_name"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.program_id %>"
+                                                                                                name="program_id"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.module_id %>"
+                                                                                                name="module_id"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.electives %>"
+                                                                                                name="electives"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.intake %>"
+                                                                                                name="intake" required>
+                                                                                </td>
+
+                                                                                <td><input type="number"
+                                                                                                value="<%- course.student_per_division %>"
+                                                                                                name="studentPerDivision"
+                                                                                                required></td>
+
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.active %>"
+                                                                                                name="active" required>
+                                                                                </td>
+
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.lec_per_week_per_division %>"
+                                                                                                name="lecPerWeekPerDivision"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.practical_per_week_per_division %>"
+                                                                                                name="practPerWeekPerDivision"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.tutorial_per_week_per_division %>"
+                                                                                                name="tutorialPerWeekPerDivision"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.workshop_per_week_per_division %>"
+                                                                                                name="workshopPerWeekPerDivision"
+                                                                                                required></td>
+                                                                                <td><input type="number"
+                                                                                                value="<%- course.continuous %>"
+                                                                                                name="continuous"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.session_per_semester %>"
+                                                                                                name="sessionPerSemester"
+                                                                                                required></td>
+                                                                                <td><input type="number"
+                                                                                                value="<%- course.acad_session_id %>"
+                                                                                                name="acadSession"
+                                                                                                required>
+                                                                                </td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.lec_per_week_per_batch %>"
+                                                                                                name="lecPerBatch"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.practical_per_week_per_batch %>"
+                                                                                                name="practPerBatch"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.tutorial_per_week_per_batch %>"
+                                                                                                name="tutorialPerBatch"
+                                                                                                required></td>
+                                                                                <td><input type="text"
+                                                                                                value="<%- course.workshop_per_week_per_batch %>"
+                                                                                                name="workshopPerBatch">
+                                                                                </td>
+
+
+                                                                        </tr>
+
+
+
+
+
+
+
+
+                                                                        <% } %>
+                                                        </tbody>
+                                                </table>
+
+
+
+                                                <div class="footer">
+                                                        <button type="submit"
+                                                                class="btn modal-inputform-btn update-data">submit</button>
+                                                </div>
+                                        </div>
+                                </div>
+                                <!--DASHBOARD CONTENT END-->
+                        </div>

@@ -1,0 +1,397 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Weekly Constraint</h5>
+            </div>
+            <div>
+                <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#add-weeklyconstraint-modal">
+                    <i class="fas fa-plus"></i></button>
+                <button class="btn ms-auto select-delete-weeklyconstraint add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-weeklyconstraint add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button>
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row table-bordered" id="weeklyConstraintTable">
+                <thead>
+                 
+                    <th>Tag Id</th>
+                    <th>Name</th>
+                    <th>Event type</th>
+                    <th>Rule on</th>
+                    <th>Repeatable</th>
+                    <th>Action</th>
+                    <th>All <input type="checkbox" class="selectAll-weekly-constraint"></th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let constraint of weeklyConstraintList) { %> 
+                    <tr>
+                        <!-- <td><%- count++ %></td> -->
+                        <td><%- constraint.tag_id %></td>
+                        <td><%- constraint.name %></td>
+                        <td><%- constraint.event_type %></td>
+                        <td><%- constraint.rule_on %></td>
+                        <td><%- constraint.repeatable %></td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-weekly-constraint"
+                                data-weekly-constraint-id="<%- constraint.id %>"></i>
+                        </td>
+                        <td>
+                            <input type="checkbox" data-weekly-constraint-id="<%- constraint.id %>" class="delete-weekly-constraint">
+                        </td>
+                    </tr>
+
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--ADD Modal -->
+<div class="modal fade" id="add-weeklyconstraint-modal" tabindex="-1" aria-labelledby="add-weeklyconstraint-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-weeklyconstraint-modal-title">ADD WEEKLY CONSTRAINT</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <input type="hidden" id="Id">
+                <div class="mb-3">
+                    <label for="tagId" class="form-label">Tag Id</label>
+                    <input type="number" id="tagId" name="tagId" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="constraintName" class="form-label">Enter Name</label>
+                    <input type="text" id="constraintName" name="constraintName" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="eventType" class="form-label">Enter Event Type</label>
+                    <input type="text" name="eventType" id="eventType" class="form-control">              
+                </div>
+                <div class="mb-3">
+                    <label for="ruleOn" class="form-label">Enter Rule On</label>
+                    <input type="text" name="ruleOn" id="ruleOn" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="repeatable" class="form-label">Repeatable</label>
+                    <select name="repeatable" id="repeatable" class="select2">
+                        <option value="" selected>--SELECT--</option>
+                        <option value="1">YES</option>
+                        <option value="0">NO</option>
+                    </select>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <span class="errorMsg"></span>
+                    <button type="submit" class="btn createWeeklyConstraint modal-inputform-btn">Create Session Date</button>
+                    <button type="submit" class="btn updateWeeklyConstraint modal-inputform-btn d-none">Update Session Date</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <%- include("../partials/footer") %>
+    
+    <script>
+        $(document).ready(function () {
+
+            $('.select2').select2({
+            dropdownParent: $('#add-weeklyconstraint-modal')});
+
+            $('.createWeeklyConstraint').on('click', function () {
+                console.log('Valuese::::::', $('#repeatable').val())
+                $.ajax({
+                    url: '/admin/weekly-constraint',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        tagId: $('#tagId').val(),
+                        constraintName: $('#constraintName').val(),
+                        eventType: $('#eventType').val(),
+                        ruleOn: $('#ruleOn').val(),
+                        repeatable: $('#repeatable').val()
+                    },
+                    success: (data) => {
+                        location.reload()
+                    },
+                    error: err => {
+                        console.log('err::::::::',err)
+                        showError(err.responseJSON)
+                    }
+                })
+            })
+
+            //EDIT SESSION DATE TYPE
+            $("#weeklyConstraintTable").on('click', '.edit-weekly-constraint', function () {
+                $(".createWeeklyConstraint").addClass('d-none')
+                $(".updateWeeklyConstraint").removeClass('d-none')
+                $("#add-weeklyconstraint-modal-title").html('UPDATE WEEKLY CONSTRAINT')
+
+                $.ajax({
+                    url: '/admin/weekly-constraint/findone',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        id: $(this).attr('data-weekly-constraint-id')
+                    },
+                    success: data => {
+                        console.log(data.data)
+                        let obj = data.data;
+                    
+                        $('#tagId').val(obj.tag_id).trigger('change')
+                        $('#constraintName').val(obj.name).trigger('change')
+                        $('#eventType').val(obj.event_type).trigger('change')
+                        $('#ruleOn').val(obj.rule_on).trigger('change')
+                        $('#repeatable').val(obj.repeatable).trigger('change')
+                        $('#Id').val(obj.id).trigger('change')
+                        $("#add-weeklyconstraint-modal").modal('show')
+                    },
+                    error: err => {
+                        showError(err.responseJSON)
+                    }
+                })
+            })
+
+            //Select All campus
+            $("#weeklyConstraintTable").on('click', '.selectAll-weekly-constraint', function () {
+                if (this.checked) {
+                    // Iterate each checkbox
+                    $('.delete-weekly-constraint:checkbox').each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    $('.delete-weekly-constraint:checkbox').each(function () {
+                        this.checked = false;
+                    });
+                }
+            })
+
+            // UPDATE SESSION DATE 
+            $(".updateWeeklyConstraint").on('click', function () {
+                console.log($('#repeatable').val())
+                $.ajax({
+                    url: '/admin/weekly-constraint/update',
+                    method: 'POST',
+                    type: 'JSON',
+                    data: {
+                        tagId: $("#tagId").val(),
+                        constraintName: $('#constraintName').val(),
+                        eventType: $('#eventType').val(),
+                        ruleOn: $('#ruleOn').val(),
+                        repeatable: $('#repeatable').val(),
+                        id: $('#Id').val()
+
+                    },
+                    success: (data) => {
+                        if (data.status == 200) {
+                            location.reload()
+                        } else {
+                            $(".errorMsg").html(data.message)
+                        }
+                    },
+                    error: err => { 
+                        showError(err.responseJSON)
+                    }
+                })
+            })
+
+            //Delete Single and mutiple Delete
+            $('.select-delete-weeklyconstraint').on('click', function () {
+                let deleteids = []
+                $('.delete-weekly-constraint:checked').each(function () {
+                    let obj = {
+                        id: $(this).attr("data-weekly-constraint-id"),
+                    }
+                    deleteids.push(obj) 
+                })
+                console.log(deleteids);
+
+                if (deleteids.length > 0) {
+
+                    let ApiObj = {
+                        url: '/admin/weekly-constraint/delete',
+                        method:'POST',
+                        data: {
+                            Ids: JSON.stringify(deleteids)
+                        },
+                        dataType: 'JSON'
+                    }
+                    ajaxApi(ApiObj).then(result => {
+                        location.reload()
+                      
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                } else {
+                    alert('Select Fields')
+                }
+            })
+
+
+
+            // SEARCH PROGRAM TYPE
+            $('#searchkeyword').on('input', delay(function (e) {
+               
+                let keyword = $("#searchkeyword").val()
+                $.ajax({
+                    method: "POST",
+                    url: "/admin/weekly-constraint/search",
+                    data: {
+                        keyword: keyword
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                        console.log(data.data);
+                    }
+                })
+            }, 1500));
+
+
+
+             //Pagination Here
+            let pageCount = `<%- pageCount %>`
+            console.log("Page Count=====>>>", pageCount)
+            let pageNos = Math.ceil(Number(pageCount) / 10)
+
+            console.log("Page Numbers", pageNos)
+            $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+            }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/admin/sessions/dates/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    console.log('data',data)
+                    AjaxtTable(data.data) 
+                }
+            })
+        });
+
+            function AjaxtTable(sessionDates) {
+                let AjaxTable = `<table class="table custom_row table-bordered" id="sessionTypeTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Acad session</th>
+                    <th>Session type</th>
+                    <th>Session start date</th>
+                    <th>Session end date</th>
+                    <th>Action</th>
+                    <th>All <input type="checkbox" class="selectAll-Session-dates"></th>
+                </thead>`;
+                if (sessionDates.length > 0) {
+                    let count = 1;
+                    for (list of sessionDates) {
+                        AjaxTable +=
+                            `<tr>
+                        <td>${count++}</td>
+                        <td>${list.acad_session}</td>
+                        <td>${list.session_type}</td>
+                        <td>${list.startDate}</td>
+                        <td>${list.endDate}</td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-session"
+                                data-session-date-id="${list.id}"></i>
+                        </td>
+                        <td>
+                            <input type="checkbox" data-session-date-id="${list.id}" class="delete-session-type">
+                        </td>
+                    </tr>`
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="3">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#sessionDateTable").html(AjaxTable);
+            }
+
+
+            
+            function showError(errors) {
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>`;
+                errorHtml += `<ul>`;
+                errors.errors.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+
+                errorHtml +=
+                    `</ul><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+
+
+            // function showError(errors) {
+            //     let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            //         <h3>Error</h3>
+            //         <p>${errors.description}</p>
+            //         <ul>`
+            //     if (errors.data.length > 0) {
+            //         $(errors.data).each(function (key, value) {
+            //             $.each(this, function (key, value) {
+            //                 errorHtml +=
+            //                     `<li>${key} ${value}</li>`
+            //             });
+            //         });
+            //     }
+            //     errorHtml +=
+            //         `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+            //     $("#errorHtml").html(errorHtml)
+            // }
+        })
+    </script>
+    <%- include("../partials/footerEnd") %>

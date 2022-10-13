@@ -1,0 +1,70 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+    <%- include("../partials/academicSubMenu") %>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>Current Academic Year Details</h5>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table custom_row">
+                <thead>
+                    <th>Academic Year</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <form action="/management/academic/academic-year" method="POST">
+                        <tr>
+                            <td>
+                                <input class="form-control" type="hidden" value="<%- academicDetails.id %>" name="id" id="id"
+                                    >
+                                <input class="form-control" type="number" value="<%- academicDetails.input_acad_year %>"
+                                    min="2021" max="2099" name="acadYear"  id="acadYear" required>
+                            </td>
+                            <td>
+                                <input class="form-control" type="date" value="<%- academicDetails.start_date %>"
+                                    name="startDate" id="startDate" required>
+                            </td>
+                            <td>
+                                <input class="form-control" type="date" value="<%- academicDetails.end_date %>"
+                                    name="endDate"  id="endDate" required>
+                            </td>
+                            <td>
+                               <%if(academicDetails.is_locked > 0){%>
+                                <button type="submit" class="btn btn-dark update-acad-year" disabled>Update</button>
+                                <%}else{%>
+                                    <button type="submit" class="btn btn-dark update-acad-year">Update</button>
+                                <%}%>
+                            </td>
+
+                        </tr>
+                    </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+
+
+<%- include("../partials/footer") %>
+
+
+<%- include("../partials/footerEnd") %>

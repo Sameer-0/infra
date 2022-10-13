@@ -1,0 +1,274 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>Cancellation Reasons List</h5>
+
+            <button class="btn add-btn ms-auto " data-bs-toggle="modal" data-bs-target="#add-cancellation-modal"><i
+                    class="fas fa-plus"></i></button>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row" id="cancellationTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Type of cancellation</th>
+                    <th>Reason Text</th>
+                    <th>Sap Id</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let list of CancellationReasonsList) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- list.type_of_cancellation %>
+                        </td>
+                        <td>
+                            <%- list.reason_text %>
+                        </td>
+                        <td>
+                            <%- list.sap_id %>
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-Cancellation"
+                                data-cancellation-id="<%- list.cancellationid %>"></i>
+                            <i data-cancellation-id="<%- list.cancellationid %>"
+                                class="fas fa-trash-alt text-danger delete-Cancellation"></i>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+
+<!-- ADD NEW CAMPUS MODAL -->
+<div class="modal fade" id="add-cancellation-modal" tabindex="-1" role="dialog" aria-labelledby="add-cancellation-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header bg-info modal-inputform-header">
+                <h5 class="modal-title text-white" id="add-cancellation-modal-title">Add New Cancellation Reason</h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="form-row mt-4">
+                    <label class="form-label">Type of cancellation</label>
+                    <input name="type_of_cancellation" id="type_of_cancellation" type="text" class="form-control"
+                        placeholder="Enter type of cancellation" required>
+                    <input type="hidden" id="cancellationId">
+                </div>
+
+                <div class="form-row mt-4">
+                    <label class="form-label">Reason</label>
+                    <input name="reason_text" id="reason_text" type="text" class="form-control"
+                        placeholder="Enter reason" required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <label class="form-label">Sap Id</label>
+                    <input name="sap_id" id="sap_id" type="number" class="form-control" placeholder="Enter sapid"
+                        required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <input name="acadSessionId" id="acadSessionId" type="hidden" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn modal-inputform-btn createCancellationReason ">Create</button>
+                <button type="button" class="btn modal-inputform-btn updateCancellationReason  d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    //management/campus/add
+    $('.createCancellationReason').on('click', function () {
+        $.ajax({
+            url: '/management/cancellationreasons',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                typeOfCancellation: $("#type_of_cancellation").val(),
+                reasonText: $("#reason_text").val(),
+                sapId: $("#sap_id").val()
+            },
+            success: data => {
+                console.log('Success: ', data)
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+    $('#cancellationTable').on('click', '.edit-Cancellation', function () {
+        $(".updateCancellationReason").removeClass('d-none')
+        $(".createCancellationReason").addClass('d-none')
+        $("#add-cancellation-modal-title").html('Update New Cancellation Reason')
+
+        console.log($(this).attr('data-cancellation-id'))
+        $.ajax({
+            url: '/management/cancellationreasons/findone',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                id: $(this).attr('data-cancellation-id')
+            },
+            success: data => {
+
+                let camp = data.data;
+                console.log(camp)
+                $("#cancellationId").val(camp.cancellationid)
+                $("#type_of_cancellation").val(camp.type_of_cancellation)
+                $("#reason_text").val(camp.reason_text)
+                $("#sap_id").val(camp.sap_id)
+                $("#add-cancellation-modal").modal('show')
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+    $('.updateCancellationReason').on('click', function () {
+        $.ajax({
+            url: '/management/cancellationreasons',
+            method: 'PUT',
+            type: 'JSON',
+            data: {
+                cancellationId: $("#cancellationId").val(),
+                typeOfCancellation: $("#type_of_cancellation").val(),
+                reasonText: $("#reason_text").val(),
+                sapId: $("#sap_id").val()
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+
+    $('#cancellationTable').on('click', '.delete-Cancellation', function () {
+        console.log('HEllo')
+        $.ajax({
+            url: '/management/cancellationreasons',
+            method: 'DELETE',
+            type: 'JSON',
+            data: {
+                id: $(this).attr('data-cancellation-id')
+            },
+            success: data => {
+                location.reload()
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+    })
+
+
+
+    //search feature delay function is writter in script.js file which is located in public/js/script.js
+    $('#searchkeyword').on('input', delay(function (e) {
+        let keyword = $("#searchkeyword").val()
+        $.ajax({
+            type: "GET",
+            url: "/management/cancellationreasons/search",
+            data: {
+                keyword: keyword
+            },
+            success: function (data) {
+                console.log('campusList::::::', data)
+                let acadSessionList = data.data;
+
+                let AjaxTable = `<table class="table custom_row" id="acadSessionTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Acad Session</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+                if (acadSessionList.length > 0) {
+                    for (session of acadSessionList) {
+                        AjaxTable +=
+                            `<tr>
+                        <td>
+                            ${session.acadSessionId}
+                        </td>
+                        <td>
+                            ${session.acad_session}
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-acadSession"  data-acadSession-id="${session.acadSessionId}"></i>
+                            <i class="fas fa-trash-alt text-danger cursor-pointer delete-acadSession" data-acadSession-id="${session.acadSessionId}" ></i>
+                        </td>
+                    </tr>`;
+                    }
+                } else {
+                    AjaxTable +=
+                        ` <tr>
+                                <td colspan="3">No Data Found</td>
+                            </tr>`;
+                }
+                AjaxTable += `<tbody></table>`
+                $("#acadSessionTable").html(AjaxTable);
+            }
+        })
+    }, 500));
+</script>
+<%- include("../partials/footerEnd") %></table>

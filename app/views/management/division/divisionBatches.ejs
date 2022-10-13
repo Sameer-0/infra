@@ -1,0 +1,258 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center">
+            <h5>Division Batches</h5>
+            <button class="btn ms-auto add-btn" data-bs-toggle="modal"
+            data-bs-target="#add-divBatch-modal"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+            <table class="table custom_row" id="divisionBatchTable">
+                <thead>
+                    <th>Division</th>
+                    <th>Batch</th>
+                    <th>EventType</th>
+                    <th>DivisionCount</th>
+                    <th>BatchCount</th>
+                    <th>Input Batch Count</th>
+                    <th>FacultyCount</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <% for (let batch of batchList) { %>
+                    <tr>
+                        <td><%- batch.division %></td>
+                        <td><%- batch.batch %></td>
+                        <td><%- batch.event_type %></td>
+                        <td><%- batch.division_count %></td>
+                        <td><%- batch.batch_count %></td>
+                        <td><%- batch.input_batch_count %></td>
+                        <td><%- batch.faculty_count %></td>
+                        <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-divBatch"
+                                data-divBatch-id="<%- batch.id %>"></i>
+                            <a data-divBatch-id="<%- batch.id %>"
+                                class="fas fa-trash-alt text-danger delete-divBatch"></a>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+
+<!-- ADD MODAL -->
+<div class="modal fade" id="add-divBatch-modal" tabindex="-1" aria-labelledby="add-divBatch-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h5 class="modal-title" id="add-divBatch-modal-title">DivBatch</h5>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="errorHtml"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input type="hidden" id="id" name="id">
+                            <select class="form-select modalSelect2" name="divisionId" id="divisionId" required>
+                                <option disabled selected>--Division--</option>
+                                <% for(let division of divisionList) { %>
+                                <option value="<%- division.id %>">
+                                    <%- division.division %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input name="batch" id="batch" type="text" class="form-control" placeholder="batch"
+                                required>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input name="eventType" id="eventType" type="text" class="form-control"
+                                placeholder="event">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input name="divisionCount" id="divisionCount" type="text" class="form-control"
+                                placeholder="divisionCount">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input name="batchCount" id="batchCount" type="text" class="form-control"
+                                placeholder="batchCount">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="my-3 py-2">
+                            <input name="inputBatchCount" id="inputBatchCount" type="text" class="form-control"
+                                placeholder="inputBatchCount">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="my-3 py-2">
+                    <input name="facultyCount" id="facultyCount" type="text" class="form-control"
+                        placeholder="facultyCount">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div id="errorMsg"></div>
+                <button type="submit" class="btn  addDivBatch modal-inputform-btn">Create Batch</button>
+                <button type="submit" class="btn  updateDivBatch modal-inputform-btn d-none">Update Batch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<%- include("../partials/footer") %>
+<script>
+    //ADD DIVISION BATCH
+
+    $('.addDivBatch').on('click', function () {
+        $.ajax({
+            url: '/management/divisions/batches/create',
+            type: 'JSON',
+            method: 'POST',
+            data: {
+                divisionId: $('#divisionId').val(),
+                batch: $('#batch').val(),
+                eventType: $('#eventType').val(),
+                divisionCount: $('#divisionCount').val(),
+                batchCount: $('#batchCount').val(),
+                inputBatchCount: $('#inputBatchCount').val(),
+                facultyCount: $('#facultyCount').val()
+            },
+            success: (data) => {
+                console.log('data:::', data)
+            },
+            error: err => {
+                let error = err.responseJSON.errors
+                let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                error.map(er => {
+                    errorHtml +=
+                        `<li>${er.msg}</li>`
+                })
+                errorHtml +=
+                    `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                $("#errorHtml").html(errorHtml)
+            }
+        })
+    })
+
+
+    //FETCH DIVISION BATCH
+
+    $('#divisionBatchTable').on('click', '.edit-divBatch', function () {
+        $("#add-divBatch-modal-title").html('Update Batch')
+        $(".addDivBatch").addClass('d-none')
+        $(".updateDivBatch").removeClass('d-none')
+        $.ajax({
+            url: '/management/division/batches/findone',
+            method: 'POST',
+            type: 'JSON',
+            data: {
+                id: $(this).attr('data-divBatch-id')
+            },
+            success: data => {
+                let batch = data.batchData;
+                console.log('Success: ', batch)
+
+                $("#add-divBatch-modal").modal('show')
+
+                $("#id").val(batch.id);
+                $('#divisionId').val(batch.division_id);
+                $('#batch').val(batch.batch);
+                $('#eventType').val(batch.event_type);
+                $('#divisionCount').val(batch.division_count);
+                $('#batchCount').val(batch.batch_count);
+                $('#inputBatchCount').val(batch.input_batch_count);
+                $('#facultyCount').val(batch.faculty_count)
+
+
+
+
+
+
+
+            },
+            error: err => {
+                console.log('Error: ', err)
+            }
+        })
+
+    })
+
+
+    // UPDATE BATCHES
+
+    $('.updateDivBatch').on('click', function () {
+        $.ajax({
+            url: '/management/division/batches/update',
+            type: 'JSON',
+            method: 'POST',
+            data: {
+                id: $('#id').val(),
+                divisionId: $('#divisionId').val(),
+                batch: $('#batch').val(),
+                eventType: $('#eventType').val(),
+                divisionCount: $('#divisionCount').val(),
+                batchCount: $('#batchCount').val(),
+                inputBatchCount: $('#inputBatchCount').val(),
+                facultyCount: $('#facultyCount').val()
+            },
+            success: (data) => {
+                console.log('On success:::', data)
+                location.reload()
+            },
+            error: err => {
+                    let error = err.responseJSON.errors
+                    let errorHtml = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h3>Error</h3>
+                    <ul>`
+                    error.map(er => {
+                        errorHtml +=
+                            `<li>${er.msg}</li>`
+                    })
+                    errorHtml +=
+                        `</ul> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>`
+                    $("#errorHtml").html(errorHtml)
+                }
+        })
+    })
+</script>
+<%- include("../partials/footerEnd") %>

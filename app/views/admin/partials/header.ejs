@@ -1,0 +1,63 @@
+<main class="main">
+    <!-- NAVBAR -->
+    <header>
+        <nav class="top-navbar d-flex justify-content-xl-end justify-content-between align-items-center">
+            <a href="/admin/dashboard"><img src="/image/logo-nmims.png" alt="NMIMS LOGO" class="nmims-logo-smalldevices me-auto"></a>
+            <div class="navbar-logo d-none me-auto">
+                <a href="/admin/dashboard"> <img src="/image/logo-nmims.png" class="nmims-logo"> </a>
+             </div>
+            <button class="me-auto left-sidebar-toggle" style="border: none; outline: none; background-color: white;"><i class="fa-solid fa-angles-left"></i></button>
+            <ul class="top-navbar__list">
+                <li style="color: #fc6964; font-weight: bold;"><img src="/icons/admin.png" class="ps-3 pe-2">Admin</li>
+
+                <li><a href="" class="text-dark"><img src="/icons/notification.png" alt=""> Notification</a></li>
+                <li><a onclick="toggle_full_screen()" style="cursor: pointer;"><img src="/icons/expand.png" alt=""></a></li>
+
+                <div class="btn-group">
+                    <button class="btn btn-white dropdown-toggle" type="button" id="defaultDropdown"
+                        data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false"> 
+                        <img src="/icons/user.png" alt=""> Hi! <%- locals.firstName %> 
+                    </button>
+                    <ul class="dropdown-menu userprofile-dropdown-menu" aria-labelledby="defaultDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog"></i> Settings</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle"></i> Manage account</a></li>
+                        <li><a class="dropdown-item" href="/user/logout"><i class="fas fa-sign-out-alt"></i></i> Signout</a></li>
+                    </ul>
+                </div>
+            </ul>
+            <div class="hamburger-smalldevices"><img src="/icons/HamburgerIcon.png" alt="" width="24px" height="20px">
+            </div>
+        </nav>
+    </header>
+    <div class="modal-loader d-none">
+        <svg version="1.1" id="L5" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+      <circle fill="#FF4136" stroke="none" cx="6" cy="50" r="6">
+        <animateTransform 
+           attributeName="transform" 
+           dur="1s" 
+           type="translate" 
+           values="0 15 ; 0 -15; 0 15" 
+           repeatCount="indefinite" 
+           begin="0.1"/>
+      </circle>
+      <circle fill="#FF851B" stroke="none" cx="30" cy="50" r="6">
+        <animateTransform 
+           attributeName="transform" 
+           dur="1s" 
+           type="translate" 
+           values="0 10 ; 0 -10; 0 10" 
+           repeatCount="indefinite" 
+           begin="0.2"/>
+      </circle>
+      <circle fill="#FFDC00" stroke="none" cx="54" cy="50" r="6">
+        <animateTransform 
+           attributeName="transform" 
+           dur="1s" 
+           type="translate" 
+           values="0 5 ; 0 -5; 0 5" 
+           repeatCount="indefinite" 
+           begin="0.3"/>
+      </circle>
+    </svg>
+      </div>

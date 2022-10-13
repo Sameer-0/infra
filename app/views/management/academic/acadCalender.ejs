@@ -1,0 +1,357 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+
+    <%- include("../partials/academicSubMenu") %>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Academic Calender List</h5>
+            </div>
+            <div>
+                <!-- <button class="btn btn-success ms-auto " data-bs-toggle="modal"
+                data-bs-target="#add-academicSession-modal"><i class="fas fa-plus"></i> Add New</button> -->
+            </div>
+            <button class="btn btn-danger ms-auto generate-academic-calender"><i class="fa-solid fa-rotate"></i>
+                Generate Calender</button>
+        </div>
+    </div>
+
+
+
+    <div class="card">
+        <div class="card-body table-responsive">
+            <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                    type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+
+            <table class="table custom_row" id="acadCalenderTable">
+                <thead>
+                    <th>Id</th>
+                    <th>Date Str</th>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Day Name</th>
+                    <th>Week</th>
+                    <th>ISO Week</th>
+                    <th>Day of Week</th>
+                    <th>Month</th>
+                    <th>Month Name</th>
+                    <th>Quarter</th>
+                    <th>Year</th>
+                    <th>Day of Year</th>
+                    <!-- <th>Action</th> -->
+                </thead>
+                <tbody>
+                    <% let count = 1 %>
+                    <% for (let calender of acadCalender) { %>
+                    <tr>
+                        <td>
+                            <%- count++ %>
+                        </td>
+                        <td>
+                            <%- calender.date_str %>
+                        </td>
+                        <td>
+                            <%- calender.date %>
+                        </td>
+                        <td>
+                            <%- calender.day %>
+                        </td>
+                        <td>
+                            <%- calender.day_name %>
+                        </td>
+                        <td>
+                            <%- calender.week %>
+                        </td>
+                        <td>
+                            <%- calender.iso_week %>
+                        </td>
+                        <td>
+                            <%- calender.day_of_week %>
+                        </td>
+                        <td>
+                            <%- calender.month %>
+                        </td>
+                        <td>
+                            <%- calender.month_name %>
+                        </td>
+                        <td>
+                            <%- calender.quarter %>
+                        </td>
+                        <td>
+                            <%- calender.year %>
+                        </td>
+                        <td>
+                            <%- calender.day_of_year %>
+                        </td>
+                        <!-- <td>
+                            <i class="fas fa-edit text-dark cursor-pointer edit-acadCalender"
+                                data-calender-id="<%- calender.id %>"></i>
+                            <i data-calender-id="<%- calender.id %>"
+                                class="fas fa-trash-alt text-danger delete-acadCalender"></i>
+                        </td> -->
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--DASHBOARD CONTENT END-->
+</div>
+
+
+
+
+
+<!-- ADD NEW CAMPUS MODAL -->
+<div class="modal fade" id="add-academicSession-modal" tabindex="-1" role="dialog"
+    aria-labelledby="add-academicSession-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header bg-info modal-inputform-header">
+                <h5 class="modal-title text-white" id="add-academicSession-modal-title">Add Acad Session</h5>
+                <button type="button" class="btn fs-4" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row mt-4">
+                    <input name="acad_session" id="acad_session" type="text" class="form-control"
+                        placeholder="Enter Academic Session" required>
+                </div>
+
+                <div class="form-row mt-4">
+                    <input name="acadSessionId" id="acadSessionId" type="hidden" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-danger createAcadSession ">Create</button>
+                <button type="button" class="btn btn-danger updateAcadSession  d-none">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/footer") %>
+
+<script>
+    $(document).ready(function () {
+
+
+        $(".generate-academic-calender").on('click', function () {
+            let apiObj = {
+                type: "POST",
+                url: "/management/academic/calender/refresh",
+                data: {},
+                dataType: "JSON"
+            }
+            ajaxApi(apiObj).then(result => {
+                console.log('result ::::::::::::::::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                console.log('Error ::::::::::::::::::::::', error)
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/management/academic/calender/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    AjaxTable(data.data)
+                }
+            })
+        });
+
+        // SEARCH CALENDER TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: "/management/academic/calender/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    AjaxTable(data.data)
+                    console.log(data.data);
+                }
+            })
+        }, 500));
+
+
+        //Search With Pagination
+        $(".pagination-search").on('click', '.pagination li', function () {
+            let keyword = $("#searchkeyword").val()
+            let pageNo = $(this).attr('data-lp')
+            $.ajax({
+                type: "POST",
+                url: "/management/academic/calender/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: pageNo
+                },
+                success: function (data) {
+                    AjaxTable(data.data)
+                }
+            })
+        })
+
+        function AjaxTable(acadCalenderList) {
+            let AjaxTable = `<table class="table custom_row" id="acadCalenderTable">
+            <thead>
+                <th>Id</th>
+                <th>Date Str</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Day Name</th>
+                <th>Week</th>
+                <th>ISO Week</th>
+                <th>Day of Week</th>
+                <th>Month</th>
+                <th>Month Name</th>
+                <th>Quarter</th>
+                <th>Year</th>
+                <th>Day of Year</th>
+                <!-- <th>Action</th> -->
+            </thead>`;
+
+            if (acadCalenderList.length > 0) {
+                let count = 1;
+                for (calender of acadCalenderList) {
+                    AjaxTable +=
+                        `<tr>
+        <td>${count++}</td>
+        <td>${calender.date_str}</td>
+        <td>${calender.date}</td>
+        <td>${calender.day}</td>
+        <td>${calender.day_name}</td>
+        <td>${calender.week}</td>
+        <td>${calender.iso_week}</td>
+        <td> ${calender.day_of_week}</td>
+        <td>${calender.month}</td>
+        <td>${calender.month_name}</td>
+        <td>${calender.quarter}</td>
+        <td>${calender.year}</td>
+        <td>${calender.day_of_year}</td>
+        <!-- <td>
+            <i class="fas fa-edit text-dark cursor-pointer edit-acadCalender"
+                data-calender-id="${calender.id}"></i>
+            <i data-calender-id="${calender.id}"
+                class="fas fa-trash-alt text-danger delete-acadCalender"></i>
+        </td> -->
+    </tr>`;
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                <td colspan="12">No Data Found</td>
+            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#acadCalenderTable").html(AjaxTable);
+        }
+
+
+
+        function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>

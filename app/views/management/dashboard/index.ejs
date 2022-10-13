@@ -1,0 +1,710 @@
+<%- include ('../partials/head') %>
+
+
+<!-- PAGE LEVEL CSSS START -->
+<% if (currentFormStep) { %>
+<style>
+    .stage:nth-child(-n + <%- currentFormStep-1 %>) {
+        background: #3cc58c;
+        color: #fff;
+
+    }
+
+    .stage:nth-child(-n + <%- currentFormStep-1 %>)::before {
+        border-left: 25px solid #3cc58c;
+    }
+ 
+    .stage:nth-child(<%- currentFormStep %>) {
+        background: #ffc800;
+        color: #000;
+
+    }
+
+    .stage:nth-child(<%- currentFormStep %>)::before {
+        border-left: 25px solid #ffc800;
+    } 
+
+    .main, .top-navbar{
+        left: 0 !important;
+    }
+    
+    .navbar-logo{
+        display: block !important;
+    }
+
+    .navbar-logo a img {
+        width: 180px;
+  
+    }
+
+    .left-sidebar-toggle{
+        display: none;
+    }
+
+    .top-navbar {
+        padding: 1vh;
+    }
+</style>
+<% } %>
+<!-- PAGE LEVEL CSSS END -->
+
+<% if (!currentFormStep) { %> 
+    <%- include ('../partials/leftSidebar') %>
+<% } %>
+
+<%- include ('../partials/header') %> 
+
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+  <% if (currentFormStep) { %> 
+
+    <%- include('./stepform.ejs') %> 
+     <% } else { %> 
+    <%- include('./dashboard.ejs') %>
+    <% } %>
+
+
+
+</div>
+</main>
+
+<%- include('../partials/notification') %>
+<%- include('../partials/footer') %>
+
+
+<!-- PAGE LEVEL JS START -->
+ 
+
+
+<script src="/js/script.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+            //storing in local storage
+        let userSession = `<%-userSession%>`
+        
+       // console.log('IF is_tructed then set in localstoage',typeof(userSession))
+        if(userSession){
+            console.log('IF is_tructed then set in localstoage',userSession)
+            localStorage.setItem('devicecheck',userSession)
+        }
+
+        userSession = `<%-userSession%>`
+        console.log('userSession::::::::::::',userSession)
+        localStorage.setItem('devicecheck',userSession)
+
+        $('.select2').select2();
+  
+        
+
+        // $(".homeCard .border").hover(function () {
+        //     $this = $(this)
+
+        //     $this.find("img").css({
+        //         "transition": "0.3s",
+        //         "transform": "scale(0.7)"
+        //     })
+
+        //     setTimeout(function () {
+        //         $this.find("img").css({
+        //             "transition": "0.2s",
+        //             "transform": "scale(1)"
+        //         })
+        //     }, 200)
+
+        // }, function () {
+        //     $this.find("img").css({
+        //         "transition": "0.2s",
+        //         "transform": "scale(1)"
+        //     })
+        // })
+
+        // $(".homeCard .border").hover(function () {
+        //     $this = $(this)
+
+
+        //     $this.find("img").css({
+        //         "transition": "0.3s",
+        //         "transform": "scale(0.7)"
+        //     })
+
+        //     setTimeout(function () {
+        //         $this.find("img").css({ 
+        //             "transition": "0.2s",
+        //             "transform": "scale(1)"
+        //         })
+        //     }, 200)
+
+        // }, function () {
+        //     $this.find("img").css({
+        //         "transition": "0.2s",
+        //         "transform": "scale(1)"
+        //     })
+        // })
+
+
+            // Add more rows for orgnization
+            $('#add-more-orgnization').on('click', function () {
+
+                console.log("Organization Added::::")
+                let lastTr = $('#add-more-org-table tbody tr:last-child')
+                console.log('last trrr ', lastTr)
+                lastTr.find('.modalSelect2').select2('destroy');
+                let orgId = lastTr.find(`input[name='orgId']`).val();
+                let orgAbbr = lastTr.find(`input[name='orgAbbr']`).val();
+                let orgName = lastTr.find(`input[name='orgName']`).val();
+                let orgCompleteName = lastTr.find(`input[name='orgCompleteName']`).val();
+                let orgType = lastTr.find(`select[name="orgType"]`).val();
+                let campus = lastTr.find(`select[name="campus"]`).val();
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='orgId']`).val('')
+                clonedTr.find(`input[name='orgAbbr']`).val('') 
+                clonedTr.find(`input[name='orgName']`).val('')
+                clonedTr.find(`input[name='orgCompleteName']`).val('')
+                clonedTr.find(`select[name='orgType']`).val('');
+                clonedTr.find(`select[name='campus']`).val(''); 
+
+                $('#add-more-org-table tbody').append(clonedTr) 
+                $('#add-more-org-table tbody tr .modalSelect2').select2();
+               // lastTr.find('#add-more-org-table .modalSelect2').select2();
+                //clonedTr.find('##add-more-org-table .modalSelect2').select2();
+            })
+
+            $('#add-more-org-table').on('click', '.remove-organization', function () {
+                let trLength = $('#add-more-org-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+
+            //Add more rows for campus
+            $('#add-more-campus').on('click', function () {
+                console.log("Organization Added::::")
+
+                let lastTr = $('#add-more-campus-table tbody tr:last-child')
+               
+                let campusId = lastTr.find(`input[name='campusId']`).val();
+                let campusAbbr = lastTr.find(`input[name='campusAbbr']`).val();
+                let campusName = lastTr.find(`select[name='campusName']`).val();
+                let campusDesc = lastTr.find(`select[name='campusDesc']`).val();
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='campusId']`).val('')
+                clonedTr.find(`input[name='campusAbbr']`).val('')
+                clonedTr.find(`select[name='campusName']`).val('')
+                clonedTr.find(`select[name='campusDesc']`).val('')
+                $('#add-more-campus-table tbody').append(clonedTr)
+
+            })
+
+            $('#add-more-campus-table').on('click', '.remove-campus', function () {
+                let trLength = $('#add-more-campus-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+
+            //Add more rows for building    
+            $('#add-more-building').on('click', function () {
+                console.log("Organization Added::::")
+                let lastTr = $('#add-more-building-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+                let buildingName = lastTr.find(`input[name='building_name']`).val();
+                let buildingNumber = lastTr.find(`input[name='building_number']`).val();
+                let floors = lastTr.find(`input[name='floors']`).val();
+                let ownerId = lastTr.find(`select[name='owner_id']`).val();
+                let startTimeId = lastTr.find(`select[name='start_time_id']`).val();
+                let endTimeId = lastTr.find(`select[name='end_time_id']`).val();
+                let handledById = lastTr.find(`select[name='handled_by']`).val();
+                let campusId = lastTr.find(`select[name='campus_lid']`).val();
+
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='building_name']`).val('')
+                clonedTr.find(`input[name='building_number']`).val('')
+                clonedTr.find(`input[name='floors']`).val('')
+                clonedTr.find(`select[name='owner_id']`).val('')
+                clonedTr.find(`select[name='start_time_id']`).val('')
+                clonedTr.find(`select[name='end_time_id']`).val('')
+                clonedTr.find(`select[name='handled_by']`).val('')
+                clonedTr.find(`select[name='campus_lid']`).val('')
+
+                $('#add-more-building-table tbody').append(clonedTr) 
+
+                $('#add-more-building-table tbody tr .modalSelect2').select2();
+
+               
+                });
+            
+
+            $('#add-more-building-table').on('click', '.remove-building', function () {
+                let trLength = $('#add-more-building-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+        
+           //Add more rows in room
+           $('#add-more-room').on('click', function () {
+                console.log("Room Added::::1")
+
+                let lastTr = $('#add-more-room-table tbody tr:last-child')
+                lastTr.find('.modalSelect2').select2('destroy');
+
+                console.log('lastTr', lastTr)
+                let roomNumber = lastTr.find(`input[name='room_number']`).val();
+                let roomTypeId = lastTr.find(`select[name='room_type_id']`).val();
+                let floorNumber = lastTr.find(`input[name='floor_number']`).val();
+                let capacity = lastTr.find(`input[name='capacity']`).val();
+                let startTimeId = lastTr.find(`select[name='start_time_id']`).val();
+                let endTimeId = lastTr.find(`select[name='end_time_id']`).val();
+                let isBasement = lastTr.find(`select[name='is_basement']`).val();
+                // let isProcessed = lastTr.find(`input[name='is_processed']`).val();
+
+                let clonedTr = lastTr.clone();
+                clonedTr.find(`input[name='room_number']`).val('')
+                clonedTr.find(`select[name='room_type_id']`).val('')
+                clonedTr.find(`input[name='floor_number']`).val('')
+                clonedTr.find(`input[name='capacity']`).val('')
+                clonedTr.find(`select[name='start_time_id']`).val('')
+                clonedTr.find(`select[name='end_time_id']`).val('')
+                clonedTr.find(`select[name='is_basement']`).val('')
+                // clonedTr.find(`select[name='is_processed']`).val('')
+
+                $('#add-more-room-table tbody').append(clonedTr)
+                $('#add-more-room-table tbody tr .modalSelect2').select2();
+
+                // lastTr.find('.modalSelect2').select2({
+                //     dropdownParent: $('#add-room-modal')
+                // });
+
+                // clonedTr.find('.modalSelect2').select2({
+                //     dropdownParent: $('#add-room-modal')
+                // });
+            })
+
+            $('#add-more-room-table').on('click', '.remove-room', function () {
+                let trLength = $('#add-more-room-table tbody tr').length;
+                if (trLength > 1) {
+                    $(this).closest('tr').remove()
+                } else {
+                    alert('Cannot delete this room.')
+                }
+            })
+
+        let currentFormStep = parseInt(`<%- currentFormStep%>`);
+
+        $('.step-form .step-form-body .active-form').removeClass('active-form').addClass('d-none');
+
+        $(`.step-form .step-form-body .step[data-step=${currentFormStep}]`).removeClass('d-none').addClass('active-form');
+      
+        function formStepNext() {
+            currentFormStep++;
+            console.log('clicked!!')
+            $(`.step-form .stages .stage:nth-child(-n + ${currentFormStep-1})`).removeClass('pending').addClass('submitted');
+            $(`.step-form .stages .stage:nth-child(${currentFormStep})`).removeClass('pending').addClass('active');
+
+            $('.step-form .step-form-body .active-form').removeClass('active-form').addClass('d-none');
+            $(`.step-form .step-form-body .step[data-step=${currentFormStep}]`).removeClass('d-none').addClass('active-form');
+                console.log(currentFormStep);
+        }
+        console.log(currentFormStep);
+        //Calling Apies
+       
+ 
+        $("#next-step").on('click', function () {
+                console.log('Click::::>>', currentFormStep)
+
+                if (currentFormStep == 2) {
+
+                    let orgElems = $('#add-more-org-table tbody tr');
+                    let orgCount = orgElems.length;
+                    let orgJson = [];
+                    orgElems.each(function (index, elem) {
+
+                        let orgId = $(elem).find(`input[name='orgId']`).val()
+                        let orgAbbr = $(elem).find(`input[name='orgAbbr']`).val()
+                        let orgName = $(elem).find(`input[name='orgName']`).val()
+                        let orgCompleteName = $(elem).find(`input[name='orgCompleteName']`).val()
+                        let orgType = $(elem).find(`select[name='orgType']`).val()
+                        let campus_lid = $(elem).find(`select[name='campus']`).val()
+
+                        if (index < orgCount - 1) {
+                            let obj = { 
+                                org_id: orgId,
+                                org_id_str: orgId,
+                                org_abbr: orgAbbr,
+                                org_name: orgName,
+                                org_complete_name: orgCompleteName,
+                                org_type_id: orgType,
+                                campus_lid: campus_lid
+                            }
+                            orgJson.push(obj) 
+                        } else {
+                            let obj = {
+                                org_id: orgId,
+                                org_id_str: orgId, 
+                                org_abbr: orgAbbr,
+                                org_name: orgName,
+                                org_complete_name: orgCompleteName,
+                                org_type_id: orgType,
+                                campus_lid:campus_lid
+                            }
+                            orgJson.push(obj)
+                        }
+                    })
+
+
+                    console.log('orgJson::::::::::::::::::::>>>', orgJson)
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/management/organizations/create',
+                        data: {
+                            inputJSON: JSON.stringify(orgJson), 
+                            settingName: 'Organization'
+                        },
+                        dataType: 'JSON'
+                    }
+
+
+                    ajaxApi(ApiObj).then(result => { 
+                        console.log('Result:::::::::::', result)
+                  
+
+                        formStepNext()
+                        showSuccess(result)
+                        
+                    }).catch(error => {
+                        console.log('error.responseJSON::::::::::::>>>',error.responseJSON)
+                        showError(error.responseJSON)
+                    })
+
+
+                } else if (currentFormStep == 1) {
+                    let campusElems = $('#add-more-campus-table tbody tr');
+                    let campusCount = campusElems.length;
+
+                    let campusJson = [];
+
+                    campusElems.each(function (index, elem) {
+                        let campusId = $(elem).find(`input[name='campusId']`).val()
+                        let campusAbbr = $(elem).find(`input[name='campusAbbr']`).val()
+                        let campusName = $(elem).find(`input[name='campusName']`).val()
+                        let campusDesc = $(elem).find(`input[name='campusDesc']`).val()
+
+                        if (index < campusCount - 1) {
+                            let obj = {
+                                campus_id: campusId,
+                                campus_abbr: campusAbbr,
+                                campus_name_40_char: campusName,
+                                campus_description: campusDesc
+                            }
+                            campusJson.push(obj)
+                        } else {
+                            let obj = {
+                                campus_id: campusId,
+                                campus_abbr: campusAbbr,
+                                campus_name_40_char: campusName,
+                                campus_description: campusDesc
+                            }
+                            campusJson.push(obj)
+                        }
+                    })
+
+                    console.log('campusJson:::::::>>', campusJson)
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/management/campuses/create',
+                        data: {
+                            inputJSON: JSON.stringify(campusJson),
+                            settingName: 'Campus'
+                        },
+                        dataType: 'JSON'
+                    }
+                   
+
+                    ajaxApi(ApiObj).then(result => {
+                        
+                        
+                        showSuccess(result);
+                       
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                } else if (currentFormStep == 3) {
+                    let buildingElems = $('#add-more-building-table tbody tr');
+                    let buildingCount = buildingElems.length;
+                    let buildingJson = [];
+                    buildingElems.each(function (index, elem) {
+                        let building_name = $(elem).find(`input[name='building_name']`).val()
+                        let building_number = $(elem).find(`input[name='building_number']`).val();
+                        let total_floors = $(elem).find(`input[name='total_floors']`).val();
+                        let owner_id = $(elem).find(`select[name='owner_id']`).val();
+                        let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+                        let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+                        let handled_by = $(elem).find(`select[name='handled_by']`).val();
+                        let campus_lid = $(elem).find(`select[name='campus_lid']`).val();
+
+
+                        if (index < buildingCount - 1) {
+                            let obj = {
+                                building_name: building_name,
+                                building_number: building_number,
+                                total_floors: total_floors,
+                                owner_id: owner_id,
+                                start_time_id: start_time_id,
+                                end_time_id: end_time_id,
+                                handled_by: handled_by,
+                                campus_lid: campus_lid
+                            }
+                            buildingJson.push(obj)
+                        } else {
+                            let obj = {
+                                building_name: building_name,
+                                building_number: building_number,
+                                total_floors: total_floors,
+                                owner_id: owner_id,
+                                start_time_id: start_time_id,
+                                end_time_id: end_time_id,
+                                handled_by: handled_by,
+                                campus_lid: campus_lid
+                            }
+                            buildingJson.push(obj)
+                        }
+                    })
+
+                    console.log('buildingJson', buildingJson)
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/management/buildings/create',
+                        data: {
+                            inputJSON: JSON.stringify(buildingJson),
+                            settingName: 'Building'
+                        },
+                        dataType: 'JSON'
+                    }
+                    
+
+                    ajaxApi(ApiObj).then(result => {
+                        // formStepNext()
+                        showSuccess(result)
+                        
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                } else if (currentFormStep == 4) {
+
+                    let roomElems = $('#add-more-room-table tbody tr');
+                    let roomCount = roomElems.length;
+
+                    let roomJson = [];
+
+                    roomElems.each(function (index, elem) {
+                        let building_lid = $('#building_lid').val();
+                        let handled_by = $("#roomHandled_by").val();
+                        let room_number = $(elem).find(`input[name='room_number']`).val()
+                        let room_type_id = $(elem).find(`select[name='room_type_id']`).val();
+                        let floor_number = $(elem).find(`input[name='floor_number']`).val();
+                        let capacity = $(elem).find(`input[name='capacity']`).val();
+                        let start_time_id = $(elem).find(`select[name='start_time_id']`).val();
+                        let end_time_id = $(elem).find(`select[name='end_time_id']`).val();
+                        let is_basement = $(elem).find(`select[name='is_basement']`).val();
+                        let is_processed = $(elem).find(`select[name='is_processed']`).val();
+
+
+                        if (room_number === "" || room_type_id === "" || handled_by === "" ||
+                            floor_number ===
+                            "" || start_time_id === "" || end_time_id === "" || is_basement === ""
+                        ) {
+                            $('.error-show').text('Fields cannot be empty!!');
+                            return;
+                        } else if (room_number.trim() === "" || floor_number.trim() === "" ||
+                            capacity
+                            .trim() === "") {
+                            $('.error-show').text('Fields cannot have empty space!!');
+                            return;
+                        } else {
+
+                            if (index < roomCount - 1) {
+                                let obj = {
+                                    building_lid: building_lid,
+                                    handled_by: handled_by,
+                                    room_number: room_number,
+                                    room_type_id: room_type_id,
+                                    floor_number: floor_number,
+                                    capacity: capacity,
+                                    start_time_id: start_time_id,
+                                    end_time_id: end_time_id,
+                                    is_basement: is_basement,
+                                    is_processed: is_processed
+                                }
+                                console.log('OBJ1::::::::::>>', obj)
+                                roomJson.push(obj)
+                            } else {
+                                let obj = {
+                                    building_lid: building_lid,
+                                    handled_by: handled_by,
+                                    room_number: room_number,
+                                    room_type_id: room_type_id,
+                                    floor_number: floor_number,
+                                    capacity: capacity,
+                                    start_time_id: start_time_id,
+                                    end_time_id: end_time_id,
+                                    is_basement: is_basement,
+                                    is_processed: is_processed
+                                }
+                                roomJson.push(obj)
+                            }
+                        }
+                    })
+
+     
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/management/rooms/create',
+                        data: {
+                            inputJSON: JSON.stringify(roomJson),
+                            settingName: 'Room'
+                        },
+                        dataType: 'JSON'
+                
+                    }
+
+                    ajaxApi(ApiObj).then(result => {
+                      
+                        showSuccess(result)
+                        
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                } else if (currentFormStep == 5) {
+                    
+
+                    let ApiObj = {
+                        type: 'POST',
+                        url: '/management/faculties/faculty/create',
+                        data: {
+                           
+                            settingName:'Faculty'
+                        },
+                        dataType: 'JSON'
+                    }
+
+
+                    ajaxApi(ApiObj).then(result => {
+                        // formStepNext()
+                        showSuccess(result)
+                        
+                        
+                    }).catch(error => {
+                        showError(error.responseJSON)
+                    })
+                }
+
+
+        })
+
+
+
+    //Getting capus Bulding List
+    $(".campus_lid_filter").on('change', function () {
+        let campus_lid = $(this).val()
+        let ApiObj = {
+            url: '/management/rooms/buildinglist',
+            type: 'POST',
+            data: {
+                campus_lid: campus_lid
+            },
+            dataType: 'JSON'
+        }
+
+        ajaxApi(ApiObj).then(result => {
+            console.log('Result:::::::::::::::', result.data)
+            //building_lid
+
+            let buildingList = ``;
+
+            if (result.data.length > 0) {
+                result.data.forEach(element => {
+                    buildingList += `<option value="${element.id}">
+                                ${element.building_name}
+                            </option>`
+                });
+            } else {
+                buildingList += `<option value="">
+                                No Building Found!
+                            </option>`
+            }
+            $("#building_lid").html(buildingList)
+        }).catch(error => {
+            showError(error.responseJSON)
+        })
+    })
+    
+    function showSuccess(errors) {
+        console.log(errors);
+        let simpleAlert = new SimpleAlert();
+        let obj = {
+            title : errors.description,
+            message: "",
+            type: 'alert-success',
+            buttons: {
+                positive:{
+                    text: "Okay",
+                    action: function(){
+                        document.querySelector('.simple-alert').remove();
+                    }
+                },
+                negative: {
+                    text: "Cancel",
+                    action: function () {
+                    alert('Negative')
+                    }
+                }
+            }
+        }
+        simpleAlert.alert(obj);
+    }
+
+    function showError(errors) {
+        
+        console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: { 
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+    } 
+
+    })
+</script>
+<!-- PAGE LEVEL JS END -->
+<%- include('../partials/footerEnd') %>

@@ -1,0 +1,794 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    <%- include("../partials/faculty-menu") %>
+    <!--DASHBOARD CONTENT START-->
+    <div class="errorHtml"></div>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Faculty Batch</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger" href="/admin/faculties/batch/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#add-facultybatch-modal"><i
+                        class="fas fa-plus"></i></button>
+                <!-- <button class="btn ms-auto delete-facultybatch add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-facultybatch add-btn "><img src="/icons/delete.png" alt=""
+                        width="24px" height="32px"></button> -->
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+            <table class="table custom_row" id="facultyBatch">
+                <thead>
+                    <th>Sr.No.</th>
+                    <th>Faculty Name</th>
+                    <th>Faculty Id</th>
+                    <th>Program Name</th>
+                    <th>Module Name</th>
+                    <th>Academic Session</th>
+                    <th>Division</th>
+                    <th>Batch</th>
+                    <th>lecture count</th>
+                    <th>Action</th>
+                </thead>
+                <tbody> 
+                   <%  let count =1; %>
+                    <% for (let faculty of FacultyBatchList) { %>
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- faculty.faculty_name %></td>
+                        <td><%- faculty.faculty_id %></td>
+                        <td><%- faculty.program_name %></td>
+                        <td><%- faculty.module_name %></td>
+                        <td><%- faculty.acad_session %></td>
+                        <td><%- faculty.division %></td>
+                        <td><%- faculty.batch %> (<%-faculty.event_type%>)</td>
+                        <td><%- faculty.lec_count%></td>
+                        <td><a class="edit-facultybatch" data-id="<%- faculty.id %>" data-faculty-lid="<%- faculty.faculty_lid %>" data-batch="<%- faculty.batch %>" data-batch-lid="<%-faculty.batch_lid%>"><i class="fas fa-edit text-dark"></i></a>
+                                <a class="delete-faculty" data-id="<%- faculty.id %>"><i class="fa fa-trash text-danger"></i></a>
+                            </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div> 
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add-facultybatch-modal" tabindex="-1" role="dialog" aria-labelledby="add-facultybatch-modal"
+aria-hidden="true">
+<div class="modal-dialog modal-fullscreen" role="document">
+    <div class="modal-content modal-inputform">
+        <div class="modal-header  modal-inputform-header">
+            <h5 class="modal-title text-dark" id="add-org-modal-title">ADD FACULTY BATCH</h5>
+            <button type="button" class="btn fs-4 text-dark" data-bs-dismiss="modal" aria-label="Close"><i
+                    class="fas fa-times"></i></button>
+
+        </div>
+        <div class="modal-body">
+            <div id="errorHtml"></div>
+         <div class="row">
+             <div class="col-md-3 select-items">
+            <div class="mb-3">
+                <label class="form-label">Select Faculty</label>
+                <select class="batch-select2" name="faculty_lid" id="faculty_lid">
+                    <option value="">--select--</option>
+                    <% for(faculty of facultyList) {%>
+                    <option value="<%- faculty.id %>">
+                        <%- faculty.faculty_name %>  (<%- faculty.faculty_id %>)</option>
+                    <%}%>
+                </select>
+
+            </div>
+            <div class="mb-3">
+             <label class="form-label">Select Program</label>
+                <select class="form-select" name="programName" id="programName"></select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Acad Session</label>
+                <select class="form-select" name="sessionName" id="sessionName"></select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Module Name</label>
+                <select class="form-select" name="moduleName" id="moduleName"></select>
+            </div>
+   
+            <div class="mb-3">
+                <label class="form-label">Select Division</label>
+                <select class="form-select" name="divisionName" id="divisionName"></select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Batch</label>
+                <select class="form-select" name="batchName" id="batchName"></select>
+            </div>
+
+            <div class="input-group mb-3 d-flex flex-column">
+                <label class="form-label" >Input Lecture count</label>
+                <input class="form-control w-100" name="batchCount" id="batchCount" type="number">
+            </div>
+
+            <div class="mb-3 d-grid gap-2">
+                <button class="btn btn-info text-light add-faculty-batch" disabled>ADD FACULTY BATCH</button>
+            </div>
+
+            <div class="alert alert-success rounded-0" role="alert">
+                Note: Select Faculty First.
+              </div>
+             </div>
+             <div class="col-md-9 selected-items">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="add-more-faculty-batch-table">
+                        <thead>
+                            <th>Sr No.</th>
+                            <th>Faculty Name</th>
+                            <th>Program Name</th>
+                            <th>Academic Session</th>
+                            <th>Module Name</th>
+                            <th>Division</th>
+                            <th>Batch</th>
+                            <th>lecture count</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+             </div>
+         </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn createfacultybatch modal-inputform-btn">CREATE</button>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<!-- Edit Faculty -->
+<div class="modal fade" id="edit-faculty-batch-modal" tabindex="-1" aria-labelledby="edit-faculty-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h3 class="modal-title" id="open-faculty-modal-title">Edit Faculty</h3>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+
+            <div class="modal-body py-0">
+                
+                <div class="row g-3">
+                    <input type="hidden" id="hidden_id" name="hidden_id">
+                    <div class="col-md-6">
+                      <label for="inputEmail4" class="form-label">Faculty Name</label>
+                      <select class="batch-select2" name="faculty_lid" id="faculty_lid">
+                        <option value="">--select--</option>
+                        <% for(faculty of facultyList) {%>
+                        <option value="<%- faculty.id %>">
+                            <%- faculty.faculty_name %>  (<%- faculty.faculty_id %>)</option>
+                        <%}%>
+                    </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="inputPassword4" class="form-label">Program Name</label>
+                      <input type="text" class="form-control" id="programName" disabled>
+                    </div>
+                    <div class="col-12">
+                      <label for="inputAddress" class="form-label">Module Name</label>
+                      <input type="text" class="form-control" id="moduleName" disabled>
+                    </div>
+                    <div class="col-12">
+                      <label for="inputAddress2" class="form-label">Academic Session</label>
+                      <input type="text" class="form-control" id="acadSessionName" disabled>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="inputCity" class="form-label">Division</label>
+                      <input type="text" class="form-control" id="divisionName" disabled>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="inputState" class="form-label">Select Batch</label>
+                      <select class="form-select" name="batchName" id="batchName"></select>
+                    </div>
+                    <div class="input-group mb-3 d-flex flex-column">
+                        <label class="form-label" >Input Lecture Count</label>
+                        <input class="form-control w-100" name="editBatchCount" id="editBatchCount" type="number">
+                    </div>
+                  </div>
+            </div>
+            <div class="modal-footer mt-2">
+                <button type="submit" class="btn updatefacultybatch modal-inputform-btn">Update Faculty</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("../partials/footer") %>
+
+<script src="/js/dashboardscript.js"></script>
+<script src="/js/leftsidebartoggle.js"></script>
+<script>
+
+$(document).ready(function(){
+
+    $('.batch-select2').select2({
+         dropdownParent: $('#add-facultybatch-modal')});
+
+
+        //search feature delay function is writter in script.js file which is located in public/js/script.js
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+            type: "POST",
+            url: "/admin/faculties/batch/search",
+            data: {
+                keyword: keyword,
+                pageNo: 1
+            },
+            success: function (data) {
+                console.log(data)
+                showAjaxTable(data.data) // Faculty List
+            }
+        })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/faculties/batch/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        showAjaxTable(data.data) // Faculty List
+                    }
+                })
+            })
+
+
+        //Edit Read
+        $("#facultyBatch").on('click','.edit-facultybatch', function(){
+            $(".createfacultybatch").addClass('d-none')
+            $(".updatefacultybatch").removeClass('d-none')
+            let id = $(this).attr('data-id')
+            let faculty_lid = $(this).attr('data-faculty-lid')
+            let faculty_batch = $(this).attr('data-batch')
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/find-batch-by-facultyid',
+                data: {
+                    id: id,
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('Result:::::::::::>>',result)
+
+                let batchList = ``;
+                if (result.result.length > 0) {
+                    console.log('in the if condition')
+                    batchList = `<option value="" disabled>Select Module</option>`
+                    result.result.forEach(element => {
+                        console.log('element::>>', element)
+                        batchList +=
+                            `<option value="${element.id}">Batch-${element.batch} / (${element.name})</option>`;
+                            $("#edit-faculty-batch-modal #programName").val(element.program_name)
+                        $("#edit-faculty-batch-modal #moduleName").val(element.module_name)
+                        $("#edit-faculty-batch-modal #acadSessionName").val(element.acad_session)
+                        $("#edit-faculty-batch-modal #divisionName").val(element.division)
+                        $(document).find("#edit-faculty-batch-modal #editBatchCount").val(element.lec_count)
+                        
+                    });
+
+                
+                } else {
+                    batchList += `<option value="">No Batch Found!</option>`;
+                }
+                console.log('faculty_batch:::::::',faculty_batch)
+                $("#faculty_batch").val(faculty_batch).trigger('change')
+                $("#edit-faculty-batch-modal  #faculty_lid").val(faculty_lid).trigger('change')
+                $("#edit-faculty-batch-modal #faculty_lid").attr("disabled", "disabled");
+                
+                $("#hidden_id").val(id)
+                $("#edit-faculty-batch-modal  #batchName").html(batchList)
+                let batch_lid = $(this).attr('data-batch-lid')
+                $("#edit-faculty-batch-modal  #batchName").val(batch_lid).trigger('change');
+                $("#edit-faculty-batch-modal").modal('show')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //Update
+        $(".updatefacultybatch").on('click', function () {
+        let facultyBatchJson = [];
+        let id = $("#edit-faculty-batch-modal #hidden_id").val();
+        let faculty_lid = $("#edit-faculty-batch-modal #faculty_lid").val()
+        let faculty_batch = $("#edit-faculty-batch-modal #batchName").val();
+        let lec_count = $('#edit-faculty-batch-modal #editBatchCount').val();
+
+                let obj = {
+                    id: id,
+                    faculty_lid: faculty_lid,
+                    batch_lid: faculty_batch,
+                    lec_count: lec_count
+                }
+                facultyBatchJson.push(obj)
+        console.log('facultyBatchJson:::::::::::::>',facultyBatchJson)
+
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/update',
+                data: {
+                    inputJSON: JSON.stringify(facultyBatchJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log(result)
+                showSuccess(result)
+                //notify()
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+
+            //Delete Faculty API
+            $("#facultyBatch").on('click','.delete-faculty',function(){
+            let id = $(this).attr("data-id");
+            console.log('batculty batch id::', id)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+    //PAGINATION
+    let pageCount = `<%- pageCount %>`
+    let pageNos = Math.ceil(Number(pageCount) / 10)
+    console.log("Page Numbers", pageNos)
+    $('#pagination').bootpag({
+        total: pageNos,
+        page: 1,
+        maxVisible: 10,
+        leaps: true,
+        firstLastUse: true,
+        first: '←',
+        last: '→',
+        wrapClass: 'pagination',
+        activeClass: 'active', 
+        disabledClass: 'disabled',
+        nextClass: 'next',
+        prevClass: 'prev',
+        lastClass: 'last',
+        firstClass: 'first'
+    }).on("page", function (event, num) {
+        console.log('pagination here!!')
+        $.ajax({
+            type: "POST",
+            url: "/admin/faculties/batch/pagination",
+            data: {
+                pageNo: num
+            },
+            success: function (data) {
+                console.log(data.data)
+                showAjaxTable(data.data) 
+            }
+        })
+    });
+
+
+    // FILTER APIES
+    $("#faculty_lid").on('change',function(){
+        let faculty_lid =  $(this).val();
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/program-by-facultyid',
+                data: {
+                    faculty_lid: faculty_lid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let programName = `<option value="">Select Program Name</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        programName +=`<option value="${element.program_lid}">${element.program_name}</option>`;
+                    });
+                    // $('.add-faculty-date-time').removeAttr('disabled')
+                } else {
+                    programName += `<option value="">No Program Found!</option>`;
+                }
+                $("#add-facultybatch-modal  #programName").html(programName).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+
+    $("#programName").on('change',function(){
+        let program_lid =  $(this).val();
+        let faculty_lid =  $("#faculty_lid").val();
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/session-by-facultyid-and-programid',
+                data: {
+                    program_lid: program_lid,
+                    faculty_lid: faculty_lid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let sessionName = `<option value="">Select Academic Session</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        sessionName +=`<option value="${element.session_lid}">${element.acad_session}</option>`;
+                    });
+                } else {
+                    sessionName += `<option value="">No Program Found!</option>`;
+                }
+                $("#add-facultybatch-modal  #sessionName").html(sessionName).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+    $("#sessionName").on('change',function(){
+        let session_lid =  $(this).val();
+        let faculty_lid =  $("#faculty_lid").val();
+        let program_lid =  $("#programName").val();
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/module-by-facultyid-programid-sessionid',
+                data: {
+                    program_lid: program_lid,
+                    faculty_lid: faculty_lid,
+                    session_lid: session_lid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let moduleName = `<option value="">Select Module Name</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        moduleName +=`<option value="${element.id}">${element.module_name}</option>`;
+                    });
+                } else {
+                    moduleName += `<option value="">No Module Found!</option>`;
+                }
+                $("#add-facultybatch-modal  #moduleName").html(moduleName)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+
+    $("#moduleName").on('input',function(){
+        console.log('Module API')
+        let module_lid =  $(this).val();
+        console.log('module_lid::::::::',module_lid)
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/division-by-moduleid',
+                data: {
+                    module_lid: module_lid,
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let divisionName = `<option value="">Select Division</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        divisionName +=`<option value="${element.id}">${element.division}</option>`;
+                    });
+                } else {
+                    divisionName += `<option value="">No Module Found!</option>`;
+                }
+                $("#add-facultybatch-modal  #divisionName").html(divisionName).trigger('change')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+
+    $("#divisionName").on('input',function(){
+        console.log('DIVISION API')
+        let division_lid =  $(this).val();
+        console.log('division_lid::::::::',division_lid)
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/batch-by-divisionid',
+                data: {
+                    division_lid: division_lid,
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let divisionName = `<option value="">Select Batch</option>`;
+                if (result.result.length > 0) {
+                    result.result.forEach(element => {
+                        divisionName +=`<option value="${element.id}">${element.batch} (${element.event_type})</option>`;
+                    });
+                   
+                } else {
+                    divisionName += `<option value="">No Batch Found!</option>`;
+                    // $('.add-faculty-batch').attr('disabled','disabled');
+                }
+                $("#add-facultybatch-modal  #batchName").html(divisionName).trigger('change');
+               
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+   $(document).on('change', '#batchName', function() {
+    $('.add-faculty-batch').removeAttr('disabled');
+   })
+
+
+            //APPEND FACULTY BATCH
+            $('.add-faculty-batch').on('click', function(){
+             let faculty_lid = $("#faculty_lid").val()
+            let faculty_name = $("#faculty_lid option:selected").text();
+            let batch_lid = $("#batchName").val();
+            let batch_name = $("#batchName option:selected").text();
+            let division = $("#divisionName option:selected").text();
+            let programName = $("#programName option:selected").text();
+            let academicSessionName = $("#sessionName option:selected").text();
+            let moduleName = $("#moduleName option:selected").text();
+            let batchCount = $("#batchCount").val();
+
+            if(batchCount.length > 0){
+
+                $('#add-more-faculty-batch-table tbody').append(`<tr>
+                <td>#</td>
+                <td data-faculty-lid="${faculty_lid}">${faculty_name}</td>
+                <td>${programName}</td>
+                <td>${academicSessionName}</td>
+                <td>${moduleName}</td>
+                <td>${division}</td>
+                <td data-batch-lid="${batch_lid}">${batch_name}</td>
+                <td data-lec-count="${batchCount}">${batchCount}</td>
+                <td>
+                    <i class="fas fa-trash-alt text-danger cursor-pointer remove-batch-column"></i></td>
+                </tr>`)
+            }
+            else{
+                alert('Batch Count is mandatory')
+            }
+
+           
+        })
+
+
+        //Remove Element
+        $("#add-more-faculty-batch-table").on('click', '.remove-batch-column', function () {
+            $($(this)).fadeOut(300, function () {
+               $($(this).parent().parent()).remove()
+            })
+        })
+
+
+
+        $(".createfacultybatch").on('click', function () {
+        let facultyBatchElems = $('#add-more-faculty-batch-table tbody tr');
+        let facultyBatchCount = facultyBatchElems.length;
+        let facultyBatchJson = [];
+        facultyBatchElems.each(function (index, elem) {
+            let faculty_lid = $(elem).find('td[data-faculty-lid]').attr('data-faculty-lid');
+            let faculty_batch = $(elem).find('td[data-batch-lid]').attr('data-batch-lid');
+            let lec_count = $(elem).find('td[data-lec-count]').attr('data-lec-count');
+
+            if (index < facultyBatchCount - 1) {
+                let obj = {
+                    faculty_lid: faculty_lid,
+                    batch_lid:faculty_batch,
+                    lec_count: lec_count
+                }
+                facultyBatchJson.push(obj)
+            } else {
+                let obj = {
+                    faculty_lid: faculty_lid,
+                    batch_lid:faculty_batch,
+                    lec_count: lec_count
+                }
+                facultyBatchJson.push(obj)
+            }
+        })
+
+        let ApiObj = {
+                type: 'POST',
+                url: '/admin/faculties/batch/create',
+                data: {
+                    inputJSON: JSON.stringify(facultyBatchJson)
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                console.log(result)
+                showSuccess(result)
+               // notify()
+
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+    })
+
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/faculties/batch/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    showAjaxTable(data.data) 
+                }
+            })
+        })
+
+
+    function showAjaxTable(facultiesList) {
+            let AjaxTable = `<table class="table custom_row" id="facultyBatch">
+                <thead>
+                    <th>Sr.No.</th>
+                    <th>Faculty Name</th>
+                    <th>Faculty Id</th>
+                    <th>Program Name</th>
+                    <th>Module Name</th>
+                    <th>Academic Session</th>
+                    <th>Division</th>
+                    <th>Batch</th>
+                    <th>lecture count</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+
+            if (facultiesList.length > 0) {
+                let count  = 1;
+                for (faculty of facultiesList) {
+                    AjaxTable +=
+                    `<tr>
+                        <td>${count++}</td>
+                        <td>${faculty.faculty_name}</td>
+                        <td>${faculty.faculty_id}</td>
+                        <td>${faculty.program_name}</td>
+                        <td>${faculty.module_name}</td>
+                        <td>${faculty.acad_session}</td>
+                        <td>${faculty.division}</td>
+                        <td>${faculty.batch} (${faculty.event_type})</td>
+                        <td>${faculty.lec_count}</td>
+                        <td><a class="edit-facultybatch" data-id="${faculty.id}" data-faculty-lid="${faculty.faculty_lid}" data-batch-lid="${faculty.batch_lid}" data-batch="${faculty.batch_lid}"><i class="fas fa-edit text-dark"></i></a>
+                            <a class="delete-faculty" data-faculty-id="${faculty.id}"><i class="fa fa-trash text-danger"></i></a>
+                        </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                         <td colspan="9">No Data Found</td>
+                      </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#facultyBatch").html(AjaxTable);
+        }
+    
+    
+
+    function showError(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+
+</script>
+<%- include("../partials/footerEnd") %>

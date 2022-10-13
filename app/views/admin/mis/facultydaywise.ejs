@@ -1,0 +1,223 @@
+<%- include("../partials/head") %>
+<style>
+    table {
+        width: 100%;
+        text-align: left;
+        position: relative;
+        border-collapse: collapse;
+        background-color: #f6f6f6;
+    }
+
+    /* Spacing */
+    td,
+    th {
+        border: 1px solid #999;
+        padding: 20px;
+    }
+
+    th {
+        background: brown;
+        color: white;
+        border-radius: 0;
+        position: sticky;
+        top: 0;
+        padding: 10px;
+
+    }
+
+    .brown {
+        background: brown;
+        color: white;
+    }
+
+    .primary {
+        background-color: #000000
+    }
+
+    tfoot>tr {
+        background: black;
+        color: white;
+    }
+
+    /* tbody > tr:hover {
+  background-color: #ffc107;
+} */
+</style>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!-- MAIN-CONTENT -->
+<div class="main-content">
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+    <!-- MENU IMPORT HERE -->
+    <!--DASHBOARD CONTENT START-->
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>FACULTY-DAY-WISE</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger download-current-report  disabled"  >Download Currunt </a>
+            </div>
+        </div>
+        <div class="card-body table-responsive">
+            <div class="col-md-4 mb-4">
+                <label>Select Faculty:</label>
+                <select class="form-select select2 mt-1" id="facultyName">
+                    <option>Select faculty</option>
+                    <option value="0">Download All</option>
+                    <%for(let faculty of facultyList){%>
+                    <option value="<%-faculty.id%>"><%-faculty.faculty_name%> (<%-faculty.faculty_id%>)</option>
+                    <%}%>
+        </select>
+        </div>
+        <div id="faculty-day-table"></div>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/footer") %>
+                    <script src="/js/dashboardscript.js"></script>
+                    <script src="/js/leftsidebartoggle.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+                    <script>
+                        $(document).ready(function () {
+                            $(".select2").select2()
+
+
+                            $("#facultyName").on('change', function () {
+                                let faculty_lid = $(this).val()
+                               
+                                if(faculty_lid > 0){
+                                    $(".download-current-report").attr('data-faculty-id',faculty_lid)
+                                    $(".download-current-report").removeClass('disabled')
+                                    $(".download-current-report").html('Download Current')
+                                     $(".download-current-report").attr('href',`/admin/mis/simulation-chart/faculty-day-wise/download/${faculty_lid}`)
+                                    let ApiObj = {
+                                    type: 'POST',
+                                    url: "/admin/mis/simulation-chart/faculty-day-wise",
+                                    data: {
+                                        faculty_lid: faculty_lid
+                                    },
+                                    dataType: 'JSON'
+                                }
+                                ajaxApi(ApiObj).then(result => {
+                                    AjaxtTable(result.data)
+                                }).catch(error => {
+                                    showError(error.responseJSON)
+                                })
+                                }
+                                else{
+                                    console.log('IN ELSE CONDITION::::::::')
+                                    $(".download-current-report").attr('data-faculty-id',faculty_lid)
+                                     $(".download-current-report").attr('href',`/admin/mis/simulation-chart/faculty-day-wise/download/${faculty_lid}`)
+                                    $(".download-current-report").removeClass('disabled')
+                                    $(".download-current-report").html('Download ALL')
+                                }
+
+                            })
+
+                          
+
+
+                function AjaxtTable(dataSet) {
+                                let table = `<table>
+                <!-- <caption>A summary of top sites with both paid and free course</caption> -->
+                <thead>
+                  <tr>
+                     <th scope="col">Time</th>
+                    <th scope="col">Monday</th>
+                    <th scope="col">Tuesday</th>
+                    <th scope="col">Wednesday</th>
+                    <th scope="col">Thursday</th>
+                    <th scope="col">Friday</th>
+                    <th scope="col">Saturday</th>
+                  </tr>
+                </thead>
+                <tbody>`
+
+                    if (dataSet.length > 0) {
+                                    dataSet.forEach(element => {
+                                        table += `<tr>
+                            <td>${element.timing}</td>
+                            <td>${element.Monday}</td>
+                            <td>${element.Tuesday}</td>
+                            <td>${element.Wednesday}</td>
+                            <td>${element.Thursday}</td>
+                            <td>${element.Friday}</td>
+                            <td>${element.Saturday}</td>
+                        </tr>`;
+                                    });
+                                } else {
+                                    $(".download-current-report").addClass('disabled')
+                                    table += `<tr><td colspan="6">No Data Found</td></tr>`;
+                                }
+
+
+
+                                table += `</tbody> </table>`;
+                                $("#faculty-day-table").html(table)
+                            }
+
+
+                            function showError(errors) {
+                                console.log('error::::::::::', errors)
+                                let simpleAlert = new SimpleAlert();
+                                let obj = {
+                                    title: errors.description,
+                                    message: errors.data,
+                                    type: 'alert-danger',
+                                    buttons: {
+                                        positive: {
+                                            text: "Okay",
+                                            action: function () {
+                                                document.querySelector('.simple-alert').remove();
+                                            }
+                                        },
+                                        negative: {
+                                            text: "Cancel",
+                                            action: function () {
+                                                alert('Negative')
+                                            }
+                                        }
+                                    }
+                                }
+                                simpleAlert.alert(obj);
+                            }
+
+
+                            function showSuccess(errors) {
+                                console.log('error::::::::::', errors)
+                                let simpleAlert = new SimpleAlert();
+                                let obj = {
+                                    title: errors.description,
+                                    message: errors.data,
+                                    type: 'alert-success',
+                                    buttons: {
+                                        positive: {
+                                            text: "Okay",
+                                            action: function () {
+                                                document.querySelector('.simple-alert').remove();
+                                            }
+                                        },
+                                        negative: {
+                                            text: "Cancel",
+                                            action: function () {
+                                                alert('Negative')
+                                            }
+                                        }
+                                    }
+                                }
+                                simpleAlert.alert(obj);
+                            }
+                        })
+                    </script>
+                    <%- include("../partials/footerEnd") %>

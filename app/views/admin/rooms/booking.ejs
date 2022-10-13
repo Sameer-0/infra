@@ -1,0 +1,773 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+            <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+            <%} }%>
+        </ul>
+    </div>
+
+
+    <!--DASHBOARD CONTENT START-->
+    <div class="errorHtml"></div>
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>ROOM BOOKING</h5>
+            </div>
+            <div>
+                <a class="btn btn-danger" href="/admin/rooms/booking/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button class="btn add-btn ms-auto" data-bs-toggle="modal" data-bs-target="#open-transaction-modal"><i
+                        class="fas fa-plus"></i></button>
+                <!-- <button class="btn ms-auto delete-campuses add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-campuses add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div>
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entry</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+            <table class="table custom_row table-bordered" id="roomTransactionTable">
+                <thead>
+                    <th>#</th>
+                    <th>Transaction Type</th>
+                    <th>Stage</th>
+                    <th>Org Name</th>
+                    <th>Campus</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <%let count = 1;%>
+                    <% for(let trans of transactionList) {%>
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- trans.transaction_type %></td>
+                        <td><%if(trans.stage=="applied"){%>
+                        <span class="badge rounded-pill bg-warning text-dark"><%- trans.stage %></span>
+                            <%}else if(trans.stage=="accepted"){%>
+                        <span class="badge rounded-pill bg-success text-white"><%- trans.stage %></span>
+                        <%}else{%>
+                            <span class="badge rounded-pill bg-danger text-white"><%- trans.stage %></span>
+                        <%}%>
+                        </td>
+                        <td><%- trans.org_name %></td>
+                        <td><%- trans.campus_abbr %></td>
+                        <td><%- trans.username %></td>
+                        <td>
+                            <a title="view details" class="viewtransactioninfo" data-id="<%- trans.id %>"><i
+                                    class="fa fa-eye"></i></a>
+                            <%if(trans.stage == 'applied'){%>
+                            <a class="delete-transaction" data-id="<%- trans.id %>"><i
+                                    class="fa fa-trash text-danger"></i></a>
+                            <%}%>
+                        </td>
+                    </tr>
+                    <%}%>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries: <%- totalentries %> </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="open-transaction-modal" tabindex="-1" aria-labelledby="open-transaction-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-inputform">
+
+            <div class="modal-header modal-inputform-header">
+                <h3 class="modal-title" id="open-transaction-modal-title">Import Room</h3>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+
+            <div class="modal-body py-0">
+                <div class="row">
+                    <!-- SELECT COLUMN -->
+                    <div class="col-md-3 col-xxl-3 select-items">
+                        <h4 class="text-center py-1 select-room-header">Select Rooms</h4>
+                        <input type="text" name="" id="searchItem" placeholder="Search Room"
+                            class="form-control searchItemRoom">
+                        <div style="margin-top: 100px;">
+                            <div class="mt-3">
+                                <label class="form-label">Campus</label>
+                                <select name="campus_lid" id="campus_lid" class="form-select select2 modalSelect2">
+                                    <option>--select--</option>
+                                    <% for(let campus of campusList) { %>
+                                    <option value="<%- campus.id %>">
+                                        <%- campus.campus_abbr %>
+                                    </option>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label">Building</label>
+                                <select name="building_lid" id="building_lid" class="form-select select2 modalSelect2">
+                                </select>
+                            </div>
+                        </div>
+
+                        <label class="form-label mt-2 fw-bold room-list-container"></label>
+                        <div class="selected-room-list"> 
+                            <ul class="list-group  selectRoomList">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SELECTED COLUMN -->
+                    <div class="col-md-9 col-xxl-9 selected-items">
+                        <h4 class="text-center py-1 selected-room-header" style="max-width: 73% !important;">
+                            Selected Rooms</h4>
+                        <input type="text" name="" id="searchSelectedItem" placeholder="Search Selected Room"
+                            class="form-control searchSelectedRoom">
+                        <div class="row selected-room-filter">
+                            <div class="col-md-12">
+                                <label class="form-label">Book for Organization</label>
+                                <select name="handled_by" id="handled_by" class="form-select select2 modalSelect2 ">
+                                    <option value="">--select--</option>
+                                    <% for(let org of orgList) { %>
+                                    <option value="<%- org.id %>" data-campus-lid="<%- org.campus_lid %>">
+                                        <%- org.org_abbr %>/<%- org.org_id %>
+                                    </option>
+                                    <% } %> 
+                                </select>
+                            </div>
+                        </div>
+
+                        <ul class="list-group custom-select-list selectedList" id="selectedList">
+                            <table class="table table-bordered" id="add-more-room-table">
+                                <thead>
+                                    <th>room</th>
+                                    <th>start Time</th>
+                                    <th>end Time</th>
+                                    <th>start Date</th>
+                                    <th>end Date</th>
+                                    <th>Transaction Type</th>
+                                    <th>Action</th>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 error-html"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn import-room modal-inputform-btn" id="createRoomTransaction">Book Room</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="room-details-modal" tabindex="-1" aria-labelledby="room-details-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content modal-inputform">
+            <div class="modal-header modal-inputform-header">
+                <h3 class="modal-title" id="room-details-modal-title">Booking Details</h3>
+                <button type="button" class="btn fs-4 text-white" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fas fa-times text-dark"></i></button>
+            </div>
+            <div class="modal-body py-0">
+           
+            </div>
+            <div class="px-3 error-html"></div>
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn import-room modal-inputform-btn" id="importRoom">Import Room</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+  <%- include("../partials/footer") %>
+<script src="https://cdn.rawgit.com/botmonster/jquery-bootpag/master/lib/jquery.bootpag.min.js"> </script>
+<script>
+    $(document).ready(function () {
+
+        $('.select2').select2({
+            dropdownParent: $('#open-transaction-modal')
+        })
+
+       // let slotObj = JSON.parse(`<%- slotIntervalTimings %>`);
+        let acadDate = JSON.parse(`<%- academicCalender %>`);
+        let transactionType = JSON.parse(`<%- transactionTypes %>`);
+
+
+        let startDate;
+        let endDate;
+        let transactionTypeList;
+     
+
+
+        for (let obj of acadDate) {
+            startDate += `<option value="${obj.id}">${obj.date}</option>`;
+        }
+
+        for (let obj of acadDate) {
+            endDate += `<option value="${obj.id}">${obj.date}</option>`;
+        }
+
+        for (let obj of transactionType) {
+            transactionTypeList += `<option value="${obj.id}">${obj.name}</option>`;
+        }
+
+        let username = `<%- locals.userId %>`;
+        //DATA SELECT FOR ROOM
+        $(".selectRoomList").on('click', '.list-group-item', function () {
+            let building_lid =  $("#building_lid").val()
+            let campus_lid =  $("#campus_lid").val()
+            // Get Room Slot By Room Id
+        roomSlotByRoomId($(this).attr('data-room-id')).then(result=>{
+            let optionStartTime = ``;
+            let optionEndTime =  ``;
+          for (let obj of result.data.roomslot) {
+                optionStartTime += `<option value="${obj.id}">${obj.start_time}</option>`;
+            }
+
+          for (let obj of result.data.roomslot) {
+              optionEndTime += `<option value="${obj.id}">${obj.end_time}</option>`;
+          }
+
+                let table =`<tr data-clickable="true" data-building-lid="${building_lid}" data-campus-lid="${campus_lid}">
+                    <td data-room-id="${$(this).attr('data-room-id')}">${$(this).text()}</td>
+                    <td> <select class="select2 modalSelect2" name="startTime">
+                        ${optionStartTime}
+                         </select>
+                    </td>
+                    <td>
+                    <select class="select2 modalSelect2" name="endTime">
+                        ${optionEndTime}
+                    </select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="startDate">${startDate}</select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="endDate">${endDate}</select>
+                    </td>
+                    <td>
+                        <select class="select2 modalSelect2" name="transaction_type_lid">${transactionTypeList}</select>
+                    </td>
+                    <td>
+                        <i class="fas fa-trash-alt text-danger cursor-pointer clicktoremove"></i>
+                    </td>
+                </tr>
+                `;
+            $(".selectedList table tbody").append(table)
+            // }
+            $('#add-more-room-table tbody tr:last-child .select2').select2({
+                dropdownParent: $('#open-transaction-modal')
+            });
+            $(this).attr('data-clickable', 'false');
+         })
+        })
+
+
+        //Remove Element
+        $(".selectedList").on('click', '.clicktoremove', function () {
+            $(this).parent().attr('data-clickable', 'false')
+            $($(this)).fadeOut(300, function () {
+                $($(this).parent().parent()).remove()
+            })
+        })
+
+        //search 
+        $('#searchItem').on('input', function () {
+            let selectItems = $('.selectRoomList li')
+            var text = $('#searchItem').val().toLowerCase();
+            for (let item of selectItems) {
+                if (item.textContent.toLowerCase().indexOf(text) > -1) {
+                    $(item).removeClass("d-none");
+                } else {
+                    $(item).addClass("d-none");
+                }
+            };
+        })
+
+        //search selected room
+        $('#searchSelectedItem').on('input', function () {
+            let selectedItems = $('.selectedList table tbody tr')
+            var text = $('#searchSelectedItem').val().toLowerCase();
+            console.log('text:::::::::', selectedItems)
+            for (let item of selectedItems) {
+                console.log('faculty:::::::::', item)
+                if (item.textContent.toLowerCase().indexOf(text) > -1) {
+                    $(item).removeClass("d-none");
+                } else {
+                    $(item).addClass("d-none");
+                }
+            };
+        })
+
+
+        //Create
+        $("#createRoomTransaction").on('click', function () {
+            let roomElems = $('#add-more-room-table tbody tr');
+            let roomCount = roomElems.length;
+            let roomJson = [];
+            let campus_lid = $("#campus_lid").val();
+            let building_lid = $("#building_lid option:selected").attr(`data-building-lid`);
+            let org_lid = $(`#handled_by`).val();
+            if(!org_lid){
+                org_lid = `<%- locals.organizationId %>`
+            }
+
+            roomElems.each(function (index, elem) {
+                let room_lid = $(elem).find(`td[data-room-id]`).attr('data-room-id');
+                let transaction_type_id = $(elem).find(`select[name='transaction_type_lid']`).val();
+                let start_time_id = $(elem).find(`select[name='startTime']`).val();
+                let end_time_id = $(elem).find(`select[name='endTime']`).val();
+                let start_date_id = $(elem).find(`select[name='startDate']`).val();
+                let end_date_id = $(elem).find(`select[name='endDate']`).val();
+              
+
+                if (index < roomCount - 1) {
+                    let obj = {
+                        room_lid: room_lid,
+                        transaction_type_lid: transaction_type_id,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        start_date_id: start_date_id,
+                        end_date_id: end_date_id,
+                        org_lid: org_lid,
+                        campus_lid: campus_lid,
+                        user_id: username
+                    }
+                    roomJson.push(obj)
+                } else {
+                    let obj = {
+                        room_lid: room_lid,
+                        transaction_type_lid: transaction_type_id,
+                        start_time_id: start_time_id,
+                        end_time_id: end_time_id,
+                        start_date_id: start_date_id,
+                        end_date_id: end_date_id,
+                        org_lid: org_lid,
+                        campus_lid: campus_lid,
+                        user_id: username
+                    }
+                    roomJson.push(obj)
+                }
+            })
+
+            console.log('roomJson::::::::::::', roomJson)
+
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/book',
+                data: {
+                    inputJSON: JSON.stringify(roomJson)
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        // SEARCH PROGRAM TYPE
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            $.ajax({
+                type: "POST",
+                url: "/admin/rooms/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                console.log('PAGE NO.:::::::::::', $(this).attr('data-lp'))
+                console.log('keyword.:::::::::::', keyword)
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/rooms/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                        console.log(data.data);
+                    }
+                })
+            })
+
+            
+
+        //Get Room Slot Time For Specific Room
+        function roomSlotByRoomId(roomLid){
+            console.log('Room Lid Fun:::::::::::>>', roomLid)
+            return new Promise((resolve, reject) =>{
+                $.ajax({
+                type: "POST",
+                url: "/admin/rooms/booking/room-slot-by-room-id",
+                data: {
+                    roomLid: roomLid
+                },
+                success: function (data) {
+                 //   console.log('data::::::::::',data.roomslot)
+                    // return data.roomslot;
+                    resolve({
+                        status:"success",
+                        data:data
+                    })
+                },
+                error: function(data){
+                    resolve({
+                        status:"failed",
+                        err: error
+                    })
+                }
+            })
+            })
+        }
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/admin/rooms/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    AjaxtTable(data.data)
+                }
+            })
+        });
+
+        //Delete Room Transaction Details "#room-details-modal #room-transactions-table"
+        $(document).on('click','.delete-room-transaction',function(){
+            let id = $(this).attr('data-id')
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/delete-room-detail',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        $("#roomTransactionTable").on('click', '.viewtransactioninfo', function () {
+            let trand_lid = $(this).attr('data-id')
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/details',
+                data: {
+                    id: trand_lid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let htmlTable = `<table class="table table-borderd" id="room-transactions-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Room No</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <!--<th>Action</th>-->
+                    </tr>    
+                    </thead> 
+                    <tbody>`
+                let count = 1;
+                result.data.forEach(function (item) {
+                    htmlTable += ` <tr>
+                        <td>${count++}</td>
+                        <td>${item.room_number}</td>
+                        <td>${item.start_time}</td>
+                        <td>${item.end_time}</td>
+                        <td>${item.start_date}</td>
+                        <td>${item.end_date}</td>
+                        <!--<td><a class="delete-room-transaction" data-id="${item.id}"><span class="fa fa-trash"></span></a></td>
+                                    </tr>-->`
+                })
+                htmlTable += `</tbody></table>`;
+              
+                $("#room-details-modal .modal-body").html(htmlTable)
+                $("#room-details-modal").modal('show')
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //Delete Room Transaction
+        $("#roomTransactionTable").on('click', '.delete-transaction', function () {
+            let id = $(this).attr("data-id");
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/delete',
+                data: {
+                    id: id
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                console.log('sucess:::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        // GET BUILDING BY CAMPUS ID
+        $("#campus_lid").on('change',function(){
+            let campus_lid  =  $(this).val()
+            console.log('campus_lid:::::::::',campus_lid)
+            let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/booking/getbuildingbycampusid',// building router
+                data: {
+                    campus_lid: campus_lid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                let buildingList = `<option value="">Select Building</option>`;
+                if (result.buildingData.length > 0) {
+                    result.buildingData.forEach(element => {
+                        buildingList +=`<option value="${element.id}">${element.building_name}</option>`;
+                    });
+                } else {
+                    buildingList += `<option value="">No Buildings Found!</option>`;
+                }
+                $("#open-transaction-modal  #building_lid").html(buildingList).trigger('change');
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        //GET ROOM BY BUILDING ID
+        $("#building_lid").on('change', function(){
+          let   building_lid  = $(this).val()
+          let ApiObj = {
+                type: 'POST',
+                url: '/admin/rooms/booking/getroomsbybuildingid',// building router
+                data: {
+                    building_lid: building_lid
+                },
+                dataType: 'JSON'
+            }
+            ajaxApi(ApiObj).then(result => {
+                $("#open-transaction-modal  .room-list-container").html(`Available Rooms`);
+                let roomList = ``;
+                let labelhtml = ``;
+                if (result.roomList.length > 0) {
+                    result.roomList.forEach(element => {
+                        roomList +=`<li class="list-group-item my-1 border-top" data-clickable="true" data-room-id="${element.id}">${element.room_number}</li>`;
+                    });
+
+                    
+                } else {
+                    roomList += `<li>No Rooms Found!</li>`;
+                }
+               
+                $("#open-transaction-modal  .selectRoomList").html(roomList);
+               
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+
+        //CHANGE ENTRIES
+        $("#changeEntry").on('change',function(){
+                let rowcount = $(this).val()
+                $.ajax({
+                type: "POST",
+                url: "/admin/rooms/booking/show-entries",
+                data: {
+                    rowcount: rowcount
+                },
+                success: function (data) {
+                    AjaxtTable(data.data) 
+                }
+            })
+        })
+
+        function AjaxtTable(transactionList) {
+            let AjaxTable = `<table class="table custom_row table-bordered" id="roomTransactionTable">
+                <thead>
+                    <th>#</th>
+                    <th>Transaction Type</th>
+                    <th>Stage</th>
+                    <th>Org Name</th>
+                    <th>Campus</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>`;
+            if (transactionList.length > 0) {
+                let count = 1;
+                for (trans of transactionList) {
+                    AjaxTable +=
+                        `<tr>
+                        <td>${count++}</td>
+                        <td>${trans.transaction_type}</td>
+                        <td>`
+                            if(trans.stage=="applied"){
+                                AjaxTable +=   `<span class="badge rounded-pill bg-warning text-dark">${trans.stage}</span>`
+                            }else if(trans.stage=="accepted"){
+                                AjaxTable +=  `<span class="badge rounded-pill bg-success text-white">${trans.stage}</span>`
+                        }else{
+                                 AjaxTable += `<span class="badge rounded-pill bg-danger text-white">${trans.stage}</span>`
+                        }
+                        `</td>`
+                        AjaxTable += `<td>${trans.org_name}</td>
+                        <td>${trans.campus_abbr}</td>
+                        <td>${trans.username}</td>
+                        <td>
+                            <a title="view details" class="viewtransactioninfo" data-id="${trans.id}"><i class="fa fa-eye"></i></a>`
+                    if (trans.stage == 'applied') {
+                        AjaxTable +=
+                            ` <a class="delete-transaction" data-id="${trans.id}"><i class="fa fa-trash text-danger"></i></a>`
+                    }
+                    ` </td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                                <td colspan="7">No Data Found</td>
+                            </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#roomTransactionTable").html(AjaxTable);
+        }
+
+
+        function showError(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-danger',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+
+        function showSuccess(errors) {
+            console.log('error::::::::::', errors)
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: errors.data,
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+    })
+
+
+    </script>
+    <%- include("../partials/footerEnd") %>
+

@@ -1,0 +1,206 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+<div class="col-12 dashboardContent">
+    <!--DASHBOARD CONTENT START-->
+  
+
+    <div class="card">
+        <div class="card-header text-uppercase d-flex">
+            <h5>Transaction List</h5>
+            <button class="btn add-btn ml-auto" data-toggle="modal" data-target="#add-building-modal"><i
+                    class="fas fa-plus"></i></button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <th>Transaction UUID</th>
+                        <!-- <th>Room</th> -->
+                        <th>Appliant</th>
+                        <!-- <th>Transaction Type</th> -->
+                        <th>Applicant Sap ID</th>
+                        <!-- <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Stage</th>
+                        <th>Organization</th>
+                        <th>Campus</th> -->
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <% for (let transaction of transactionList) { %>
+                        <tr>
+                            <td><%- transaction.transaction_uuid %></td>
+                            <!-- <td><%- transaction.room_id %></td> -->
+                            <td><%- transaction.applicant %></td>
+                            <!-- <td><%- transaction.transaction_type_id %></td> -->
+                            <td><%- transaction.applicant_sap_id %></td>
+                            <!-- <td><%- transaction.start_date_id %></td>
+                            <td><%- transaction.end_date_id %></td>
+                            <td><%- transaction.start_time_id %></td>
+                            <td><%- transaction.end_time_id %></td>
+                            <td><%- transaction.stage_id %></td>
+                            <td><%- transaction.organization %></td>
+                            <td><%- transaction.campus %></td> -->
+                            <td>
+                                <button class="btn btn-sm btn-success view-trans" data-trans-id="<%- transaction.transaction_uuid %>"
+                                     data-toggle="modal"
+                                    data-target="#view-trans-modal">View Details</button>
+                            </td>
+
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <!--DASHBOARD CONTENT END-->
+    </div>
+
+
+
+    <!-- modal view trans details -->
+
+    <div class="modal fade full-screen-modal" id="view-trans-modal" tabindex="-1" role="dialog"
+        aria-labelledby="view-trans-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h5 class="modal-title text-white" id="view-trans-modal-title">Transaction Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="trans-details-table">
+                            <thead>
+                                <th>Room </th>
+                                <th>Applicant</th>
+                                <th>Transaction Type</th>
+                                <th>Applicant SAP ID</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Stage</th>
+                                <th>Organization</th>
+                                <th>Campus</th>
+                            </thead>
+                            <tbody>
+                               
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <%- include("../partials/footer") %>
+    <script>
+        $('.view-trans').on('click', function () {
+            let transId = $(this).attr('data-trans-id');
+
+            $.ajax({
+                url: '/management/room/transaction/details',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {
+                    transId: transId
+                },
+                success: (data) => {
+
+                    let transData = data.transDetails;
+                   
+
+                    let trStr = ``;
+
+                    for (let trans of transData) {
+                        trStr += `<tr>
+                                    <td>${trans.room}</td>
+                                    <td>${trans.applicant}</td>
+                                    <td>${trans.trans_type}</td>
+                                    <td>${trans.applicant_sap_id}</td>
+                                    <td>${trans.start_date}</td>
+                                    <td>${trans.end_date}</td>
+                                    <td>${trans.start_time}</td>
+                                    <td>${trans.end_time}</td>
+                                    <td>${trans.stage}</td>
+                                    <td>${trans.organization}</td>
+                                    <td>${trans.campus}</td>
+                                 </tr>`
+                    }
+
+
+                    $('#trans-details-table tbody').html(trStr)
+              
+                   
+
+
+
+
+                }
+
+            })
+
+        })
+
+
+
+
+        function callDatatable() {
+            if ($('.call-datatable').length > 0) {
+                //CALL DATATABLE
+
+                $('.call-datatable').DataTable({
+                    autoFill: false,
+                    //scrollY: 400,
+                    scrollX: '100%',
+                    deferRender: true,
+                    scrollY: true,
+                    scrollX: true,
+                    paging: true,
+                    initComplete: function () {
+                        this.api().columns().every(function () {
+                            var column = this;
+                            var select = $(
+                                    '<select><option value="">-Select-</option></select>'
+                                )
+                                .appendTo($(column.footer()).empty())
+                                .on('change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex(
+                                        $(this).val()
+                                    );
+
+                                    column
+                                        .search(val ? '^' + val + '$' : '',
+                                            true, false)
+                                        .draw();
+                                });
+
+                            column.data().unique().sort().each(function (d, j) {
+                                select.append('<option value="' + d +
+                                    '">' + d + '</option>')
+                            });
+                        });
+                    }
+                })
+                //CALL DATATABLE END
+            }
+        }
+        callDatatable();
+    </script>
+    <%- include("../partials/footerEnd") %>

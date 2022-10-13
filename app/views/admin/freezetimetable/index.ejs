@@ -1,0 +1,188 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+
+        <ul class="breadcrumb">
+            <% if (breadcrumbs) {
+                for (let crumb of breadcrumbs) { %>
+            <li><a href="<%- crumb.url %>"><%- crumb.name %></a></li>
+            <% }} %>
+        </ul>
+    </div>
+
+    <!-- <%- include("../partials/timetablesimulationMenu") %> -->
+
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>Freeze Time Table Allocation</h5>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="input-groups col-md-6 col-sm-12">
+                    <label for="program-name" class="d-flex justify-content-between">Select Program:</label>
+
+                    <select name="program-name" id="program-name-a" class="form-select">
+                        <option selected disabled value>--Select Program--</option>
+                        <% for(let program of programList){%>
+                        <option value="<%- program.id%>"><%-program.program_name%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div class="input-groups col-md-6 col-sm-12">
+                    <label for="program-name">Select Session:</label>
+
+                    <select name="session-name" id="session-name-a" class="form-select">
+                        <option selected disabled value>--Select Session--</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="mt-3 d-flex justify-content-start">
+                <button class="btn btn-dark me-3" id="freeze-time-table">Freeze Time Table</button>
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+<%- include("../partials/footer") %>
+<script>
+    $(document).ready(function () {
+
+        //Getting session List Ajax
+        $("#program-name-a").on('change', function () {
+            let programLid = $(this).val();
+
+
+            let ApiObj = {
+                url: '/admin/programs/sessions/program-sessions',
+                type: 'POST',
+                data: {
+                    programLid: programLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+                let sessionList = ``;
+
+                if (result.length > 0) {
+                    sessionList +=
+                        `<option disabled selected value="">--Select Session--</option>`;
+                    result.forEach(element => {
+                        sessionList += `<option value="${element.id}">
+        ${element.acad_session}
+    </option>`
+                    });
+                } else {
+                    sessionList += `<option value="">
+        No Session Found!
+    </option>`
+                }
+                sessionList += `</select>`;
+                $("#session-name-a").html(sessionList)
+            }).catch(error => {
+                showError(error.responseJSON)
+            })
+        })
+
+        $("#freeze-time-table").on('click', function () {
+
+            let programLid = $('#program-name-a').val();
+            let sessionLid = $('#session-name-a').val();
+
+            if (programLid && sessionLid) {
+
+                let ApiObj = {
+                    url: '',
+                    type: 'POST',
+                    data: {
+                        programLid: programLid,
+                        sessionLid: sessionLid,
+                    },
+                    dataType: 'JSON'
+                }
+
+                ajaxApi(ApiObj).then(result => {
+                    console.log('time table Freezed:::::::', result);
+                    showSuccess(result);
+                    // alert('SUCCESS')
+                }).catch(error => {
+                    showError(error.responseJSON)
+                })
+
+            } else {
+                alert('Please select program and acad session.')
+            }
+
+
+
+        })
+
+
+      
+
+        function showError(errors) {
+                console.log(errors);
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title: errors.description,
+                    message: "",
+                    type: 'alert-success',
+                    buttons: {
+                        positive: {
+                            text: "Okay",
+                            action: function () {
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                                alert('Negative')
+                            }
+                        }
+                    }
+                }
+                simpleAlert.alert(obj);
+            }
+
+        function showSuccess(errors) {
+            console.log(errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title: errors.description,
+                message: "",
+                type: 'alert-success',
+                buttons: {
+                    positive: {
+                        text: "Okay",
+                        action: function () {
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                            alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+</script>
+
+ <%- include("../partials/footerEnd") %>

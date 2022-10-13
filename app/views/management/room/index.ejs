@@ -1,0 +1,32 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <!--DASHBOARD CONTENT START-->
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+    
+
+    <%- include("../partials/roomMenu") %>
+
+    
+</div>
+
+<!-- ADD NEW ROOM MODAL-->
+
+
+
+
+
+<%- include('../partials/notification') %>
+<%- include('../partials/alert') %>
+<%- include("../partials/footer") %>

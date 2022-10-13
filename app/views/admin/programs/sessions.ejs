@@ -1,0 +1,285 @@
+<%- include("../partials/head") %>
+<%- include("../partials/leftSidebar") %>
+<%- include("../partials/header") %>
+<!--Notificaion icon-->
+<!--HEADER END-->
+
+<div class="main-content">
+    <div class="breadcrumbs-container">
+    
+        <ul class="breadcrumb">
+            <% if(breadcrumbs){%> <% for (let crumbs of breadcrumbs){%>
+                <li><a href="<%- crumbs.url%>"><%- crumbs.name%></a></li>
+                <%} }%>
+        </ul>
+    </div>
+
+    <%- include("../partials/program-menu") %>
+<div class="errorHtml"></div>
+    <!--DASHBOARD CONTENT START-->
+    <div class="card table-card">
+        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+            <div>
+                <h5>PROGRAM SESSIONS LIST</h5>
+            </div>
+             <div>
+                <a class="btn btn-danger" href="/admin/programs/sessions/download"><i
+                    class="fas fa-download"></i> Download </a>
+                <button class="btn btn-danger ms-auto refresh_program_session"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                data-bs-target="#add-room-modal">
+                <i class="fas fa-plus"></i>
+                </button>
+                <button class="btn ms-auto select-delete-program-type add-btn "><i class="fas fa-trash"></i></button>
+                <button class="btn ms-auto bulk-delete-program-type add-btn "><img src="/icons/delete.png" alt=""
+                        width="26px" height="32px"></button> -->
+            </div> 
+        </div>
+
+        <div class="card-body table-responsive">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <label>Show Entries</label>
+                    <select class="form-select" id="changeEntry">
+                        <%for(let page of locals.page_filter){%>
+                           <option value="<%-page%>"><%-page%></option>
+                        <%}%>
+                    </select>
+                </div>
+                <div>
+                    <div class="table-searchbar-container"><button type="button"><i class="fas fa-search"></i> </button><input
+                        type="search" id="searchkeyword" placeholder="Enter keywords" class="table-searchbar"></div>
+                </div>
+            </div>
+
+            <table class="table custom_row table-bordered" id="programTypeTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Program Name</th>
+                    <th>Acad Session</th>
+                    <th>Academic Year</th>
+                </thead>
+                <tbody>
+                    <% let count = 1%>
+                    <% for (let day of programSessions) { %>
+                    <tr>
+                        <td><%- count++ %></td>
+                        <td><%- day.program_name %></td>
+                        <td><%- day.acad_session %></td>
+                        <td><%- day.acad_year %></td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <p>Total entries:<%- pageCount %>
+                    </p>
+                </div>
+                <div>
+                    <p id="pagination" class="pagination-search"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--DASHBOARD CONTENT END-->
+
+
+
+<%- include("../partials/footer") %>
+
+<script>
+    $(document).ready(function () {
+
+        // SEARCH
+        $('#searchkeyword').on('input', delay(function (e) {
+            let keyword = $("#searchkeyword").val()
+            
+            $.ajax({
+                type: "POST",
+                url: "/admin/programs/sessions/search",
+                data: {
+                    keyword: keyword,
+                    pageNo: 1
+                },
+                success: function (data) {
+                    AjaxtTable(data.data)
+                }
+            })
+        }, 500));
+
+
+            //Search With Pagination
+            $(".pagination-search").on('click','.pagination li',function(){
+                let keyword = $("#searchkeyword").val()
+                let pageNo = $(this).attr('data-lp')
+                console.log('PAGE NO.:::::::::::', $(this).attr('data-lp'))
+                console.log('keyword.:::::::::::', keyword)
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/programs/sessions/search",
+                    data: {
+                        keyword: keyword,
+                        pageNo: pageNo
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data)
+                        console.log(data.data);
+                    }
+                })
+            })
+
+        //Pagination Here
+        let pageCount = `<%- pageCount %>`
+        console.log("Page Count=====>>>", pageCount)
+        let pageNos = Math.ceil(Number(pageCount) / 10)
+
+        console.log("Page Numbers", pageNos)
+        $('#pagination').bootpag({
+            total: pageNos,
+            page: 1,
+            maxVisible: 10,
+            leaps: true,
+            firstLastUse: true,
+            first: '←',
+            last: '→',
+            wrapClass: 'pagination',
+            activeClass: 'active',
+            disabledClass: 'disabled',
+            nextClass: 'next',
+            prevClass: 'prev',
+            lastClass: 'last',
+            firstClass: 'first'
+        }).on("page", function (event, num) {
+            $.ajax({
+                type: "POST",
+                url: "/admin/programs/sessions/pagination",
+                data: {
+                    pageNo: num
+                },
+                success: function (data) {
+                    AjaxtTable(data.data)
+                }
+            })
+        });
+
+
+        $(".refresh_program_session").on('click',function(){
+            let apiObj = {
+                type:"POST",
+                url:"/admin/programs/sessions/refresh",
+                data: {},
+                dataType:"JSON"
+            }
+            ajaxApi(apiObj).then(result => {
+                console.log('result ::::::::::::::::::::::', result)
+                showSuccess(result)
+            }).catch(error => {
+                console.log('Error ::::::::::::::::::::::', error)
+                showError(error.responseJSON)
+            })
+        })
+
+
+         //CHANGE ENTRIES
+         $("#changeEntry").on('change',function(){
+                    let rowcount = $(this).val()
+                    $.ajax({
+                    type: "POST",
+                    url: "/admin/programs/sessions/show-entries",
+                    data: {
+                        rowcount: rowcount
+                    },
+                    success: function (data) {
+                        AjaxtTable(data.data) 
+                    }
+                })
+            })
+
+
+
+        function AjaxtTable(programTypeList) {
+            let AjaxTable = `<table class="table custom_row table-bordered" id="programTypeTable">
+                <thead>
+                    <th>Sr No.</th>
+                    <th>Program Name</th>
+                    <th>Acad Session</th>
+                    <th>Academic Year</th>
+                </thead>`;
+            if (programTypeList.length > 0) {
+                let count = 1;
+                for (let day of programTypeList) {
+                    AjaxTable +=
+                    `<tr>
+                        <td>${count++}</td>
+                        <td>${day.program_name}</td>
+                        <td>${day.acad_session}</td>
+                        <td>${day.acad_year}</td>
+                    </tr>`
+                }
+            } else {
+                AjaxTable +=
+                    ` <tr>
+                      <td colspan="4">No Data Found</td>
+                      </tr>`;
+            }
+            AjaxTable += `<tbody></table>`
+            $("#programTypeTable").html(AjaxTable);
+        }
+
+
+        function showError(errors) {
+                console.log('success',errors);
+                let simpleAlert = new SimpleAlert();
+                let obj = {
+                    title : errors.description,
+                    message: errors.data,
+                    type: 'alert-dannger',
+                    buttons: {
+                        positive:{
+                            text: "Okay",
+                            action: function(){
+                                document.querySelector('.simple-alert').remove();
+                            }
+                        },
+                        negative: {
+                            text: "Cancel",
+                            action: function () {
+                            alert('Negative')
+                            }
+                        }
+                    }
+                }
+            simpleAlert.alert(obj);
+            }
+
+
+            function showSuccess(errors) {
+            console.log('success',errors);
+            let simpleAlert = new SimpleAlert();
+            let obj = {
+                title : errors.description,
+                message:"",
+                type: 'alert-success',
+                buttons: {
+                    positive:{
+                        text: "Okay",
+                        action: function(){
+                            document.querySelector('.simple-alert').remove();
+                        }
+                    },
+                    negative: {
+                        text: "Cancel",
+                        action: function () {
+                        alert('Negative')
+                        }
+                    }
+                }
+            }
+            simpleAlert.alert(obj);
+        }
+
+    })
+</script>
+<%- include("../partials/footerEnd") %>
