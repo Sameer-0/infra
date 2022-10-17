@@ -14,8 +14,8 @@ module.exports = {
             res.render('admin/rooms/status'
             ,{
                 RoomTimings: result[0].recordset,
-                RoomNumbers: result[1].recordset
-                // breadcrumbs: req.breadcrumbs,
+                RoomNumbers: result[1].recordset,
+                breadcrumbs: req.breadcrumbs
             })
         }) 
     },

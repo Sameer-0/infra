@@ -1,78 +1,82 @@
 <%- include("../partials/head") %>
-<%- include("../partials/leftSidebar") %>
-<%- include("../partials/header") %>
-<!--Notificaion icon-->
-<!--HEADER END-->
+    <%- include("../partials/leftSidebar") %>
+        <%- include("../partials/header") %>
+            <!--Notificaion icon-->
+            <!--HEADER END-->
 
-<style>
-    hr {
-        margin: 0 !important;
-    }
+            <style>
+                hr {
+                    margin: 0 !important;
+                }
 
-    .timetable-container {
-        width: var(--timetableWidth);
-        background: #e6e6e6;
-        /* border: 2px solid;    */
-    }
+                .room-slot-item {
+                    cursor: pointer;
+                }
 
-    .day-name {
-        line-height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-width: var(--roomNoWidth);
-        max-width: var(--roomNoWidth);
-        background: #006faa;
-        color: #fff;
-        border-bottom: 1px solid;
-        text-align: center;
-        padding: 10px 0px;
-        writing-mode: vertical-lr;
-        /* text-orientation: upright; */
-    }
+                .timetable-container {
+                    width: var(--timetableWidth);
+                    background: #e6e6e6;
+                    /* border: 2px solid;    */
+                }
 
-    .room-slots {
-        width: var(--roomSlotWidth);
-        min-height: 50px;
-        position: relative;
-        background-size: var(--breakIntervalWidth);
-        background-image: linear-gradient(to right, grey 1px, transparent 1px)
-    }
+                .day-name {
+                    line-height: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-width: var(--roomNoWidth);
+                    max-width: var(--roomNoWidth);
+                    background: #006faa;
+                    color: #fff;
+                    border-bottom: 1px solid;
+                    text-align: center;
+                    padding: 10px 0px;
+                    /* writing-mode: vertical-lr; */
+                    /* text-orientation: upright; */
+                }
 
-    .timetable-slots {
-        width: var(--roomSlotWidth);
-        min-height: 10px;
-        position: relative;
-        left: 50px;
-    }
+                .room-slots {
+                    width: var(--roomSlotWidth);
+                    min-height: 50px;
+                    position: relative;
+                    background-size: var(--breakIntervalWidth);
+                    background-image: linear-gradient(to right, grey 1px, transparent 1px)
+                }
 
-    .timetable-slots span {
-        width: 156px;
-        font-size: 14px;
-    }
+                .timetable-slots {
+                    width: var(--roomSlotWidth);
+                    min-height: 10px;
+                    position: relative;
+                    left: 50px;
+                }
 
-    .room {
-        border-bottom: 1px solid black;
-        line-height: 10px;
-    }
+                .timetable-slots span {
+                    width: 156px;
+                    font-size: 14px;
+                }
 
-    .event {
-        position: absolute;
-        width: 120px;
-        background: #ffffff;
-        word-break: normal;
-        height: 100%;
-        /* overflow: hidden; */
-        padding-right: calc(var(--breakIntervalWidth) + 2px);
-        padding-left: 2px;
-        padding-top: 5px;
-        font-size: 14px;
-    }
+                .room {
+                    border-bottom: 1px solid black;
+                    line-height: 10px;
+                }
+
+                .event {
+                    position: absolute;
+                    width: 120px;
+                    background: #ffffff;
+                    word-break: normal;
+                    height: 100%;
+                    /* overflow: hidden; */
+                    padding-right: calc(var(--breakIntervalWidth) + 2px);
+                    padding-left: 2px;
+                    padding-top: 5px;
+                    font-size: 14px;
+                }
 
 
 
 
-    /* .event:nth-child(even) .start-time{
+                /* .event:nth-child(even) .start-time{
        background-color: #dc3545 !important;
  
    }
@@ -82,296 +86,324 @@
    } */
 
 
-    .start-time {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        border-radius: 0 !important;
-        font-size: 0.75rem;
-    }
+                .start-time {
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    border-radius: 0 !important;
+                    font-size: 0.75rem;
+                }
 
-    .end-time {
-        position: absolute;
-        right: var(--breakIntervalWidth);
-        bottom: 0;
-        border-radius: 0 !important;
-        font-size: 0.75rem;
-    }
+                .end-time {
+                    position: absolute;
+                    right: var(--breakIntervalWidth);
+                    bottom: 0;
+                    border-radius: 0 !important;
+                    font-size: 0.75rem;
+                }
 
-    .fa-arrows-left-right {
-        /* position: absolute; */
-        right: calc(var(--breakIntervalWidth) + 78px - 7px);
-        bottom: 0;
-    }
+                .fa-arrows-left-right {
+                    /* position: absolute; */
+                    right: calc(var(--breakIntervalWidth) + 78px - 7px);
+                    bottom: 0;
+                }
 
-    .break {
-        position: absolute;
-        height: 100%;
-        width: var(--breakIntervalWidth);
-        background-size: 3px;
-        background: #1ff704ab;
-    }
+                .break {
+                    position: absolute;
+                    height: 100%;
+                    width: var(--breakIntervalWidth);
+                    background-size: 3px;
+                    background: #1ff704ab;
+                }
 
-    .fixed-break {
-        position: absolute;
-        height: 100%;
-        /* background-color: #006faa; */
-        width: var(--fixedBreakWidth);
-        background-size: 3px;
-        background: repeating-linear-gradient(251deg, #212121, #444141 12px);
-        color: #fff;
-        font-size: 13px;
-        padding: 1px 18px;
-        text-align: center;
-        line-height: 1.1;
+                .fixed-break {
+                    position: absolute;
+                    height: 100%;
+                    /* background-color: #006faa; */
+                    width: var(--fixedBreakWidth);
+                    background-size: 3px;
+                    background: repeating-linear-gradient(251deg, #212121, #444141 12px);
+                    color: #fff;
+                    font-size: 13px;
+                    padding: 1px 18px;
+                    text-align: center;
+                    line-height: 1.1;
 
-    }
+                }
 
-    .occupied-event {
-        position: absolute;
-        background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
-        height: 100%;
-        text-align: center;
-        padding: 125px 0px;
-        font-weight: bold;
-    }
+                .occupied-event {
+                    position: absolute;
+                    background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
+                    height: 100%;
+                    text-align: center;
+                    padding: 125px 0px;
+                    font-weight: bold;
+                }
 
-    .light-success {
-        background: #76e71acf;
-    }
+                .light-success {
+                    background: #76e71acf;
+                }
 
-    .light-danger {
-        background: #e91b14;
-    }
-</style>
+                .light-danger {
+                    background: #e91b14;
+                }
+            </style>
 
-<div class="main-content">
-    <div class="breadcrumbs-container">
+            <div class="main-content">
+                <div class="breadcrumbs-container">
+                    <ul class="breadcrumb">
+                        <% if(breadcrumbs){%>
+                            <% for (let crumbs of breadcrumbs){%>
+                                <li><a href="<%- crumbs.url%>">
+                                        <%- crumbs.name%>
+                                    </a></li>
+                                <%} }%>
+                    </ul>
+                </div>
 
+                <!--DASHBOARD CONTENT START-->
 
-    </div>
-
-    <!--DASHBOARD CONTENT START-->
-
-    <div class="card table-card">
-        <div class="card-header table-card-header text-uppercase ">
-            <h5>Search Room</h5>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- <div class="col-md-3">
+                <div class="card table-card">
+                    <div class="card-header table-card-header text-uppercase ">
+                        <h5>Search Room</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- <div class="col-md-3">
                     <label>Select Year</label>
                     <input type="text" readonly class="form-control" id="acadYear" value="2022">
                 </div> -->
-                <div class="col-md-3">
-                    <label>Select Start Date</label>
+                            <div class="col-md-3">
+                                <label>Select Start Date</label>
 
-                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                <input type="date" class="form-control" id="startDate" name="startDate">
 
+                            </div>
+                            <div class="col-md-3">
+                                <label>Select End Date</label>
+
+                                <input type="date" class="form-control" id="endDate" name="endDate">
+
+                            </div>
+                            <div class="col-md-3">
+                                <label>Select Room No.</label>
+                                <select class="select2" id="RoomNo" name="RoomNo">
+                                    <option value="0">Select RoomNo</option>
+                                    <% for(let rooms of RoomNumbers) {%>
+                                        <option value="<%- rooms.room_number %>">
+                                            <%- rooms.room_number%>
+                                        </option>
+                                        <%}%>
+                                </select>
+
+
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary ms-3 mt-4 searchRoom"><i class="fa fa-search"></i>
+                                    Search</button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label>Select End Date</label>
 
-                    <input type="date" class="form-control" id="endDate" name="endDate">
-
-                </div>
-                <div class="col-md-3">
-                    <label>Select Room No.</label>
-                    <select class="select2" id="RoomNo" name="RoomNo">
-                        <option value="0">Select RoomNo</option>
-                        <% for(let rooms of RoomNumbers) {%>
-                        <option value="<%- rooms.room_number %>"><%- rooms.room_number%></option>
-                        <%}%>
-                    </select>
-
-
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-primary ms-3 mt-4 searchRoom"><i class="fa fa-search"></i> Search</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="card table-card mt-3">
-        <div class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
-            <div>
-                <h5>Rooms Status</h5>
-            </div>
-            <div>
-                <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
+                <div class="card table-card mt-3">
+                    <div
+                        class="card-header table-card-header text-uppercase d-flex align-items-center justify-content-between">
+                        <div>
+                            <h5>Rooms Status</h5>
+                        </div>
+                        <div>
+                            <!-- <button type="button" class="btn add-btn ms-auto" data-bs-toggle="modal"
                     data-bs-target="#add-holiday-modal">
                     <i class="fas fa-plus"></i></button> -->
-                <!-- <button class="btn ms-auto select-delete-holidays add-btn "><i class="fas fa-trash"></i></button>
+                            <!-- <button class="btn ms-auto select-delete-holidays add-btn "><i class="fas fa-trash"></i></button>
                 <button class="btn ms-auto bulk-delete-holiday add-btn "><img src="/icons/delete.png" alt=""
                         width="26px" height="32px"></button> -->
+                        </div>
+                    </div>
+
+
+
+                    <div class="timetable-slots mt-3"></div>
+
+                    <div class="timetable-container" style="overflow-x: auto;"></div>
+
+                </div>
             </div>
-        </div>
+            <!--DASHBOARD CONTENT END-->
 
 
+            <%- include("../partials/footer") %>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+                <script>
+                    $(document).ready(function () {
+                        $('.select2').select2();
 
-        <div class="timetable-slots mt-3"></div>
+                        function getTimeStops(start, end) {
+                            console.log(start, end)
+                            var startTime = moment(start, 'HH:mm');
+                            var endTime = moment(end, 'HH:mm');
 
-        <div class="timetable-container" style="overflow-x: auto;"></div>
+                            if (endTime.isBefore(startTime)) {
+                                endTime.add(1, 'day');
+                            }
 
-    </div>
-</div>
-<!--DASHBOARD CONTENT END-->
+                            var timeStops = [];
 
+                            while (startTime <= endTime) {
+                                timeStops.push(new moment(startTime).format('LT'));
+                                startTime.add(60, 'minutes');
+                            }
+                            return timeStops;
+                        }
 
-<%- include("../partials/footer") %>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2();
+                        function getDatesInRange(start, end) {
 
-            function getTimeStops(start, end) {
-                console.log(start, end)
-                var startTime = moment(start, 'HH:mm');
-                var endTime = moment(end, 'HH:mm');
+                            let dateArray = [];
+                            let currentDate = moment(start);
+                            let stopDate = moment(end);
 
-                if (endTime.isBefore(startTime)) {
-                    endTime.add(1, 'day');
-                }
+                            while (currentDate <= stopDate) {
+                                dateArray.push(moment(currentDate).format('DD-MM-YYYY'));
+                                currentDate = moment(currentDate.add(1, 'days'));
+                            }
+                            return dateArray;
+                        }
 
-                var timeStops = [];
+                        $('.searchRoom').on('click', function () {
 
-                while (startTime <= endTime) {
-                    timeStops.push(new moment(startTime).format('LT'));
-                    startTime.add(60, 'minutes');
-                }
-                return timeStops;
-            }
+                            console.log("clickeddd")
+                            let startDate = $('#startDate').val().replaceAll('-', '/');
+                            let endDate = $('#endDate').val().replaceAll('-', '/');
+                            let roomNo = $('#RoomNo').val();
 
-            function getDatesInRange(start, end) {
+                            if (startDate > endDate || startDate == '' || endDate == '' || roomNo == '0') {
+                                errorMessage()
+                                return;
+                            }
 
-                let dateArray = [];
-                let currentDate = moment(start);
-                let stopDate = moment(end);
+                            let ApiObj = {
+                                url: '/admin/rooms/getstatus',
+                                type: 'POST',
+                                data: {
+                                    startDate: startDate,
+                                    endDate: endDate,
+                                    roomNo: roomNo
+                                },
+                                dataType: 'JSON'
+                            }
 
-                while (currentDate <= stopDate) {
-                    dateArray.push(moment(currentDate).format('DD-MM-YYYY'));
-                    currentDate = moment(currentDate.add(1, 'days'));
-                }
-                return dateArray;
-            }
+                            ajaxApi(ApiObj).then(result => {
+                                setTable(result);
+                            }).catch(error => {
+                                console.log('Error ::::::::::::::::::::::', error)
+                                // showError(error.responseJSON)
+                            })
 
-            $('.searchRoom').on('click', function () {
+                        })
 
-                console.log("clickeddd")
-                let startDate = $('#startDate').val().replaceAll('-', '/');
-                let endDate = $('#endDate').val().replaceAll('-', '/');
-                let roomNo = $('#RoomNo').val();
+                        function setTable(data) {
 
-                if (startDate > endDate || startDate =='' || endDate == '' || roomNo == '0') {
-                    return;
-                }
+                            let eventStartSlot;
+                            let eventLeftPosition;
+                            let roomSlot;
 
-                console.log(10);
-                let ApiObj = {
-                    url: '/admin/rooms/getstatus',
-                    type: 'POST',
-                    data: {
-                        startDate: startDate,
-                        endDate: endDate,
-                        roomNo: roomNo
-                    },
-                    dataType: 'JSON'
-                }
+                            let div =
+                                ` <div class="text-light" style="display: flex;background:#CC0700"></div>`
 
-                ajaxApi(ApiObj).then(result => {
-                    setTable(result);
-                    // ajaxTable(result)
-                }).catch(error => {
-                    console.log('Error ::::::::::::::::::::::', error)
-                    // showError(error.responseJSON)
-                })
-
-            })
-
-            function setTable(data) {
-                console.log(data);
-
-                let eventStartSlot;
-                let eventLeftPosition;
-                let roomSlot;
-
-                let div =
-                    ` <div class="text-light" style="display: flex;background:#CC0700"></div>`
-
-                const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+                            const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
 
 
-                const timeStops = getTimeStops(timings[0].min_timing.slice(0, -3), timings[
-                        0].max_timing
-                    .slice(0, -3))
-                const startDateNew = $('#startDate').val();
-                const endDateNew = $('#endDate').val();
-                const daterange = getDatesInRange(startDateNew, endDateNew)
+                            const timeStops = getTimeStops(timings[0].min_timing.slice(0, -3), timings[0].max_timing
+                                .slice(0, -3))
+                            const startDateNew = $('#startDate').val();
+                            const endDateNew = $('#endDate').val();
+                            const daterange = getDatesInRange(startDateNew, endDateNew)
 
-                let slotHtml =
-                    `<div class="text-light" style="display: flex;background:#CC0700">`;
-                timeStops.forEach(item => {
-                    slotHtml += `<span>${item} </span>`
-                });
-                slotHtml += `</div>`
-                $(".timetable-slots").html(slotHtml)
-
-
-                let dayHtml = ``;
-                for (let day of daterange) {
-                    dayHtml += `<div class="d-flex room" day-lid="${day}">
-                            <div class="day-name" day-lid="${day}">
-                                ${day}
-                            </div>
-
-                            <div class="room-slots">
-
-                            </div>
-                            </div>`
-                }
-                $('.timetable-container').html(dayHtml);
-
-                let tableProps = {
-                    pxPerSlot: 10,
-                    roomNoWidth: 50,
-                    totalSpans: timeStops.length,
-                }
-
-                for (let event of data) {
-
-                    eventLeftPosition = (event.start_time_lid - 91) * tableProps.pxPerSlot
-                    console.log("EVENTLEFT>>>>>>>", eventLeftPosition + "px")
-
-                    // let  roomSlotItem = document.createElement('div');
-                    // roomSlotItem.setAttribute("class",`event room-slot-item text-white light-danger}`)
-                    // roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_time_lid - event.start_time_lid + 1) * tableProps.pxPerSlot}px;`)
+                            let slotHtml =
+                                `<div class="text-light" style="display: flex;background:#CC0700">`;
+                            timeStops.forEach(item => {
+                                slotHtml += `<span>${item} </span>`
+                            });
+                            slotHtml += `</div>`
+                            $(".timetable-slots").html(slotHtml)
 
 
-                    roomSlots = document.querySelector(
-                        `.room[day-lid = "${event.date_str.replaceAll('/','-')}"] .room-slots`
-                        )
-                    console.log(event.date_str)
-                    roomSlots.innerHTML += (`
-                    <div class="event room-slot-item text-white" style="left: ${eventLeftPosition}px;line-height: 1.4; padding-top: 15px; background-color:#1ff704ab;">
-                    <span class="badge  start-time">${event.start_time.slice(0,-3)}</span>
-                    <span class="badge  end-time">${event.end_time.slice(0,-3)}</span></div>`)
-                }
+                            let dayHtml = ``;
+                            for (let day of daterange) {
+                                dayHtml += `<div class="d-flex room" day-lid="${day}">
+                                                <div class="day-name" day-lid="${day}">
+                                                    ${day}
+                                                </div>
+                                                <div class="room-slots">
+                                                </div>
+                                            </div>`
+                            }
+                            $('.timetable-container').html(dayHtml);
 
-                const totalSlots = tableProps.pxPerSlot * 12;
-                const totalWidth = tableProps.totalSpans * totalSlots
+                            let tableProps = {
+                                pxPerSlot: 10,
+                                roomNoWidth: 50,
+                                totalSpans: timeStops.length,
+                            }
+                            for (let event of data) {
 
-                let cssRoot = document.querySelector(':root');
-                let styleRoot = getComputedStyle(cssRoot);
+                                eventLeftPosition = (event.start_time_lid - 91) * tableProps.pxPerSlot
 
-                cssRoot.style.setProperty('--timetableWidth', `${totalWidth + 50 }px`);
-                cssRoot.style.setProperty('--roomNoWidth', `${tableProps.roomNoWidth}px`);
-                cssRoot.style.setProperty('--breakIntervalWidth',
-                    `${tableProps.pxPerSlot}px`);
-                // cssRoot.style.setProperty('--eventWidth', `${(tableProps.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
-                cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
-            }
-        })
-    </script>
-<%- include("../partials/footerEnd") %>
+                                // let  roomSlotItem = document.createElement('div');
+                                // roomSlotItem.setAttribute("class",`event room-slot-item text-white light-danger}`)
+                                // roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_time_lid - event.start_time_lid + 1) * tableProps.pxPerSlot}px;`)
+
+
+                                roomSlots = document.querySelector(
+                                    `.room[day-lid = "${event.date_str.replaceAll('/', '-')}"] .room-slots`
+                                )
+                                roomSlots.innerHTML += (`
+                                    <div class="event room-slot-item text-white" style="left: ${eventLeftPosition}px;line-height: 1.4; padding-top: 15px; background-color:#1ff704ab;">
+                                    <span class="badge text-muted  start-time">${event.start_time.slice(0, -3)}</span>
+                                    <span class="badge text-muted end-time">${event.end_time.slice(0, -3)}</span></div>`)
+                            }
+
+                            const totalSlots = tableProps.pxPerSlot * 12;
+                            const totalWidth = tableProps.totalSpans * totalSlots
+
+                            let cssRoot = document.querySelector(':root');
+                            let styleRoot = getComputedStyle(cssRoot);
+
+                            cssRoot.style.setProperty('--timetableWidth', `${totalWidth + tableProps.roomNoWidth}px`);
+                            cssRoot.style.setProperty('--roomNoWidth', `${tableProps.roomNoWidth}px`);
+                            cssRoot.style.setProperty('--breakIntervalWidth',
+                                `${tableProps.pxPerSlot}px`);
+                            // cssRoot.style.setProperty('--eventWidth', `${(tableProps.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
+                            cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
+                        }
+
+                        function errorMessage() {
+
+                            let simpleAlert = new SimpleAlert();
+
+                            simpleAlert.alert({
+                                title: "Invalid Input!",
+                                message: [{ "": 'Please Enter valid details' }],
+                                type: "alert-info",
+                                buttons: {
+                                    positive: {
+                                        text: "Okay",
+                                        action: function () {
+                                            document.querySelector('.simple-alert').remove();
+                                        }
+                                    },
+                                    negative: {
+                                        text: "Cancel",
+                                        action: function () {
+                                            alert('Negative')
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                    })
+                </script>
+                <%- include("../partials/footerEnd") %>
