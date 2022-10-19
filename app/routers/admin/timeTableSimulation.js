@@ -31,6 +31,7 @@ router.post('/time-table-simulation/time-table/pending-events-module', timeTable
 router.post('/time-table-simulation/time-table/drop-event', timeTable.dropEvent)
 router.post('/time-table-simulation/time-table/schedule-event', timeTable.scheduleEvent)
 router.post('/time-table-simulation/time-table/swap-events', timeTable.swapEvents) 
+router.post('/time-table-simulation/time-table/delete-event', timeTable.deleteEvent) 
 router.get('/time-table-simulation/time-table/download', timeTable.downloadMaster) 
 router.get('/time-table-simulation/time-table/div-allocation', timeTable.getDivAllocationPage)
 router.post('/time-table-simulation/time-table/get-div-allocation', timeTable.getDivAllocation)

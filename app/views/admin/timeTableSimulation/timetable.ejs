@@ -860,7 +860,10 @@
                 ${response.data[0].module_name} <br>
                 ${response.data[0].division}-${response.data[0].batch} (${response.data[0].event_type})
                 </p>
-                </div>` 
+                </div>
+                <button class="btn btn-danger" data-event-lid="${response.data[0].event_lid}">
+                <i class="fa fa-solid fa-trash" data-event-lid="${response.data[0].event_lid}"></i>
+          </button>` 
               
                 $(document).find('.pending-event-container').append(pendingEventFromDrop)
                 $(document).find(`.event[data-event-lid="${response.data[0].event_lid}"]`).remove();
@@ -1041,8 +1044,13 @@
                 ${pendingEvent.module_name}<br>
                 ${pendingEvent.division}-${pendingEvent.batch} (${pendingEvent.event_type})
             </p>
-          </div>`
+          </div>
+                <i class="fa w-100 py-2 text-white text-center bg-danger fa-solid fa-trash delete-event-btn" data-event-lid="${pendingEvent.id}"></i>
+`
         }
+        // <button class="btn btn-danger" data-event-lid="${pendingEvent.id}">
+        //         <i class="fa fa-solid fa-trash" data-event-lid="${pendingEvent.id}"></i>
+        //   </button>
         
         let pendingEventContainer = document.querySelector('.pending-event-container');
         pendingEventContainer.innerHTML = pendingEventElement;
@@ -2105,6 +2113,18 @@
             dragObj.swapElem.remove();
         }
 
+        $('.delete-event-btn').on('click', function() {
+           let EventLid =  $(this).attr('data-event-lid')
+
+           let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/delete-event',
+                type: 'POST',
+                data: {
+                    id: EventLid
+                },
+                dataType: 'JSON'
+            }
+        })
          })
     </script>
 <%- include("../partials/footerEnd") %>

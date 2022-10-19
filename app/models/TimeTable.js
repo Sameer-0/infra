@@ -414,6 +414,14 @@ pt.program_lid, pt.acad_session_lid, pt.te_lid order by pt.program_lid, pt.acad_
         })
     }
 
+    static deleteEvent(id,slug) {
+
+        return poolConnection.then(pool => {
+            return pool.request()
+                .input('id', sql.Int, id)
+                .execute(`DELETE FROM [${slug}].tb_events WHERE id = @id`);
+        })
+    }
 
  
 }
