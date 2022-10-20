@@ -853,17 +853,17 @@
           
             if (response.status == 1) {
                 console.log('Drop successful')
-                let pendingEventFromDrop = `<div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${response.data[0].program_lid}" data-session-lid="${response.data[0].acad_session_lid}" data-module-lid="${response.data[0].course_lid}" data-event-type-lid="${response.data[0].event_type_lid}" data-event-lid="${response.data[0].event_lid}">
+                let pendingEventFromDrop = `
+                <div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${response.data[0].program_lid}" data-session-lid="${response.data[0].acad_session_lid}" data-module-lid="${response.data[0].course_lid}" data-event-type-lid="${response.data[0].event_type_lid}" data-event-lid="${response.data[0].event_lid}">
                 <div class="d-flex justify-content-center align-items-center"><i class="fa-solid fa-circle-dot pending-list-bullet"></i></div>
                 <p class="flex-fill text-center">${response.data[0].program_name}<br>
                 ${response.data[0].acad_session} <br>
                 ${response.data[0].module_name} <br>
                 ${response.data[0].division}-${response.data[0].batch} (${response.data[0].event_type})
                 </p>
-                </div>
-                <button class="btn btn-danger" data-event-lid="${response.data[0].event_lid}">
-                <i class="fa fa-solid fa-trash" data-event-lid="${response.data[0].event_lid}"></i>
-          </button>` 
+                <div class="w-30 h-100 d-flex bg-danger justify-content-center align-items-center delete-event-btn" data-event-lid="${response.data[0].event_lid}" style="cursor:pointer;">
+             <i class="fa px-1 text-white text-center fa-solid fa-trash delete-event-btn" data-event-lid="${response.data[0].event_lid}" style="cursor:pointer;"></i>
+            </div></div>`
               
                 $(document).find('.pending-event-container').append(pendingEventFromDrop)
                 $(document).find(`.event[data-event-lid="${response.data[0].event_lid}"]`).remove();
@@ -1037,20 +1037,19 @@
         let pendingEventElement=``;
         for(let pendingEvent of pendingEventListJson) {
 
-            pendingEventElement += `<div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${pendingEvent.program_lid}" data-session-lid="${pendingEvent.acad_session_lid}" data-module-lid="${pendingEvent.course_lid}" data-event-type-lid="${pendingEvent.event_type_lid}" data-event-lid="${pendingEvent.id}" data-division-lid="${pendingEvent.division_lid}">
+            pendingEventElement += `
+            <div class="d-flex w-100 justify-content-between list-group-item list-group-item-action pending-event" data-program-lid="${pendingEvent.program_lid}" data-session-lid="${pendingEvent.acad_session_lid}" data-module-lid="${pendingEvent.course_lid}" data-event-type-lid="${pendingEvent.event_type_lid}" data-event-lid="${pendingEvent.id}" data-division-lid="${pendingEvent.division_lid}">
                 <div class="d-flex justify-content-center align-items-center"><i class="fa-solid fa-circle-dot pending-list-bullet"></i></div>
             <p class="text-center flex-fill">${pendingEvent.program_name}<br>
                 ${pendingEvent.acad_session} <br>
                 ${pendingEvent.module_name}<br>
                 ${pendingEvent.division}-${pendingEvent.batch} (${pendingEvent.event_type})
             </p>
-          </div>
-                <i class="fa w-100 py-2 text-white text-center bg-danger fa-solid fa-trash delete-event-btn" data-event-lid="${pendingEvent.id}"></i>
-`
+            <div class="w-30 h-100 d-flex bg-danger justify-content-center align-items-center delete-event-btn" data-event-lid="${pendingEvent.id}" style="cursor:pointer;">
+             <i class="fa px-1 text-white text-center fa-solid fa-trash delete-event-btn" data-event-lid="${pendingEvent.id}" style="cursor:pointer;"></i>
+            </div></div>
+            `
         }
-        // <button class="btn btn-danger" data-event-lid="${pendingEvent.id}">
-        //         <i class="fa fa-solid fa-trash" data-event-lid="${pendingEvent.id}"></i>
-        //   </button>
         
         let pendingEventContainer = document.querySelector('.pending-event-container');
         pendingEventContainer.innerHTML = pendingEventElement;
@@ -1098,6 +1097,34 @@
 
         // SELECT AND UNSELECT PENDING EVENTS WITH CREATING SHADOW OBJECT
         $(document).on('click','.pending-event', function (e) {
+
+            if(e.target.classList.contains('delete-event-btn')) {
+                let target = e.target;
+              let EventLid =  target.dataset.eventLid
+
+           let ApiObj = {
+                url: '/admin/time-table-simulation/time-table/delete-event',
+                type: 'POST',
+                data: {
+                    id: EventLid
+                },
+                dataType: 'JSON'
+            }
+
+            ajaxApi(ApiObj).then(result => {
+
+                    console.log(result);    
+                    target.closest('div').remove();
+                    let successObj = {
+                        "description": "Deleted Successfully",
+                        "data": []
+                    }
+                    showSuccess(successObj);
+                }).catch(error => {
+                    // showError(error.responseJSON)
+                    console.log('error', error);
+                })
+            }
 
             if ($(this).hasClass('selected-pending-event')) {
                 $(this).removeClass('selected-pending-event')
@@ -2113,18 +2140,6 @@
             dragObj.swapElem.remove();
         }
 
-        $('.delete-event-btn').on('click', function() {
-           let EventLid =  $(this).attr('data-event-lid')
-
-           let ApiObj = {
-                url: '/admin/time-table-simulation/time-table/delete-event',
-                type: 'POST',
-                data: {
-                    id: EventLid
-                },
-                dataType: 'JSON'
-            }
-        })
          })
     </script>
 <%- include("../partials/footerEnd") %>

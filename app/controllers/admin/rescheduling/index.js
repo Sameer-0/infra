@@ -37,6 +37,32 @@ module.exports = {
     })
   },
 
+  getTestPage: (req, res) => {
+    let slug = res.locals.slug;
+    console.log('user::>>', res.locals)
+    Promise.all([SessionCalendar.fetchSessionStartEnd(slug), Simulation.semesterDates(slug), CancellationReasons.fetchAll(50), Simulation.rescheduleFlag(slug), Simulation.slotData(slug), Programs.fetchAll(100, slug), Days.fetchActiveDay(res.locals.slug), Simulation.facultyLectureCount(res.locals.slug), SlotIntervalTimings.fetchAll(1000)]).then(result => {
+      res.render('admin/rescheduling/rescheduling-test', {
+        dateRange: result[0].recordset[0],
+        semesterDates: result[1].recordset,
+        cancellationReasons: result[2].recordset,
+        rescheduleFlag: result[3].recordset,
+        slotData: result[4].recordset,
+        programList: result[5].recordset,
+        dayList: JSON.stringify(result[6].recordset), 
+        pageCount: result[7].recordset[0].count,
+        slotIntervalTiming: JSON.stringify(result[8].recordset),
+        slotIntervalTimingJson: result[8].recordset,
+        breadcrumbs: req.breadcrumbs,
+        Url: req.originalUrl,
+        slug: slug,
+        userId: res.locals.userId,
+        orgId: res.locals.organizationIdSap
+      })
+    }).catch(error => {
+      console.log('ERROR:::::::::::::::::>>>>',error)
+    })
+  },
+
   startSimulation: function (req, res, next) {
     console.log('Clicked-------->')
     let request = req.app.locals.db.request()
