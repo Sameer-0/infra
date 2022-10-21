@@ -44,7 +44,7 @@ module.exports = class RoomStatus {
         return poolConnection.then(pool => {
             let request = pool.request();
             return request
-                .query(`SELECT room_number FROM dbo.rooms`)
+                .query(`SELECT id,room_number FROM dbo.rooms`)
         })
     }
 }

@@ -6,7 +6,9 @@ const AcademicCalender = require('../../../models/AcademicCalender')
 const Simulation = require('../../../models/Simulation')
 const Programs = require('../../../models/Programs')
 const SessionCalendar = require('../../../models/SessionCalendar')
-const SlotIntervalTimings = require('../../../models/SlotIntervalTimings')
+const SlotIntervalTimings = require('../../../models/SlotIntervalTimings');
+const RoomStatus = require('../../../models/RoomStatus');
+const ReschedulingTest = require('../../../models/ReschedulingTest');
 
 module.exports = { 
  
@@ -40,7 +42,7 @@ module.exports = {
   getTestPage: (req, res) => {
     let slug = res.locals.slug;
     console.log('user::>>', res.locals)
-    Promise.all([SessionCalendar.fetchSessionStartEnd(slug), Simulation.semesterDates(slug), CancellationReasons.fetchAll(50), Simulation.rescheduleFlag(slug), Simulation.slotData(slug), Programs.fetchAll(100, slug), Days.fetchActiveDay(res.locals.slug), Simulation.facultyLectureCount(res.locals.slug), SlotIntervalTimings.fetchAll(1000)]).then(result => {
+    Promise.all([SessionCalendar.fetchSessionStartEnd(slug), Simulation.semesterDates(slug), CancellationReasons.fetchAll(50), Simulation.rescheduleFlag(slug), Simulation.slotData(slug), Programs.fetchAll(100, slug), Days.fetchActiveDay(res.locals.slug), Simulation.facultyLectureCount(res.locals.slug),ReschedulingTest.getTimings(1000), RoomStatus.getRoomTimings(),RoomStatus.getRoomNumbers()]).then(result => {
       res.render('admin/rescheduling/rescheduling-test', {
         dateRange: result[0].recordset[0],
         semesterDates: result[1].recordset,
@@ -52,6 +54,8 @@ module.exports = {
         pageCount: result[7].recordset[0].count,
         slotIntervalTiming: JSON.stringify(result[8].recordset),
         slotIntervalTimingJson: result[8].recordset,
+        RoomTimings: result[9].recordset,
+        RoomNumbers: result[10].recordset,
         breadcrumbs: req.breadcrumbs,
         Url: req.originalUrl,
         slug: slug,
@@ -735,7 +739,7 @@ module.exports = {
   fetchAvailableRoomAndFacultyForExtraClass: async (req, res, next) => {
     console.log('>>>>>>>fetchAvailableRoomAndFacultyForExtraClass<<<<<<<<<')
     console.log('req::::::::::::::>>>>>>>>>>>>', req.body)
-     Simulation.getAvailableRoomForTimeRange(res.locals.slug, req.body).then(result => {
+     ReschedulingTest.getAvailableRoomForTimeRange(res.locals.slug, req.body).then(result => {
       console.log('result[1].recordset:::::::::::::::',result.recordset)
       res.json({
         status: 200,
@@ -745,6 +749,19 @@ module.exports = {
       console.log(err)
     })
   },
+  // fetchAvailableRoomAndFacultyForExtraClass: async (req, res, next) => {
+  //   console.log('>>>>>>>fetchAvailableRoomAndFacultyForExtraClass<<<<<<<<<')
+  //   console.log('req::::::::::::::>>>>>>>>>>>>', req.body)
+  //    Simulation.getAvailableRoomForTimeRange(res.locals.slug, req.body).then(result => {
+  //     console.log('result[1].recordset:::::::::::::::',result.recordset)
+  //     res.json({
+  //       status: 200,
+  //       availableRoom: result.recordset
+  //     })
+  //   }).catch(err => {
+  //     console.log(err)
+  //   })
+  // },
 
   fetchAvailableFacultyForExtraClass: async (req, res, next) => {
     console.log('>>>>>>>fetchAvailableFacultyForExtraClass<<<<<<<<<')

@@ -125,7 +125,148 @@
     border-radius: 0;
   }
 
+  hr {
+      margin: 0 !important;
+  }
 
+  .room-slot-item {
+      cursor: pointer;
+  }
+
+  .timetable-container {
+      width: var(--timetableWidth);
+      background: #e6e6e6;
+      /* border: 2px solid;    */
+  }
+
+  .day-name {
+      line-height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: var(--roomNoWidth);
+      max-width: var(--roomNoWidth);
+      background: #006faa;
+      color: #fff;
+      border-bottom: 1px solid;
+      text-align: center;
+      padding: 10px 0px;
+      /* writing-mode: vertical-lr; */
+      /* text-orientation: upright; */
+  }
+
+  .room-slots {
+      width: var(--roomSlotWidth);
+      min-height: 50px;
+      position: relative;
+      background-size: var(--breakIntervalWidth);
+      background-image: linear-gradient(to right, grey 1px, transparent 1px)
+  }
+
+  .timetable-slots {
+      width: var(--roomSlotWidth);
+      min-height: 10px;
+      position: relative;
+      left: 50px;
+  }
+
+  .timetable-slots span {
+      width: 84px;
+      font-size: 14px;
+  }
+
+  .room {
+      border-bottom: 1px solid black;
+      line-height: 10px;
+  }
+
+  .event {
+      position: absolute;
+      width: 60px;
+      background: #ffffff;
+      word-break: normal;
+      height: 100%;
+      /* overflow: hidden; */
+      padding-right: calc(var(--breakIntervalWidth) + 2px);
+      padding-left: 2px;
+      padding-top: 5px;
+      font-size: 14px;
+  }
+
+
+
+
+  /* .event:nth-child(even) .start-time{
+background-color: #dc3545 !important;
+
+}
+
+.event:nth-child(even) .end-time{
+background: #dc3545 !important;
+} */
+
+
+  .start-time {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      border-radius: 0 !important;
+      font-size: 0.75rem;
+  }
+
+  .end-time {
+      position: absolute;
+      right: var(--breakIntervalWidth);
+      bottom: 0;
+      border-radius: 0 !important;
+      font-size: 0.75rem;
+  }
+
+  .fa-arrows-left-right {
+      /* position: absolute; */
+      right: calc(var(--breakIntervalWidth) + 78px - 7px);
+      bottom: 0;
+  }
+
+  .break {
+      position: absolute;
+      height: 100%;
+      width: var(--breakIntervalWidth);
+      background-size: 3px;
+      background: #1ff704ab;
+  }
+
+  .fixed-break {
+      position: absolute;
+      height: 100%;
+      /* background-color: #006faa; */
+      width: var(--fixedBreakWidth);
+      background-size: 3px;
+      background: repeating-linear-gradient(251deg, #212121, #444141 12px);
+      color: #fff;
+      font-size: 13px;
+      padding: 1px 18px;
+      text-align: center;
+      line-height: 1.1;
+
+  }
+
+  .occupied-event {
+      position: absolute;
+      background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
+      height: 100%;
+      text-align: center;
+      padding: 125px 0px;
+      font-weight: bold;
+  }
+
+  .light-success {
+      background: #76e71acf;
+  }
+
+  .light-danger {
+      background: #e91b14;
+  }
 </style>
 <%- include("../partials/leftSidebar") %>
 <%- include("../partials/header") %>
@@ -354,7 +495,7 @@
                   <div class="col-md-6 col-sm-12">
                   
                    <label>Select Start Date: <strong class="text-danger">*</strong></label>
-                   <input type="date"  min="<%- dateRange.start_date %>" max="<%- dateRange.end_date %>" id="schedule-to-date" class="form-control rounded-0 empty-filter"/>
+                   <input type="date"  min="<%- dateRange.start_date %>" max="<%- dateRange.end_date %>" id="schedule-from-date" class="form-control rounded-0 empty-filter"/>
                  </div>
                  <div class="col-md-6 col-sm-12">
                   
@@ -363,22 +504,38 @@
                   </div>
                 </div>
 
-                <!-- <div class="mb-3">
+                <div class="mb-3 row">
+
+                  <div class="col-md-4 col-sm-12">
                   <label>Select Start Time: <strong class="text-danger">*</strong></label>
-                  <select id="select-schedule-start-time" class="form-control empty-filter" disabled>
+                  <select id="select-schedule-start-time" class="form-control empty-filter" >
                     <option disabled selected value>--Select Time--</option>
                     <% for(let time of slotIntervalTimingJson){%>
-                    <option value="<%-time.id %>"><%-time.start_time %></option>
+                    <option value="<%-time.id %>" data-text="<%-time.start_time %>"><%-time.start_time_str %></option>
                     <%}%>
                   </select>
-                </div> -->
+                  </div>
 
-                <!-- <div class="mb-3">
-                  <label>Select End Time: <strong class="text-danger">*</strong></label>
-                  <select id="select-schedule-end-time" class="form-control empty-filter" disabled>
-                    <option disabled selected value>--Select End Time--</option>
-                  </select>
-                </div> -->
+                  <div class="col-md-4 col-sm-12">
+                    <label>Select End Time: <strong class="text-danger">*</strong></label>
+                    <select id="select-schedule-end-time" class="form-control empty-filter" >
+                    <option disabled selected value>--Select Time--</option>
+                    <% for(let time of slotIntervalTimingJson){%>
+                    <option value="<%-time.id %>" data-text="<%-time.start_time %>"><%-time.start_time_str %></option>
+                    <%}%>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4 col-sm-12">
+                    <label>Select Room No: <strong class="text-danger">*</strong></label>
+                    <select id="select-schedule-room-no" class="form-control empty-filter" >
+                    <option disabled selected value>--Select Room--</option>
+                    <% for(let room of RoomNumbers){%>
+                    <option value="<%-room.id %>"><%-room.room_number %></option>
+                    <%}%>
+                    </select>
+                  </div>
+                </div>
 
                 <!-- <div class="mb-3">
                   <label>Select Room: <strong class="text-danger">*</strong></label>
@@ -397,6 +554,13 @@
                 <div class="mb-3">
                   <button class="btn btn-md btn-dark rounded-0" id="schedule-event">Schedule</button>
                 </div> -->
+              <div class="table-responsive" >
+
+                  <div class="timetable-slots mt-3"></div>
+
+                  <div class="timetable-container" style="overflow-x: auto;"></div>
+              </div>
+
             </div>
             </div>
 
@@ -494,9 +658,41 @@
 
   <%- include("../partials/footer") %>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
   <script>
     $(document).ready(function() {
       $(".select2").select2()
+
+        function getTimeStops(start, end) {
+                var startTime = moment(start, 'HH:mm');
+                var endTime = moment(end, 'HH:mm');
+
+                if (endTime.isBefore(startTime)) {
+                    endTime.add(1, 'day');
+                }
+
+                var timeStops = [];
+
+                while (startTime <= endTime) {
+                    timeStops.push(new moment(startTime).format('LT'));
+                    startTime.add(60, 'minutes');
+                }
+                console.log("TIMESTOPS>>>>",timeStops)
+                return timeStops;
+            }
+
+            function getDatesInRange(start, end) {
+
+                let dateArray = [];
+                let currentDate = moment(start);
+                let stopDate = moment(end);
+
+                while (currentDate <= stopDate) {
+                    dateArray.push(moment(currentDate).format('DD-MM-YYYY'));
+                    currentDate = moment(currentDate.add(1, 'days'));
+                }
+                return dateArray;
+            }
 
       //select2 init
       // $('.modal-selct2').select2({
@@ -1033,17 +1229,18 @@
         }
 
         ajaxApi(ApiObj).then(result => {
+      
 
-          let availableRoomHTML = `<option value="">Select Room</option>`;
-          if (result.availableRoom.length > 0) {
-            result.availableRoom.forEach(element => {
-              availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
-            });
-          } else {
-            availableRoomHTML += `<option value="">Room Not Found!</option>`;
-          }
+          // let availableRoomHTML = `<option value="">Select Room</option>`;
+          // if (result.availableRoom.length > 0) {
+          //   result.availableRoom.forEach(element => {
+          //     availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
+          //   });
+          // } else {
+          //   availableRoomHTML += `<option value="">Room Not Found!</option>`;
+          // }
 
-          $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
+          // $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
         }).catch(error => {
           console.log('error::::::::::::::::', error)
           showError(error.responseJSON)
@@ -1054,28 +1251,30 @@
 
       })
 
-      $('#select-schedule-start-time').on('change', function() {
+      // $('#select-schedule-start-time').on('change', function() {
 
-        $(document).find("#select-schedule-end-time").html('')
+      //   $(document).find("#select-schedule-end-time").html('')
 
-        let endTimeOption = '<option value="">--Select End Time--</option>';
-        let startTimeLid = parseInt($(this).val())
+      //   let endTimeOption = '<option value="">--Select End Time--</option>';
+      //   let startTimeLid = parseInt($(this).val())
 
-        for(let time of timeListJson){
-          if((startTimeLid + 11) == time.id){
-            endTimeOption += `<option value="${time.id}">${time.end_time}</option>`
-          }
-        }
+      //   for(let time of timeListJson){
+      //     if((startTimeLid + 11) == time.id){
+      //       endTimeOption += `<option value="${time.id}">${time.end_time}</option>`
+      //     }
+      //   }
 
-        $(document).find("#select-schedule-end-time").append(endTimeOption).removeAttr('disabled');
-      })
+      //   $(document).find("#select-schedule-end-time").append(endTimeOption).removeAttr('disabled');
+      // })
 
-      $("#select-schedule-end-time").on('change', function() {
+      $("#select-schedule-room-no").on('change', function() {
 
         scheduleToDate = $("#schedule-to-date").val()
         scheduleStartTime = $("#select-schedule-start-time").val()
         scheduleEndTime = $("#select-schedule-end-time").val()
-
+        const startDate = $('#schedule-from-date').val();
+        const endDate =  $('#schedule-to-date').val();
+        const roomNo =  $(this).val();
         let ApiObj = {
           type: 'POST',
           url: '/admin/rescheduling/fetch-available-room-faculty-for-extra-class',
@@ -1086,26 +1285,33 @@
             acad_session_lid: rescheduleObj.acadSessionLid,
             date: scheduleToDate,
             startTimeLid: scheduleStartTime,
-            endTimeLid: scheduleEndTime
+            endTimeLid: scheduleEndTime,
+            startDate: startDate,
+            endDate: endDate,
+            roomId: roomNo
           },
           dataType: 'JSON'
         }
 
         ajaxApi(ApiObj).then(result => {
+          console.log(result)
 
-          let availableRoomHTML = `<option value="">Select Room</option>`;
-          if (result.availableRoom.length > 0) {
-            result.availableRoom.forEach(element => {
-              availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
-            });
-          } else {
-            availableRoomHTML += `<option value="">Room Not Found!</option>`;
-          }
+          console.log("ENTERED AJAX DATE>>>>")
 
-          $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
-        }).catch(error => {
-          console.log('error::::::::::::::::', error)
-          showError(error.responseJSON)
+            setTable();
+        //   let availableRoomHTML = `<option value="">Select Room</option>`;
+        //   if (result.availableRoom.length > 0) {
+        //     result.availableRoom.forEach(element => {
+        //       availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
+        //     });
+        //   } else {
+        //     availableRoomHTML += `<option value="">Room Not Found!</option>`;
+        //   }
+
+        //   $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
+        // }).catch(error => {
+        //   console.log('error::::::::::::::::', error)
+        //   showError(error.responseJSON)
         })
       })
 
@@ -2692,8 +2898,128 @@
         }
         simpleAlert.alert(obj);
       }
+      
+    function setTable() {
+
+        let eventStartSlot;
+        let eventLeftPosition;
+        let roomSlot;
+
+        let div =
+            ` <div class="text-light" style="display: flex;background:#CC0700"></div>`
+
+        const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+
+        let startTime = $('#select-schedule-start-time').find(':selected').data('text');
+        let endTime = $('#select-schedule-end-time').find(':selected').data('text');
+        const timeStops = getTimeStops(startTime, endTime);
+        const startDateNew = $('#schedule-from-date').val();
+        const endDateNew = $('#schedule-to-date').val();
+        const daterange = getDatesInRange(startDateNew, endDateNew)
+
+        let slotHtml =
+            `<div class="text-light" style="display: flex;background:#CC0700">`;
+        timeStops.forEach(item => {
+            slotHtml += `<span>${item} </span>`
+        });
+        slotHtml += `</div>`
+        $(".timetable-slots").html(slotHtml)
 
 
+        let dayHtml = ``;
+        for (let day of daterange) {
+            dayHtml += `<div class="d-flex room" day-lid="${day}">
+                            <div class="day-name" day-lid="${day}">
+                                ${day}
+                            </div>
+                            <div class="room-slots">
+                            </div>
+                        </div>`
+        }
+        $('.timetable-container').html(dayHtml);
+
+        let tableProps = {
+            pxPerSlot: 7,
+            roomNoWidth: 50,
+            totalSpans: timeStops.length,
+        }
+        // for (let event of data) {
+
+        //     eventLeftPosition = (event.start_time_lid - 91) * tableProps.pxPerSlot
+
+        //     // let  roomSlotItem = document.createElement('div');
+        //     // roomSlotItem.setAttribute("class",`event room-slot-item text-white light-danger}`)
+        //     // roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_time_lid - event.start_time_lid + 1) * tableProps.pxPerSlot}px;`)
+
+
+        //     roomSlots = document.querySelector(
+        //         `.room[day-lid = "${event.date_str.replaceAll('/', '-')}"] .room-slots`
+        //     )
+        //     roomSlots.innerHTML += (`
+        //         <div class="event room-slot-item text-white" style="left: ${eventLeftPosition}px;line-height: 1.4; padding-top: 15px; background-color:#1ff704ab;">
+        //         <span class="badge text-muted  start-time">${event.start_time.slice(0, -3)}</span>
+        //         <span class="badge text-muted end-time">${event.end_time.slice(0, -3)}</span></div>`)
+        // }
+
+        const totalSlots = tableProps.pxPerSlot * 12;
+        const totalWidth = tableProps.totalSpans * totalSlots
+
+        let cssRoot = document.querySelector(':root');
+        let styleRoot = getComputedStyle(cssRoot);
+
+        cssRoot.style.setProperty('--timetableWidth', `${totalWidth + tableProps.roomNoWidth}px`);
+        cssRoot.style.setProperty('--roomNoWidth', `${tableProps.roomNoWidth}px`);
+        cssRoot.style.setProperty('--breakIntervalWidth',
+            `${tableProps.pxPerSlot}px`);
+        // cssRoot.style.setProperty('--eventWidth', `${(tableProps.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
+        cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
+    }
+
+            // const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+            // const timeStops = getTimeStops(timings[0].min_timing.slice(0, -3), timings[0].max_timing
+            //           .slice(0, -3))
+
+            // let tableProps = {  pxPerSlot: 7,
+            //                     roomNoWidth: 50,
+            //                     totalSpans: timeStops.length}
+
+            //       const totalSlots = tableProps.pxPerSlot * 12;
+            //       const totalWidth = tableProps.totalSpans * totalSlots
+
+            //       let cssRoot = document.querySelector(':root');
+            //       let styleRoot = getComputedStyle(cssRoot);
+
+            //       cssRoot.style.setProperty('--timetableWidth', `${totalWidth + tableProps.roomNoWidth}px`);
+            //       cssRoot.style.setProperty('--roomNoWidth', `${tableProps.roomNoWidth}px`);
+            //       cssRoot.style.setProperty('--breakIntervalWidth',
+            //           `${tableProps.pxPerSlot}px`);
+            // cssRoot.style.setProperty('--eventWidth', `${(tableProps.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
+            // cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
+
+            // const startDateNew = $('#startDate').val();
+            // const endDateNew = $('#endDate').val();
+            // const daterange = getDatesInRange(startDateNew, endDateNew)
+
+            // let slotHtml =
+            //     `<div class="text-light" style="display: flex;background:#CC0700">`;
+            // timeStops.forEach(item => {
+            //     slotHtml += `<span>${item} </span>`
+            // });
+            // slotHtml += `</div>`
+            // $(".timetable-slots").html(slotHtml)
+
+
+            // let dayHtml = ``;
+            // for (let day of daterange) {
+            //     dayHtml += `<div class="d-flex room" day-lid="${day}">
+            //                     <div class="day-name" day-lid="${day}">
+            //                         ${day}
+            //                     </div>
+            //                     <div class="room-slots">
+            //                     </div>
+            //                 </div>`
+            // }
+            // $('.timetable-container').html(dayHtml);
 
 
     })
