@@ -8,9 +8,10 @@ const RoomStatus = require('../../../models/RoomStatus')
 
 
 module.exports = {
+    
     getPage: (req, res) => {
-        
-        Promise.all([RoomStatus.getRoomTimings(res.body),RoomStatus.getRoomNumbers()],).then(result => {
+        const slug = res.locals.slug
+        Promise.all([RoomStatus.getRoomTimings(res.body,slug),RoomStatus.getRoomNumbers()],).then(result => {
             res.render('admin/rooms/status'
             ,{
                 RoomTimings: result[0].recordset,
@@ -22,7 +23,8 @@ module.exports = {
 
     getStatus: (req, res) => {
 
-         RoomStatus.roomStatus(req.body)
+        const slug = res.locals.slug
+         RoomStatus.roomStatus(req.body,slug)
          .then(result => {
             res.status(200).json(result.recordset)
         })

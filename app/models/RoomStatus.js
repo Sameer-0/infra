@@ -9,17 +9,7 @@ const {
 
 module.exports = class RoomStatus {
 
-    // static roomStatus(startDate,endDate,roomNo) {
-    //     return poolConnection.then(pool => {
-    //         console.log(">>>>>>>>>>",startDate,endDate,roomNo)
-    //         return pool.request().query(`SELECT date,room_no,room_abbr,day_name,event_name,start_time,end_time
-    //         ,program_name,acad_session,module_name,faculty_id,faculty_name,division,batch 
-    //         FROM [asmsoc-mum].timesheet WHERE date BETWEEN CONVERT(date, ${startDate}, 111) 
-    //         AND CONVERT(date, ${endDate}, 111) AND room_no = ${roomNo} AND active = 1 ORDER BY start_time`)
-    //     })
-    // }
-
-    static roomStatus(body) {
+    static roomStatus(body,slug) {
         return poolConnection.then(pool => {
             let request = pool.request();
             return request.input('startDate', sql.NVarChar(MAX), body.startDate)
@@ -27,16 +17,16 @@ module.exports = class RoomStatus {
                 .input('roomNo', sql.NVarChar(MAX), body.roomNo)
                 .query(`SELECT start_time_lid,end_time_lid,date_str,room_no,room_abbr,day_name,event_name,start_time,end_time
                 ,program_name,acad_session,module_name,faculty_id,faculty_name,division,batch 
-                FROM [asmsoc-mum].timesheet WHERE date BETWEEN CONVERT(date, @startDate, 111) 
+                FROM [${slug}].timesheet WHERE date BETWEEN CONVERT(date, @startDate, 111) 
                 AND CONVERT(date, @endDate, 111) AND room_no = @roomNo AND active = 1 ORDER BY start_time`)
         })
     }
 
-    static getRoomTimings() {
+    static getRoomTimings(slug) {
         return poolConnection.then(pool => {
             let request = pool.request();
             return request
-                .query(`SELECT MIN(start_time) as min_timing,MAX(end_time) as max_timing FROM [asmsoc-mum].timesheet WHERE active = 1 `)
+                .query(`SELECT MIN(start_time) as min_timing,MAX(end_time) as max_timing FROM [${slug}].timesheet WHERE active = 1 `)
         })
     }
 

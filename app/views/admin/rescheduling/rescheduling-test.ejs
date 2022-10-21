@@ -156,6 +156,7 @@
   }
 
   .room-slots {
+    cursor: pointer;
       width: var(--roomSlotWidth);
       min-height: 50px;
       position: relative;
@@ -256,7 +257,7 @@ background: #dc3545 !important;
       background: repeating-linear-gradient(225deg, #9cceff, #fcfcfc 10px);
       height: 100%;
       text-align: center;
-      padding: 125px 0px;
+      padding: 25px 0px;
       font-weight: bold;
   }
 
@@ -506,7 +507,7 @@ background: #dc3545 !important;
 
                 <div class="mb-3 row">
 
-                  <div class="col-md-4 col-sm-12">
+                  <!-- <div class="col-md-4 col-sm-12">
                   <label>Select Start Time: <strong class="text-danger">*</strong></label>
                   <select id="select-schedule-start-time" class="form-control empty-filter" >
                     <option disabled selected value>--Select Time--</option>
@@ -524,7 +525,7 @@ background: #dc3545 !important;
                     <option value="<%-time.id %>" data-text="<%-time.start_time %>"><%-time.start_time_str %></option>
                     <%}%>
                     </select>
-                  </div>
+                  </div> -->
 
                   <div class="col-md-4 col-sm-12">
                     <label>Select Room No: <strong class="text-danger">*</strong></label>
@@ -635,6 +636,25 @@ background: #dc3545 !important;
   </div>
 </div>
 
+<div class="modal fade" id="regular-schedule" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="regular-schedule-Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="regular-schedule-Label">Reschedule </h5>
+        <button type="button" class="btn-close" id="close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="schedule-modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+        <button type="button" class="btn btn-primary" id="schedule-update-btn">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- ALERT MODAL -->
 <div id="alertModal" class="alert-modal d-none">
 
@@ -662,6 +682,9 @@ background: #dc3545 !important;
   <script>
     $(document).ready(function() {
       $(".select2").select2()
+
+      let _startTime;
+      let BookedRoomsObj;
 
         function getTimeStops(start, end) {
                 var startTime = moment(start, 'HH:mm');
@@ -1207,49 +1230,49 @@ background: #dc3545 !important;
         }
       })
 
-      $('#schedule-to-date').on('change', function() {
-        $('#select-schedule-start-time').removeAttr('disabled');
-        scheduleToDate = $(this).val();
-        // $('#select-schedule-start-time').val('');
+      // $('#schedule-to-date').on('change', function() {
+      //   // $('#select-schedule-start-time').removeAttr('disabled');
+      //   scheduleToDate = $(this).val();
+      //   // $('#select-schedule-start-time').val('');
 
-        if($('#select-schedule-start-time').val() && $('#select-schedule-end-time').val()){
-          let ApiObj = {
-          type: 'POST',
-          url: '/admin/rescheduling/fetch-available-room-faculty-for-extra-class',
-          data: {
-            program_lid: rescheduleObj.programLid,
-            division_lid: rescheduleObj.divisionLid,
-            module_lid: rescheduleObj.moduleLid,
-            acad_session_lid: rescheduleObj.acadSessionLid,
-            date: scheduleToDate,
-            startTimeLid: scheduleStartTime,
-            endTimeLid: scheduleEndTime
-          },
-          dataType: 'JSON'
-        }
+      //   if($('#select-schedule-start-time').val() && $('#select-schedule-end-time').val()){
+      //     let ApiObj = {
+      //     type: 'POST',
+      //     url: '/admin/rescheduling/fetch-available-room-faculty-for-extra-class',
+      //     data: {
+      //       program_lid: rescheduleObj.programLid,
+      //       division_lid: rescheduleObj.divisionLid,
+      //       module_lid: rescheduleObj.moduleLid,
+      //       acad_session_lid: rescheduleObj.acadSessionLid,
+      //       date: scheduleToDate,
+      //       startTimeLid: scheduleStartTime,
+      //       endTimeLid: scheduleEndTime
+      //     },
+      //     dataType: 'JSON'
+      //   }
 
-        ajaxApi(ApiObj).then(result => {
+      //   ajaxApi(ApiObj).then(result => {
       
 
-          // let availableRoomHTML = `<option value="">Select Room</option>`;
-          // if (result.availableRoom.length > 0) {
-          //   result.availableRoom.forEach(element => {
-          //     availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
-          //   });
-          // } else {
-          //   availableRoomHTML += `<option value="">Room Not Found!</option>`;
-          // }
+      //     // let availableRoomHTML = `<option value="">Select Room</option>`;
+      //     // if (result.availableRoom.length > 0) {
+      //     //   result.availableRoom.forEach(element => {
+      //     //     availableRoomHTML += `<option value="${element.room_lid}">${element.room_number}</option>`;
+      //     //   });
+      //     // } else {
+      //     //   availableRoomHTML += `<option value="">Room Not Found!</option>`;
+      //     // }
 
-          // $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
-        }).catch(error => {
-          console.log('error::::::::::::::::', error)
-          showError(error.responseJSON)
-        })
-        }
+      //     // $("#select-schedule-to-room").html(availableRoomHTML).attr('disabled', false)
+      //   }).catch(error => {
+      //     console.log('error::::::::::::::::', error)
+      //     showError(error.responseJSON)
+      //   })
+      //   }
 
 
 
-      })
+      // })
 
       // $('#select-schedule-start-time').on('change', function() {
 
@@ -1269,23 +1292,23 @@ background: #dc3545 !important;
 
       $("#select-schedule-room-no").on('change', function() {
 
-        scheduleToDate = $("#schedule-to-date").val()
-        scheduleStartTime = $("#select-schedule-start-time").val()
-        scheduleEndTime = $("#select-schedule-end-time").val()
+        // scheduleStartTime = $("#select-schedule-start-time").val()
+        // scheduleEndTime = $("#select-schedule-end-time").val()
         const startDate = $('#schedule-from-date').val();
         const endDate =  $('#schedule-to-date').val();
         const roomNo =  $(this).val();
+        let batchLid = $('#BatchFilter').val();
         let ApiObj = {
           type: 'POST',
           url: '/admin/rescheduling/fetch-available-room-faculty-for-extra-class',
           data: {
-            program_lid: rescheduleObj.programLid,
-            division_lid: rescheduleObj.divisionLid,
+            // program_lid: rescheduleObj.programLid,
+            // division_lid: rescheduleObj.divisionLid,
             module_lid: rescheduleObj.moduleLid,
-            acad_session_lid: rescheduleObj.acadSessionLid,
-            date: scheduleToDate,
-            startTimeLid: scheduleStartTime,
-            endTimeLid: scheduleEndTime,
+            // acad_session_lid: rescheduleObj.acadSessionLid,
+            // batch_lid: batchLid,
+            // startTimeLid: scheduleStartTime,
+            // endTimeLid: scheduleEndTime,
             startDate: startDate,
             endDate: endDate,
             roomId: roomNo
@@ -1294,11 +1317,10 @@ background: #dc3545 !important;
         }
 
         ajaxApi(ApiObj).then(result => {
-          console.log(result)
 
-          console.log("ENTERED AJAX DATE>>>>")
-
-            setTable();
+          console.log("ENTERED AJAX DATE>>>>",result.sessionHours)
+          setTable(result);
+          let  roomSlotItem = document.createElement('div');
         //   let availableRoomHTML = `<option value="">Select Room</option>`;
         //   if (result.availableRoom.length > 0) {
         //     result.availableRoom.forEach(element => {
@@ -2898,9 +2920,16 @@ background: #dc3545 !important;
         }
         simpleAlert.alert(obj);
       }
-      
-    function setTable() {
 
+      let tableProps = {
+            pxPerSlot: 7,
+            roomNoWidth: 50,
+            totalSpans: 0,
+        }
+
+    function setTable(json) {
+        let availableRoomsData = json.availableRoom[0]
+        BookedRoomsObj = json.bookedRooms
         let eventStartSlot;
         let eventLeftPosition;
         let roomSlot;
@@ -2908,10 +2937,12 @@ background: #dc3545 !important;
         let div =
             ` <div class="text-light" style="display: flex;background:#CC0700"></div>`
 
-        const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+        // const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
+        console.log("TIMINGS>>>>>" , availableRoomsData)
+        console.log("TIMINGS222222>>>>>" , BookedRoomsObj)
 
-        let startTime = $('#select-schedule-start-time').find(':selected').data('text');
-        let endTime = $('#select-schedule-end-time').find(':selected').data('text');
+        let startTime = availableRoomsData.start_time_str.split('T')[1].slice(0, -3);
+        let endTime = availableRoomsData.end_time_str.split('T')[1].slice(0, -3);
         const timeStops = getTimeStops(startTime, endTime);
         const startDateNew = $('#schedule-from-date').val();
         const endDateNew = $('#schedule-to-date').val();
@@ -2925,7 +2956,7 @@ background: #dc3545 !important;
         slotHtml += `</div>`
         $(".timetable-slots").html(slotHtml)
 
-
+          tableProps.totalSpans = timeStops.length
         let dayHtml = ``;
         for (let day of daterange) {
             dayHtml += `<div class="d-flex room" day-lid="${day}">
@@ -2938,28 +2969,21 @@ background: #dc3545 !important;
         }
         $('.timetable-container').html(dayHtml);
 
-        let tableProps = {
-            pxPerSlot: 7,
-            roomNoWidth: 50,
-            totalSpans: timeStops.length,
+        for (let event of BookedRoomsObj) {
+            _startTime = availableRoomsData.id
+            eventLeftPosition = (event.start_time_lid - _startTime) * tableProps.pxPerSlot
+
+            // let  roomSlotItem = document.createElement('div');
+            // roomSlotItem.setAttribute("class",`event room-slot-item text-white light-danger}`)
+            // roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_time_lid - event.start_time_lid + 1) * tableProps.pxPerSlot}px;`)
+
+
+            roomSlots = document.querySelector(
+                `.room[day-lid = "${event.date_str.replaceAll('/', '-')}"] .room-slots`
+            )
+            roomSlots.innerHTML += (`
+                <div class="occupied-event room-slot-item" data-start-lid="${event.start_time_lid}" style="left: ${eventLeftPosition}px;top: 0; "><small>Occupied</small></div>`)
         }
-        // for (let event of data) {
-
-        //     eventLeftPosition = (event.start_time_lid - 91) * tableProps.pxPerSlot
-
-        //     // let  roomSlotItem = document.createElement('div');
-        //     // roomSlotItem.setAttribute("class",`event room-slot-item text-white light-danger}`)
-        //     // roomSlotItem.setAttribute("style",`left: ${eventLeftPosition}px ;top: 0; text-align:center; width:${(event.end_time_lid - event.start_time_lid + 1) * tableProps.pxPerSlot}px;`)
-
-
-        //     roomSlots = document.querySelector(
-        //         `.room[day-lid = "${event.date_str.replaceAll('/', '-')}"] .room-slots`
-        //     )
-        //     roomSlots.innerHTML += (`
-        //         <div class="event room-slot-item text-white" style="left: ${eventLeftPosition}px;line-height: 1.4; padding-top: 15px; background-color:#1ff704ab;">
-        //         <span class="badge text-muted  start-time">${event.start_time.slice(0, -3)}</span>
-        //         <span class="badge text-muted end-time">${event.end_time.slice(0, -3)}</span></div>`)
-        // }
 
         const totalSlots = tableProps.pxPerSlot * 12;
         const totalWidth = tableProps.totalSpans * totalSlots
@@ -2975,53 +2999,80 @@ background: #dc3545 !important;
         cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
     }
 
-            // const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
-            // const timeStops = getTimeStops(timings[0].min_timing.slice(0, -3), timings[0].max_timing
-            //           .slice(0, -3))
+    $('.timetable-container').on('click', function(e) {
+      if(e.target.classList.contains('occupied-event')) {
+        return;
+      }
+      if(e.target.classList.contains('room-slots')) {
 
-            // let tableProps = {  pxPerSlot: 7,
-            //                     roomNoWidth: 50,
-            //                     totalSpans: timeStops.length}
+      console.log("E>TARGET>>>>>>>", e.target)
+      let module_lid = $('#ModuleFilter').val();
+      let tableLeftPosition = document.querySelector('.timetable-container').getBoundingClientRect().left
+      let relativeClientX = e.clientX - tableLeftPosition
+      const rowDate = e.target.previousElementSibling.getAttribute('day-lid').replaceAll('-', '/');
 
-            //       const totalSlots = tableProps.pxPerSlot * 12;
-            //       const totalWidth = tableProps.totalSpans * totalSlots
+      const closestStartLid = e.target;
+      console.log("closestStartLid>>>>>", closestStartLid)
 
-            //       let cssRoot = document.querySelector(':root');
-            //       let styleRoot = getComputedStyle(cssRoot);
+      let leftPosition = ((Math.round((e.clientX - tableLeftPosition - tableProps.roomNoWidth)/tableProps.pxPerSlot) + 1) * tableProps.pxPerSlot) ;
+      
+      const startTimeLid =  (leftPosition/tableProps.pxPerSlot) + _startTime
 
-            //       cssRoot.style.setProperty('--timetableWidth', `${totalWidth + tableProps.roomNoWidth}px`);
-            //       cssRoot.style.setProperty('--roomNoWidth', `${tableProps.roomNoWidth}px`);
-            //       cssRoot.style.setProperty('--breakIntervalWidth',
-            //           `${tableProps.pxPerSlot}px`);
-            // cssRoot.style.setProperty('--eventWidth', `${(tableProps.pxPerSlot * 12) + timetableProp.pxPerSlot }px`);
-            // cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
+      const timings = JSON.parse(`<%- JSON.stringify(slotIntervalTimingJson) %>`)
+      
+      const timing = timings.filter(e => e.id === startTimeLid);
+      let divToAppend = ''
+       
+      console.log("MODULELID>>>>>>>>",module_lid)
+      let ApiObj = {
+          type: 'POST',
+          url: '/admin/rescheduling/find-faculty-by-module',
+          data: {
+            module_lid: module_lid
+          },
+          dataType: 'JSON'
+        }
+        ajaxApi(ApiObj).then(result => {
+          console.log("RESULT>>>>>>>>>>>>>" ,result)
+          divToAppend += `<div class="container">
+                  <div class="mb-3">
+                  <input value="${rowDate}" class="d-none">
+                  <label>Select Start Time: <strong class="text-danger">*</strong></label>
+                  <select id="modal-schedule-start-time" class="form-control empty-filter" >
+                    <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
+                  </select>
+                  </div>
+                  <div class="mb-3">
+                  <label>Select End Time: <strong class="text-danger">*</strong></label>
+                  <select id="modal-schedule-end-time" class="form-control empty-filter" >
+                    <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
+                  </select>
+                  </div>`
+          
+        console.log("BookedRoomsObj" ,BookedRoomsObj)
+        // let BookedRoomsByDate = BookedRoomsObj.filter(room => room.date_str == rowDate)
+        // console.log("NEW Booked Rooms>>>>>" ,BookedRoomsByDate)
+                  //.date_str.replaceAll('/', '-')
+       divToAppend += `<div class="mb-3">
+                  <label>Faculty: <strong class="text-danger">*</strong></label>
+                  <select id="select-schedule-to-faculty" class="form-control empty-filter">
+                    <option disabled selected value>--Select Faculty--</option>`
+        for(let faculty of result.availableFaculty) {
+          divToAppend += `<option  value = "${faculty.id}" data-faculty-id="${faculty.faculty_id}">${faculty.faculty_name}</option>`
+        }
 
-            // const startDateNew = $('#startDate').val();
-            // const endDateNew = $('#endDate').val();
-            // const daterange = getDatesInRange(startDateNew, endDateNew)
+      divToAppend +=`</select>
+                  </div>
+                </div>`
+      $('.schedule-modal-body').html(divToAppend);
+      $('#regular-schedule').modal('show');
+          
+        }).catch(error => {
+          showError(error.responseJSON)
+        })
+      }
 
-            // let slotHtml =
-            //     `<div class="text-light" style="display: flex;background:#CC0700">`;
-            // timeStops.forEach(item => {
-            //     slotHtml += `<span>${item} </span>`
-            // });
-            // slotHtml += `</div>`
-            // $(".timetable-slots").html(slotHtml)
-
-
-            // let dayHtml = ``;
-            // for (let day of daterange) {
-            //     dayHtml += `<div class="d-flex room" day-lid="${day}">
-            //                     <div class="day-name" day-lid="${day}">
-            //                         ${day}
-            //                     </div>
-            //                     <div class="room-slots">
-            //                     </div>
-            //                 </div>`
-            // }
-            // $('.timetable-container').html(dayHtml);
-
-
+    })
     })
   </script>
   <%- include("../partials/footerEnd") %>

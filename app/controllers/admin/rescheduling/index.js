@@ -42,7 +42,7 @@ module.exports = {
   getTestPage: (req, res) => {
     let slug = res.locals.slug;
     console.log('user::>>', res.locals)
-    Promise.all([SessionCalendar.fetchSessionStartEnd(slug), Simulation.semesterDates(slug), CancellationReasons.fetchAll(50), Simulation.rescheduleFlag(slug), Simulation.slotData(slug), Programs.fetchAll(100, slug), Days.fetchActiveDay(res.locals.slug), Simulation.facultyLectureCount(res.locals.slug),ReschedulingTest.getTimings(1000), RoomStatus.getRoomTimings(),RoomStatus.getRoomNumbers()]).then(result => {
+    Promise.all([SessionCalendar.fetchSessionStartEnd(slug), Simulation.semesterDates(slug), CancellationReasons.fetchAll(50), Simulation.rescheduleFlag(slug), Simulation.slotData(slug), Programs.fetchAll(100, slug), Days.fetchActiveDay(res.locals.slug), Simulation.facultyLectureCount(res.locals.slug),ReschedulingTest.getTimings(1000), RoomStatus.getRoomTimings(slug),RoomStatus.getRoomNumbers()]).then(result => {
       res.render('admin/rescheduling/rescheduling-test', {
         dateRange: result[0].recordset[0],
         semesterDates: result[1].recordset,
@@ -739,11 +739,12 @@ module.exports = {
   fetchAvailableRoomAndFacultyForExtraClass: async (req, res, next) => {
     console.log('>>>>>>>fetchAvailableRoomAndFacultyForExtraClass<<<<<<<<<')
     console.log('req::::::::::::::>>>>>>>>>>>>', req.body)
-     ReschedulingTest.getAvailableRoomForTimeRange(res.locals.slug, req.body).then(result => {
-      console.log('result[1].recordset:::::::::::::::',result.recordset)
+     Promise.all([ReschedulingTest.getAvailableRoomForTimeRange(res.locals.slug, req.body),ReschedulingTest.getBookedRooms(res.locals.slug,req.body),ReschedulingTest.getSessionHours(res.locals.slug,req.body.module_lid)]).then(result => {
       res.json({
         status: 200,
-        availableRoom: result.recordset
+        availableRoom: result[0].recordset,
+        bookedRooms: result[1].recordset,
+        sessionHours: result[2].recordset
       })
     }).catch(err => {
       console.log(err)
@@ -777,5 +778,20 @@ module.exports = {
       console.log(err)
     })
   },
+
+  fetchFacultyByModule: async (req, res, next) => {
+    console.log('>>>>>>>fetchAvailableFacultyForExtraClass<<<<<<<<<')
+    console.log('req::::::::::::::>>>>>>>>>>>>', req.body)
+    ReschedulingTest.fetchFacultyByModule(res.locals.slug,req.body.module_lid)
+    .then(result => {
+      console.log('result.recordset:::::::::::::::', result)
+      res.json({
+        status: 200,
+        availableFaculty: result.recordset,
+      })
+    }).catch(err => {
+      console.log(err)
+    })
+  }
 
 }
