@@ -11,7 +11,7 @@ module.exports = {
     
     getPage: (req, res) => {
         const slug = res.locals.slug
-        Promise.all([RoomStatus.getRoomTimings(res.body,slug),RoomStatus.getRoomNumbers()],).then(result => {
+        Promise.all([RoomStatus.getRoomTimings(slug),RoomStatus.getRoomNumbers()],).then(result => {
             res.render('admin/rooms/status'
             ,{
                 RoomTimings: result[0].recordset,
@@ -32,7 +32,7 @@ module.exports = {
             console.log('error:>>>>>>', error)
             if(isJsonString.isJsonString(error.originalError.info.message)){
                 console.log("error")
-                // res.status(500).json(JSON.parse(error.originalError.info.message))
+                res.status(500).json(JSON.parse(error.originalError.info.message))
             }
             else{
                 console.log("error2")

@@ -136,7 +136,7 @@ module.exports = class TimeTable {
                 LEFT JOIN acad_sessions ads ON ads.id = e.acad_session_lid
                 LEFT JOIN [${slug}].initial_course_workload icw ON icw.id = e.course_lid
                 LEFT JOIN event_types et ON et.id = e.event_type_lid
-                WHERE eb.id IS NULL`
+                WHERE eb.id IS NOT NULL`
 
 
             return pool.request()

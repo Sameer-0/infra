@@ -7,6 +7,12 @@
     position: relative;
   } 
 
+  .draggable-div {
+    width: 84px;
+    height: 61px;
+    background-color: #54E0C7;
+  }
+
   .inputGroup :hover {
     background: #b1b3c297;
   }
@@ -194,8 +200,22 @@
       font-size: 14px;
   }
 
+.reschedule-event {
+   cursor:pointer;
+   border:1px solid blue;
+   height: 35px;
+   margin-top: 25px;
+}
 
-
+.pen-element{
+   background-color: #0ae30a;
+   position: absolute;
+   width:84px; 
+   height:61px;
+   border-left:1px solid rgb(255, 86, 86); 
+   border-right:1px solid rgb(255, 86, 86);
+   box-shadow: rgba(0, 0, 0, 0.30) 0px 5px 15px;
+}
 
   /* .event:nth-child(even) .start-time{
 background-color: #dc3545 !important;
@@ -505,7 +525,7 @@ background: #dc3545 !important;
                   </div>
                 </div>
 
-                <div class="mb-3 row">
+                <div class="mb-3 row add-event-row">
 
                   <!-- <div class="col-md-4 col-sm-12">
                   <label>Select Start Time: <strong class="text-danger">*</strong></label>
@@ -1319,6 +1339,9 @@ background: #dc3545 !important;
         ajaxApi(ApiObj).then(result => {
 
           console.log("ENTERED AJAX DATE>>>>",result.sessionHours)
+          let divToAppend = `<div class="col-md-2 col-sm-12 text-center reschedule-event" ><i class="mt-2 fa fa-solid fa-plus"></i></div>`
+          document.querySelector('.add-event-row').innerHTML += divToAppend
+          // $('.add-event-row').append(divToAppend)
           setTable(result);
           let  roomSlotItem = document.createElement('div');
         //   let availableRoomHTML = `<option value="">Select Room</option>`;
@@ -2939,7 +2962,6 @@ background: #dc3545 !important;
 
         // const timings = JSON.parse(`<%- JSON.stringify(RoomTimings) %>`)
         console.log("TIMINGS>>>>>" , availableRoomsData)
-        console.log("TIMINGS222222>>>>>" , BookedRoomsObj)
 
         let startTime = availableRoomsData.start_time_str.split('T')[1].slice(0, -3);
         let endTime = availableRoomsData.end_time_str.split('T')[1].slice(0, -3);
@@ -2999,80 +3021,215 @@ background: #dc3545 !important;
         cssRoot.style.setProperty('--roomSlotWidth', `${totalWidth}px`);
     }
 
-    $('.timetable-container').on('click', function(e) {
-      if(e.target.classList.contains('occupied-event')) {
-        return;
-      }
-      if(e.target.classList.contains('room-slots')) {
+    // $('.timetable-container').on('click', function(e) {
+    //   if(e.target.classList.contains('occupied-event')) {
+    //     return;
+    //   }
+    //   if(e.target.classList.contains('room-slots')) {
 
-      console.log("E>TARGET>>>>>>>", e.target)
-      let module_lid = $('#ModuleFilter').val();
-      let tableLeftPosition = document.querySelector('.timetable-container').getBoundingClientRect().left
-      let relativeClientX = e.clientX - tableLeftPosition
-      const rowDate = e.target.previousElementSibling.getAttribute('day-lid').replaceAll('-', '/');
+    //   console.log("E>TARGET>>>>>>>", e.target)
+    //   let module_lid = $('#ModuleFilter').val();
+    //   let tableLeftPosition = document.querySelector('.timetable-container').getBoundingClientRect().left
+    //   let relativeClientX = e.clientX - tableLeftPosition
+    //   const rowDate = e.target.previousElementSibling.getAttribute('day-lid').replaceAll('-', '/');
 
-      const closestStartLid = e.target;
-      console.log("closestStartLid>>>>>", closestStartLid)
+    //   const closestStartLid = e.target;
+    //   console.log("closestStartLid>>>>>", closestStartLid)
 
-      let leftPosition = ((Math.round((e.clientX - tableLeftPosition - tableProps.roomNoWidth)/tableProps.pxPerSlot) + 1) * tableProps.pxPerSlot) ;
+    //   let leftPosition = ((Math.round((e.clientX - tableLeftPosition - tableProps.roomNoWidth)/tableProps.pxPerSlot) + 1) * tableProps.pxPerSlot) ;
       
-      const startTimeLid =  (leftPosition/tableProps.pxPerSlot) + _startTime
+    //   const startTimeLid =  (leftPosition/tableProps.pxPerSlot) + _startTime
 
-      const timings = JSON.parse(`<%- JSON.stringify(slotIntervalTimingJson) %>`)
+    //   const timings = JSON.parse(`<%- JSON.stringify(slotIntervalTimingJson) %>`)
       
-      const timing = timings.filter(e => e.id === startTimeLid);
-      let divToAppend = ''
+    //   const timing = timings.filter(e => e.id === startTimeLid);
+    //   let divToAppend = ''
        
-      console.log("MODULELID>>>>>>>>",module_lid)
-      let ApiObj = {
-          type: 'POST',
-          url: '/admin/rescheduling/find-faculty-by-module',
-          data: {
-            module_lid: module_lid
-          },
-          dataType: 'JSON'
-        }
-        ajaxApi(ApiObj).then(result => {
-          console.log("RESULT>>>>>>>>>>>>>" ,result)
-          divToAppend += `<div class="container">
-                  <div class="mb-3">
-                  <input value="${rowDate}" class="d-none">
-                  <label>Select Start Time: <strong class="text-danger">*</strong></label>
-                  <select id="modal-schedule-start-time" class="form-control empty-filter" >
-                    <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
-                  </select>
-                  </div>
-                  <div class="mb-3">
-                  <label>Select End Time: <strong class="text-danger">*</strong></label>
-                  <select id="modal-schedule-end-time" class="form-control empty-filter" >
-                    <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
-                  </select>
-                  </div>`
+    //   console.log("MODULELID>>>>>>>>",module_lid)
+    //   let ApiObj = {
+    //       type: 'POST',
+    //       url: '/admin/rescheduling/find-faculty-by-module',
+    //       data: {
+    //         module_lid: module_lid
+    //       },
+    //       dataType: 'JSON'
+    //     }
+    //     ajaxApi(ApiObj).then(result => {
+    //       console.log("RESULT>>>>>>>>>>>>>" ,result)
+    //       divToAppend += `<div class="container">
+    //               <div class="mb-3">
+    //               <input value="${rowDate}" class="d-none">
+    //               <label>Select Start Time: <strong class="text-danger">*</strong></label>
+    //               <select id="modal-schedule-start-time" class="form-control empty-filter" >
+    //                 <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
+    //               </select>
+    //               </div>
+    //               <div class="mb-3">
+    //               <label>Select End Time: <strong class="text-danger">*</strong></label>
+    //               <select id="modal-schedule-end-time" class="form-control empty-filter" >
+    //                 <option selected value="${timing[0].id}" data-text="${timing[0].start_time}">${timing[0].start_time_str}</option>
+    //               </select>
+    //               </div>`
           
-        console.log("BookedRoomsObj" ,BookedRoomsObj)
-        // let BookedRoomsByDate = BookedRoomsObj.filter(room => room.date_str == rowDate)
-        // console.log("NEW Booked Rooms>>>>>" ,BookedRoomsByDate)
-                  //.date_str.replaceAll('/', '-')
-       divToAppend += `<div class="mb-3">
-                  <label>Faculty: <strong class="text-danger">*</strong></label>
-                  <select id="select-schedule-to-faculty" class="form-control empty-filter">
-                    <option disabled selected value>--Select Faculty--</option>`
-        for(let faculty of result.availableFaculty) {
-          divToAppend += `<option  value = "${faculty.id}" data-faculty-id="${faculty.faculty_id}">${faculty.faculty_name}</option>`
-        }
+    //     // let BookedRoomsByDate = BookedRoomsObj.filter(room => room.date_str == rowDate)
+    //     // console.log("NEW Booked Rooms>>>>>" ,BookedRoomsByDate)
+    //               //.date_str.replaceAll('/', '-')
+    //    divToAppend += `<div class="mb-3">
+    //               <label>Faculty: <strong class="text-danger">*</strong></label>
+    //               <select id="select-schedule-to-faculty" class="form-control empty-filter">
+    //                 <option disabled selected value>--Select Faculty--</option>`
+    //     for(let faculty of result.availableFaculty) {
+    //       divToAppend += `<option  value = "${faculty.id}" data-faculty-id="${faculty.faculty_id}">${faculty.faculty_name}</option>`
+    //     }
 
-      divToAppend +=`</select>
-                  </div>
-                </div>`
-      $('.schedule-modal-body').html(divToAppend);
-      $('#regular-schedule').modal('show');
+    //   divToAppend +=`</select>
+    //               </div>
+    //             </div>`
+    //   $('.schedule-modal-body').html(divToAppend);
+    //   $('#regular-schedule').modal('show');
           
-        }).catch(error => {
-          showError(error.responseJSON)
+    //     }).catch(error => {
+    //       showError(error.responseJSON)
+    //     })
+    //   }
+
+    // })
+        // document.addEventListener('mousedown', dragStart);
+        // document.addEventListener('mousemove', onDrag)
+        // document.addEventListener('mouseup', dragEnd)
+
+        //         function dragStart(e) {
+
+        //     dragObj.tableLeftPosition = document.querySelector('.timetable-container').getBoundingClientRect().left;
+        //     dragObj.timetableRect = document.querySelector('.timetable-container').getBoundingClientRect();
+
+           
+        //     if (e.target.classList.contains('room-slots')) e.preventDefault();
+
+        //     dragObj.relativeClientX = e.clientX - dragObj.tableLeftPosition
+
+        //     if (e.buttons != 1) {
+        //         return false;
+        //     }
+
+        //     dragObj.initialClientX = dragObj.relativeClientX;
+        //     dragObj.initialClientY = e.clientY;
+        //     document.querySelectorAll('.room-slots').forEach(e => {
+        //         e.style.outline = "none"
+        //     })
+
+
+        //     if (e.target.classList.contains('event')) {
+
+        //         dragObj.actionType = 'clicked';
+
+        //         fixedBreakBounding = null//document.querySelector('.fixed-break').getBoundingClientRect();
+        //         fixedBreakTwoBounding = null//document.querySelector('.fixed-break[data-break-id="2"]').getBoundingClientRect();
+
+        //         console.log("IS DRAGGABLE");
+
+        //         dragObj.isMouseDown = true;
+
+        //         dragObj.targetElem = e.target;
+        //         dragObj.firstRoom = dragObj.targetElem.parentElement
+        //         dragObj.targetElem.classList.add('active')
+
+        //         dragObj.initialRoom = getCurrentRoom(document.elementsFromPoint(e.clientX, e.clientY));
+                
+        //         dragObj.initialRoom.style.cssText = `outline: 3px solid #ff8400`;
+
+        //         e.target.style.zIndex = 100;
+
+        //         targetProp.index = Array.from(dragObj.initialRoom.children).indexOf(dragObj.targetElem);
+
+        //         targetProp.oldOffsetX = e.offsetX;
+        //         targetProp.oldOffsetY = e.offsetY;
+        //         targetProp.width = dragObj.targetElem.clientWidth
+
+        //         targetProp.initialX = e.target.offsetLeft;
+        //         targetProp.initialY = e.target.offsetTop;
+        //         targetProp.initialBounding = dragObj.targetElem.getBoundingClientRect();
+        //         targetProp.initialClientX = dragObj.relativeClientX;
+        //         targetProp.initialClientY = e.clientY;
+        //         dragObj.isDraggable = true;
+        //         dragObj.intialXposition = Math.round(targetProp.initialBounding.left - dragObj.tableLeftPosition - timetableProp.roomNoWidth)
+
+        //         dragObj.startSlotIndex = (Math.round((targetProp.initialBounding.left - dragObj.tableLeftPosition -
+        //             timetableProp.roomNoWidth) / timetableProp.pxPerSlot));
+
+        //         if (dragObj.targetElem.style.width == 'var(--eventNoBreakWidth)') {
+        //             dragObj.endSlotIndex = (Math.round((targetProp.initialBounding.right - dragObj.tableLeftPosition -
+        //                 timetableProp.roomNoWidth - timetableProp.pxPerSlot) / timetableProp.pxPerSlot))
+        //         } else {
+
+        //             dragObj.endSlotIndex = (Math.round((targetProp.initialBounding.right - dragObj.tableLeftPosition -
+        //                 timetableProp.roomNoWidth - timetableProp.pxPerSlot) / timetableProp.pxPerSlot)) - 1;
+        //         }
+
+        //         dragObj.targetElem.querySelector('.start-time').innerHTML = timeJson[dragObj.startSlotIndex].start_time;
+        //         dragObj.targetElem.querySelector('.end-time').innerHTML = timeJson[dragObj.endSlotIndex + 1].end_time;
+
+
+        //     } else {
+        //         // if (true) {
+        //         //     console.log('pending events')
+        //         //     document.addEventListener('click', function (e) {
+
+
+        //         //         let tarEle = document.elementsFromPoint(e.clientX, e.clientY);
+        //         //         //console.log('tar:::', document.elementsFromPoint(e.clientX, e.clientY));
+        //         //         getCurrentRoom(tarEle)
+        //         //         //console.log('fff', getCurrentRoom(tarEle));
+
+        //         //     })
+        //         // } else {
+
+        //             console.log('Not draggable')
+        //             dragObj.isDraggable = false;
+        //         // }
+        //     }
+
+        // }
+
+        let penElem = document.createElement('div');
+          $(document).on('click','.reschedule-event', function (e) {
+
+            if ($(this).hasClass('selected-pending-event')) {
+                $(this).removeClass('selected-pending-event')
+                $(this).removeAttr('data-selected')
+                $(this).css('border','1px solid blue')
+            } else {
+                $('.pending-event').removeClass('selected-pending-event')
+                $('.pending-event').removeAttr('data-selected')
+                $(this).addClass('selected-pending-event')
+                $(this).attr('data-selected', 'true')
+                $(this).css('border','1px solid red')
+
+            }
+
+            penElem.setAttribute('class', 'pen-element d-none');
+            // penElem.innerHTML = `${$(document).find('.selected-pending-event').text()}`
+
+            penElem.style.top = e.clientY - 75 + 'px';
+            penElem.style.left = e.clientX - 84.5 + 'px';
+            // penElem.style.width = e.clientX -  + 'px';
+
+            document.body.append(penElem)
+
+            // if ($(document).find(`.pending-event[data-selected='true']`).length > 0) {
+            //     isPenEventSelected = true;
+            //     let penElem = document.createElement('div');
+            //     penElem.setAttribute('class', 'pen-element d-none');
+            //     penElem.innerHTML = `B.Com. (Hons.)-7401 - Semester III <br><hr> Business Law <br><hr> A - 1 (TH)`
+            //     document.body.append(penElem)
+
+
+            // } else {
+            //     isPenEventSelected = false;
+            // }
+
+
         })
-      }
-
-    })
     })
   </script>
   <%- include("../partials/footerEnd") %>
